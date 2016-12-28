@@ -1,0 +1,45 @@
+/**
+ * Created by jheinnic on 12/25/16.
+ */
+import { Injectable } from '@angular/core';
+import { NavbarDataModel } from './navbar_data.model';
+import { createStore, Reducer, Store, Action } from 'redux';
+
+const enum NavbarDataActionType {
+  ADD_TAB,
+  SET_DEFAULT
+}
+
+class NavbarDataAction implements Action {
+  type: NavbarDataActionType;
+}
+
+function navbarDataReducer(state: NavbarDataModel, action:NavbarDataAction) {
+  // Redux reducers typically use a switch statement
+  // to determine how to handle a given action
+  let retVal:NavbarDataModel = state;
+
+  switch (action.type) {
+    case NavbarDataActionType.ADD_TAB: {
+
+    }
+    case NavbarDataActionType.SET_DEFAULT: {
+
+    }
+  }
+
+  return retVal;
+}
+
+const navbarDataStore: Store<NavbarDataModel> = createStore(navbarDataReducer);
+
+@Injectable( )
+export class NavbarDataService {
+  navbarDataStore: Store<NavbarDataModel> = createStore(navbarDataReducer);
+
+  addTab() {
+    return this.navbarDataStore.dispatch({
+      type: NavbarDataActionType.ADD_TAB
+    });
+  }
+}

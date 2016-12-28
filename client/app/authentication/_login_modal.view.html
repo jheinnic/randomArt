@@ -1,0 +1,23 @@
+<h1 class="modal-title" md-dialog-title flex="80">{{loginTitle}}</h1>
+<md-dialog-content flex="80">
+  <h4 class="modal-title">Please login</h4>
+  <p>Basic login or register form</p>
+  <form class="form-horizontal" role="form" layout="column">
+    <md-input-container layout="row" layout-xs="column" md-no-float>
+      <label for="username" flex="15" flex-xs="25" class="control-label">Username</label>
+      <input type="text" class="form-control" id="username" flex="85" flex-xs="25" placeholder="Your Username" [(ngModel)]="creds.username">
+    </md-input-container>
+    Forgot your username?  <!--a ui-sref="public.forgot.username">Click Here</a-->
+    <md-input-container layout="row" layout-xs="column" md-no-float>
+      <label for="password" flex="15" flex-xs="25" class="control-label">Password</label>
+      <input type="password" class="form-control" id="password" flex="85" flex-xs="25" placeholder="Your Password" [(ngModel)]="creds.password">
+    </md-input-container>
+    Forgot your password?  <!--a ui-sref="public.forgot.password">Click Here</a-->
+  </form>
+</md-dialog-content>
+<md-dialog-actions flex="80">
+  <button class="close" md-dialog-close aria-hidden="true">&times;</button>
+  <button md-dialog-close class="md-danger md-raised">Cancel</button>
+  <button (click)="register()" class="md-warn md-raised">Sign Up</button>
+  <button (click)="login()" class="md-primary md-raised">Login</button>
+</md-dialog-actions>

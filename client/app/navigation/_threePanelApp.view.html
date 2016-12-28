@@ -1,0 +1,12 @@
+<div>
+  <div class="col-sm-3" ui-view="sidePanel"></div>
+  <div class="col-sm-9">
+    <div class="row">
+      <div class="col-sm-12" ui-view="contextBar"></div>
+    </div>
+    <!-- App canvas may arrange itself as multiple rows, and must at least root itself in a single row. -->
+    <!-- div class="row" ui-view="appContent"></div-->
+    <div ui-view="appContent"></div>
+  </div>
+  <!-- No provision made for a footer row that cuts the side panel short -->
+</div>

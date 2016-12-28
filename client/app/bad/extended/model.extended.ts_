@@ -1,0 +1,10 @@
+import { Model } from '../../';
+
+export class ModelExtended extends Model {
+
+  constructor(json: Model) { super(json); }
+
+  customFunction() {
+    return `${this.name}: ${this.description}`;
+  }
+}

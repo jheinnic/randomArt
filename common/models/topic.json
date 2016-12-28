@@ -1,0 +1,31 @@
+{
+  "name": "topic",
+  "base": "Topic",
+  "idInjection": false,
+  "properties": {
+    "guid": {
+      "id": true,
+      "type": "string",
+      "required": false,
+      "defaultFn": "guid"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "_owner": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": "id",
+      "property": "ownerId"
+    }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "accessType": "READ",
+      "permission": "ALLOW"
+    }
+  ],
+  "methods": []
+}

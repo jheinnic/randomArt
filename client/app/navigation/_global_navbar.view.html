@@ -1,0 +1,26 @@
+<md-toolbar>
+  <div class="md-toolbar-tools">
+    <h1>{{navbarData.brandName}}</h1>
+    <!-- fill up the space between left and right area -->
+    <span flex> </span>
+    <span ng-if="vm.isLoggedIn()">
+      <button class="md-raised-button md-accent">SETTINGS</button>
+      <h2>Hello, {{userInfo.firstName}}</h2>
+    </span>
+    <span ng-if="! vm.isLoggedIn()">
+      <button class="md-raised-button md-accent">REGISTER</button>
+      <button class="md-raised-button md-primary">LOGIN</button>
+    </span>
+  </div>
+</md-toolbar>
+<!--
+<md-nav-bar md-selected-nav-item="vm.navData.activeTabId">
+  <md-nav-item ng-repeat="tabModel in ::vm.navbarData.tabModels track by ::tabModel.tabId" md-nav-sref="{{tabModel.srefTarget}}" name="{{tabModel.tabId}}">
+    {{tabModel.displayName}}
+  </md-nav-item>
+</md-nav-bar>
+-->:w
+:w
+/Ov
+<a [routerLink]="['/']">Home</a>
+<a [routerLink]="['/about']">About</a>

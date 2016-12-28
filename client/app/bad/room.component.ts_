@@ -1,0 +1,44 @@
+import { Component }             from '@angular/core';
+import { BASE_URL, API_VERSION } from '../shared'; 
+import { LoopBackConfig }        from '../shared/sdk'; 
+import { Room, Message }         from '../shared/sdk/models';
+import { RoomApi, AccountApi }   from '../shared/sdk/services';
+
+@Component()
+export class RoomComponent {
+  // All the types you need already there
+  private room    : Room = new Room();
+  private message : Message = new Message();
+  // All the services you need already there
+  constructor(
+    private accountApi: AccountApi,
+    private roomApi   : RoomApi
+  ) {
+    LoopBackConfig.setBaseURL(BASE_URL);
+    LoopBackConfig.setApiVersion(API_VERSION);
+    this.getRoom(1); // Get room id by params or whatever mechanism
+  }
+  // Built in support for the LoopBack Query Language (Include, Where, Order, Limit, Offset, Etc...)
+  // Built in support for the LoopBack Component Pubsub (roomApi.onCreateMessages(id: RoomId))
+  getRoom(id: any): void {
+      this.roomApi.findById(id, {
+        include: [
+          {
+            relation: 'messages',
+            scope: { order: 'id DESC' }
+          }
+        ]
+      }).subscribe((room: Room) => {
+        this.room = room;
+        this.roomApi.onCreateMessages(this.room.id)
+                    .subscribe((message: Message) => this.room.messages.push(message))
+      });
+  }
+
+  // Built in logged account functionality
+  sendMessage(): void {
+    this.message.accountId = this.accountApi.getCurrentId();
+    this.roomApi.createMessages(this.room.id, this.message)
+                .subscribe(() => this.message = new Message());
+  }
+}
