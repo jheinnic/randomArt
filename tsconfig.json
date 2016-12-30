@@ -8,29 +8,26 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "noEmitHelpers": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "strictNullChecks": false,
-    "traceResolution": true,
-    "baseUrl": "client",
-    "rootDirs": [
-      "client",
-      "node_modules"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules"
-    ],
-    "lib": [
-      "dom",
-      "es6",
-      "scripthost"
-    ],
+    "outDir": "tscomp",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "common/lib/*", "node_module/*"]
+    },
+    "rootDirs": [ "client", "common/lib" ],
+    "lib": [ "dom", "es6", "scripthost" ],
     "types": [
       "@angular/core",
       "@angular/http",
       "@angular/material",
       "@angular/router",
       "socket.io-client",
-      "any-promise",
+      "q",
+      "uuid",
+      "chai",
+      // "es6-promise",
       "hammerjs",
       "chance",
       "jasmine",
@@ -44,16 +41,18 @@
     ]
   },
   "exclude": [
-    "node_modules",
-    "client/demo",
-    "build",
-    "dist"
+    "node_modules/**/*",
+    "typings/main/**/*",
+    "client/demo/**/*",
+    "build/**/*",
+    "dist/**/*"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
-    "useWebpackText": true
+    "useWebpackText": true,
+    "useCache": true
   },
-  "compileOnSave": false,
-  "buildOnSave": false,
+  "compileOnSave": true,
+  "buildOnSave": true,
   "atom": { "rewriteTsconfig": false }
 }

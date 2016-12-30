@@ -1,12 +1,9 @@
 /* tslint:disable */
 import { Injectable, Inject } from '@angular/core';
-// import { Router } from '@angular/router';
 import { Response } from '@angular/http';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { LoginModal } from '.';
 import { Observable } from 'rxjs/Observable';
-// import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-// import 'rxjs/add/observable';
 
 /**
  * Login-redirecting error handler

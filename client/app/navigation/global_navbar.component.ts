@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { LoginModal } from '../authentication';
-import { LoopBackAuth, UserApi } from 'app/shared/sdk/services';
-import { User } from 'app/shared/sdk/models';
-import { LoopBackConfig } from 'app/shared/sdk';
-import { BASE_URL, API_VERSION } from 'app/shared';
+import { LoopBackAuth, UserApi } from '../shared/sdk/services';
+import { User } from '../shared/sdk/models';
+import { LoopBackConfig } from '../shared/sdk';
+import { BASE_URL, API_VERSION } from '../shared';
 import * as path from "path";
 
 const NO_USER_INFO:any = {id: undefined, firstName: undefined, lastName: undefined};

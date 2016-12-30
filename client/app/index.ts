@@ -3,45 +3,55 @@ import {BrowserModule} from "@angular/platform-browser";
 import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
-import {HttpModule} from "@angular/http";
-import {MdButtonModule, MdInputModule, MdToolbarModule, MdDialogModule, MdDialog} from "@angular/material";
-import {HomeModule} from "app/+home";
-import {LobbyModule} from "app/+lobby";
-import {NoContentComponent} from "app/no-content";
-import {AppComponent} from "app/app.component";
-import {LoginModal, RedirectingErrorHandler} from "app/authentication";
-import {GlobalNavbar} from "app/navigation";
-import {SDKBrowserModule} from "app/shared/sdk";
-import {ErrorHandler} from "app/shared/sdk/services/core";
-import {EmailApi, UserApi} from "app/shared/sdk/services/custom";
-import {AppState} from "app/app.service";
-import {routes} from "app/app.routes";
+import {HttpModule, Http, XSRFStrategy, CookieXSRFStrategy, BaseRequestOptions} from "@angular/http";
+import {MdButtonModule, MdInputModule, MdToolbarModule, MdDialogModule} from "@angular/material";
+import {Chance} from "chance";
+import {NoContentComponent} from "./no-content";
+import {AppComponent} from "./app.component";
+import {AppState} from "./app.service";
+import {TokenCheckXHRBackend} from "./token_check_xhr_backend.service";
+import {LoginModal, RedirectingErrorHandler} from "./authentication";
+import {GlobalNavbar} from "./navigation";
+import {ErrorHandler, EmailApi, UserApi} from "./shared/sdk/services";
+import {SDKBrowserModule} from "./shared/sdk";
+import {routes} from "./app.routes";
+
+function httpOverrideFactory(xhrBackend:TokenCheckXHRBackend, requestOptions:BaseRequestOptions) {
+  return new Http(xhrBackend, requestOptions);
+}
+
+function configureXSRFStrategy() {
+  return new CookieXSRFStrategy('XSRF', 'X-XSRF-Token');
+}
 
 @NgModule({
-  declarations: [AppComponent, NoContentComponent, LoginModal, GlobalNavbar], /* MdDialogActions, MdDialogClose, MdDialogContent, MdDialogTitle, MdInputContainer],*/
+  declarations: [AppComponent, NoContentComponent, LoginModal, GlobalNavbar],
   imports: [
     BrowserModule,
     CommonModule,
-    HttpModule,
     FormsModule,
+    HttpModule,
     MdButtonModule.forRoot(),
     MdInputModule.forRoot(),
     MdToolbarModule.forRoot(),
     MdDialogModule.forRoot(),
-    HomeModule,
-    LobbyModule,
     RouterModule.forRoot(routes),
     SDKBrowserModule.forRoot()
   ],
   providers: [
     {provide: ErrorHandler, useClass: RedirectingErrorHandler},
-    {provide: MdDialog, useClass: MdDialog},
-    {provide: EmailApi, useClass: EmailApi},
-    {provide: UserApi, useClass: UserApi},
-    {provide: AppState, useClass: AppState}
+    {provide: Chance, useFactory: Chance, deps: []},
+    // {provide: MdDialog, useClass: MdDialog},
+    EmailApi, // {provide: EmailApi, useClass: EmailApi},
+    UserApi, // {provide: UserApi, useClass: UserApi},
+    AppState, // {provide: AppState, useClass: AppState},
+    // TokenCheckXHRBackend,
+    // {provide: Http, useFactory: httpOverrideFactory, deps: [TokenCheckXHRBackend, BaseRequestOptions]},
+    // {provide: XSRFStrategy, useFactory: configureXSRFStrategy }
   ],
+  // exports: [HttpModule],
   entryComponents: [AppComponent, LoginModal],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent] // , HttpModule]
 })
 export class AppModule {
   static routes = routes;

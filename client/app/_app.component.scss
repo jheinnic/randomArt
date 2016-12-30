@@ -1,0 +1,11 @@
+html, body{
+  height: 100%;
+  // font-family: Arial, Helvetica, sans-serif
+  font-family: 'Anonymous Pro', monospace;
+}
+
+span.active {
+  background-color: gray;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700i');

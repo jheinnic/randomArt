@@ -22,6 +22,9 @@ import { routes } from './home.routes';
 })
 export class HomeModule {
   static routes = routes;
+  constructor() {
+    console.log('Home Loads');
+  }
 }
 
 // export HomeComponent;

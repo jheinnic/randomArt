@@ -5,12 +5,14 @@
   <form class="form-horizontal" role="form" layout="column">
     <md-input-container layout="row" layout-xs="column" md-no-float>
       <label for="username" flex="15" flex-xs="25" class="control-label">Username</label>
-      <input type="text" class="form-control" id="username" flex="85" flex-xs="25" placeholder="Your Username" [(ngModel)]="creds.username">
+      <input type="text" class="form-control" id="username" flex="85" flex-xs="25" placeholder="Your Username"
+             [(ngModel)]="cred.username">
     </md-input-container>
     Forgot your username?  <!--a ui-sref="public.forgot.username">Click Here</a-->
     <md-input-container layout="row" layout-xs="column" md-no-float>
       <label for="password" flex="15" flex-xs="25" class="control-label">Password</label>
-      <input type="password" class="form-control" id="password" flex="85" flex-xs="25" placeholder="Your Password" [(ngModel)]="creds.password">
+      <input type="password" class="form-control" id="password" flex="85" flex-xs="25" placeholder="Your Password"
+             [(ngModel)]="cred.password">
     </md-input-container>
     Forgot your password?  <!--a ui-sref="public.forgot.password">Click Here</a-->
   </form>

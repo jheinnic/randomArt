@@ -43,16 +43,8 @@ import * as _ from 'lodash'
  *
  */
 
-/*
-declare module 'peerjs'
-  function Peer(config: any): Peer;
-  namespace Peer {}
-  export = Peer;
-}
-*/
-
 // support NodeJS modules without type definitions
-// declare module '*' {};
+declare module '*';
 
 /*
 // for legacy tslint etc to understand rename 'modern-lru' with your package
@@ -70,7 +62,7 @@ declare var HMR: boolean;
 declare var System: SystemJS;
 
 interface SystemJS {
-  'import': (path?: string) => Promise<any>;
+  import: (path?: string) => Promise<any>;
 }
 
 interface GlobalEnvironment {
@@ -84,7 +76,6 @@ interface Es6PromiseLoader {
   (id: string): (exportName?: string) => Promise<any>;
 }
 
-/*
 type FactoryEs6PromiseLoader = () => Es6PromiseLoader;
 type FactoryPromise = () => Promise<any>;
 
@@ -100,7 +91,6 @@ type IdleCallbacks = Es6PromiseLoader |
                              Function |
               FactoryEs6PromiseLoader |
                        FactoryPromise ;
-*/
 
 interface WebpackModule {
   hot: {

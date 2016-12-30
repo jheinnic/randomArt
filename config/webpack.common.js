@@ -4,6 +4,7 @@
 
 const webpack = require('webpack');
 const helpers = require('./helpers');
+console.log(helpers.root('client/index.html'));
 
 /*
  * Webpack Plugins
@@ -56,9 +57,9 @@ module.exports = function (options) {
      */
     entry: {
 
-      'polyfills': './client/polyfills.browser.ts',
-      'vendor':    './client/vendor.browser.ts',
-      'main':      './client/main.browser.ts'
+      'polyfills': './polyfills.browser.ts',
+      'vendor':    './vendor.browser.ts',
+      'main':      './main.browser.ts'
 
     },
 
@@ -74,7 +75,7 @@ module.exports = function (options) {
        *
        * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
        */
-      extensions: ['.ts', '.js', '.json'],
+      extensions: ['.ts', '.js', '.json', '.scss', '.css'],
 
       // An array of directory names to be resolved to the current directory
       modules: [helpers.root('client'), helpers.root('node_modules')],
@@ -107,7 +108,9 @@ module.exports = function (options) {
             'angular2-template-loader',
             'angular-router-loader'
           ],
-          exclude: [/\.(spec|e2e)\.ts$/]
+          exclude: [
+            /\.(spec|e2e)\.ts$/, /\/(node_modules|build|dist|server|tests|config)\//
+          ]
         },
 
         /*
@@ -142,7 +145,10 @@ module.exports = function (options) {
         {
           test: /\.html$/,
           use: 'raw-loader',
-          exclude: [helpers.root('client/index.html')]
+          exclude: [
+            helpers.root('client/index.html'),
+            /\/index\.html$/
+          ]
         },
 
         /* File loader for supporting images, for example, in CSS files.
@@ -212,8 +218,8 @@ module.exports = function (options) {
        * See: https://www.npmjs.com/package/copy-webpack-plugin
        */
       new CopyWebpackPlugin([
-        { from: 'client/assets', to: 'assets' },
-        { from: 'client/meta', to: 'meta' }
+        { from: './assets', to: 'assets' },
+        { from: './meta', to: 'meta' }
       ]),
 
 
@@ -226,7 +232,7 @@ module.exports = function (options) {
        * See: https://github.com/ampedandwired/html-webpack-plugin
        */
       new HtmlWebpackPlugin({
-        template: 'client/index.html',
+        template: 'index.html',
         title: METADATA.title,
         chunksSortMode: 'dependency',
         metadata: METADATA,

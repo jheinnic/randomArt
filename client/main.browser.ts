@@ -18,6 +18,7 @@ import * as _ from "lodash";
  * our top level module that holds all of our components
  */
 import {AppModule} from "./app";
+import {HttpModule} from "@angular/http"
 
 /*
 function onConnectToNet(index, id) {
