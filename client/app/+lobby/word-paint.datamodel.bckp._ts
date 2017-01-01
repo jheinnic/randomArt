@@ -1,0 +1,83 @@
+/**
+ * Created by jheinnic on 12/31/16.
+ */
+
+export enum WordPaintEventType {
+  modelSnapshot, offerTask, dropTask, beginTask, completeTask, cancelTask
+}
+
+export interface WordPaintEvent {
+  eventType: WordPaintEventType;
+}
+
+export interface WordPaintChangeEvent {
+  eventType: WordPaintEventType;
+  sequenceId: number;
+}
+
+class AbstractWordPaintEvent {
+  constructor(readonly eventType: WordPaintEventType, readonly sequenceId: number) {
+  }
+}
+
+export class ModelSnapshotEvent {
+  readonly eventType: WordPaintEventType = WordPaintEventType.modelSnapshot;
+  readonly dataModel: WordPaintDataModel;
+
+  constructor(_dataModel: WordPaintDataModel) {
+    this.dataModel = _.cloneDeep(_dataModel);
+  }
+}
+
+export class OfferWordPaintTaskEvent extends AbstractWordPaintEvent {
+  constructor(sequenceId: number, readonly taskWord: string) {
+    super(WordPaintEventType.offerTask, sequenceId);
+  }
+}
+
+export class DropWordPaintTaskEvent extends AbstractWordPaintEvent {
+  constructor(sequenceId: number, readonly taskWord: string) {
+    super(WordPaintEventType.dropTask, sequenceId);
+  }
+}
+
+export class BeginWordPaintTaskEvent extends AbstractWordPaintEvent {
+  constructor(sequenceId: number, readonly taskWord: string) {
+    super(WordPaintEventType.beginTask, sequenceId);
+  }
+}
+
+export class CompleteWordPaintTaskEvent extends AbstractWordPaintEvent {
+  constructor(sequenceId: number, readonly taskWord: string) {
+    super(WordPaintEventType.completeTask, sequenceId);
+  }
+}
+
+export class CancelWordPaintTaskEvent extends AbstractWordPaintEvent {
+  constructor(sequenceId: number, readonly taskWord: string) {
+    super(WordPaintEventType.cancelTask, sequenceId);
+  }
+}
+
+interface DataModel {
+  sequenceId?: number;
+  wordQueue?: string[];
+  currentWord?: string;
+}
+
+export class WordPaintDataModel {
+  sequenceId: number;
+  wordQueue: string[];
+  currentWord?: string;
+
+  constructor(updates: DataModel = {}) {
+    Object.assign(this, updates);
+  }
+
+  // getNext(updates: DataModel) {
+  //   let temp = Object.assign({}, this);
+  //   Object.assign(temp, updates);
+  //   temp.sequenceId = this.sequenceId + 1;
+  //   return new WordPaintDataModel(temp);
+  // }
+}
