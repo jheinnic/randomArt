@@ -16,6 +16,7 @@
     </md-input-container>
     Forgot your password?  <!--a ui-sref="public.forgot.password">Click Here</a-->
   </form>
+  <p [ngIf]="error != null">{{error}}</p>
 </md-dialog-content>
 <md-dialog-actions flex="80">
   <button class="close" md-dialog-close aria-hidden="true">&times;</button>

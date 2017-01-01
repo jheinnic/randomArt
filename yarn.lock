@@ -125,6 +125,12 @@
   version "2.0.34"
   resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.34.tgz#9cbac4f41cb039436141785e1be50b3ab10a04a9"
 
+"@types/immutable@^3.8.7":
+  version "3.8.7"
+  resolved "https://registry.yarnpkg.com/@types/immutable/-/immutable-3.8.7.tgz#536d33d30f3f3d9a6d4642a219419fd82af633fb"
+  dependencies:
+    immutable "*"
+
 "@types/jasmine@^2.5.36":
   version "2.5.38"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.38.tgz#a4379124c4921d4e21de54ec74669c9e9b356717"
@@ -136,6 +142,12 @@
 "@types/node@*", "@types/node@^6.0.46", "@types/node@^6.0.54":
   version "6.0.54"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.54.tgz#65859962ba988052cbdd5c48881395acfdd46931"
+
+"@types/peerjs@^0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/peerjs/-/peerjs-0.0.28.tgz#677c1dc730220162cbfa501c0ee75ff7e4b0f764"
+  dependencies:
+    "@types/webrtc" "*"
 
 "@types/q@^0.0.32":
   version "0.0.32"
@@ -175,7 +187,7 @@
   dependencies:
     "@types/uglify-js" "*"
 
-"@types/webrtc@^0.0.21":
+"@types/webrtc@*", "@types/webrtc@^0.0.21":
   version "0.0.21"
   resolved "https://registry.yarnpkg.com/@types/webrtc/-/webrtc-0.0.21.tgz#bc3cfb7e22add284761e5d63efad664b0eba8b86"
 
@@ -964,6 +976,16 @@ center-align@^0.1.1:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
 
+chai-as-promised@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/chai-as-promised/-/chai-as-promised-6.0.0.tgz#1a02a433a6f24dafac63b9c96fa1684db1aa8da6"
+  dependencies:
+    check-error "^1.0.2"
+
+chai-immutable@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/chai-immutable/-/chai-immutable-1.6.0.tgz#9ec00bdd67948b13b20fcbb89cbf4af2ce6f9247"
+
 chai@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/chai/-/chai-3.5.0.tgz#4d02637b067fe958bdbfdd3a40ec56fef7373247"
@@ -989,6 +1011,10 @@ chance@^1.0.4:
 charenc@~0.0.1:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
+
+check-error@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/check-error/-/check-error-1.0.2.tgz#574d312edd88bb5dd8912e9286dd6c0aed4aac82"
 
 chokidar@^1.4.1, chokidar@^1.4.3, chokidar@^1.6.0:
   version "1.6.1"
@@ -1726,6 +1752,10 @@ diffie-hellman@^5.0.0:
     bn.js "^4.1.0"
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
+
+dirty-chai@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/dirty-chai/-/dirty-chai-1.2.2.tgz#78495e619635f7fe44219aa4c837849bf183142e"
 
 dns-prefetch-control@0.1.0:
   version "0.1.0"
@@ -2494,6 +2524,10 @@ flat-cache@^1.2.1:
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
+
+fluent-interface-builder@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/fluent-interface-builder/-/fluent-interface-builder-1.0.1.tgz#b54e253c427301aefb51e9a9fb72a265009d6876"
 
 for-each@~0.3.2:
   version "0.3.2"
@@ -3352,6 +3386,10 @@ ienoopen@1.0.0:
 ignore@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.2.0.tgz#8d88f03c3002a0ac52114db25d2c673b0bf1e435"
+
+immutable@*, immutable@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.1.tgz#200807f11ab0f72710ea485542de088075f68cd2"
 
 imports-loader@^0.7.0:
   version "0.7.0"

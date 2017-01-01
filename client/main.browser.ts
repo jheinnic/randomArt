@@ -20,6 +20,8 @@ import * as _ from "lodash";
 import {AppModule} from "./app";
 import {HttpModule} from "@angular/http"
 
+import "@angular/material/core/theming/prebuilt/purple-green";
+
 /*
 function onConnectToNet(index, id) {
   idList[index] = id;

@@ -1,3 +1,5 @@
+@import "_app.theme";
+
 html, body{
   height: 100%;
   // font-family: Arial, Helvetica, sans-serif
@@ -9,3 +11,4 @@ span.active {
 }
 
 @import url('https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700i');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');

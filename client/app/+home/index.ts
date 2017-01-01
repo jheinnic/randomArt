@@ -3,22 +3,21 @@
  */
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home.component';
 import { Title } from './title';
 import { XLarge } from './x-large';
+import { NgZoneDemo } from './ng-zone-demo';
 import { routes } from './home.routes';
 
 @NgModule({
-  declarations: [ HomeComponent, XLarge ],
+  declarations: [ HomeComponent, NgZoneDemo, XLarge ],
   imports: [
     CommonModule,
-    FormsModule,
     RouterModule.forChild(routes)
   ],
-  providers: [ {provide: Title, useClass: Title} ],
-  exports: [ XLarge ]
+  providers: [ Title ],
+  exports: [ XLarge, NgZoneDemo ]
 })
 export class HomeModule {
   static routes = routes;
@@ -28,3 +27,7 @@ export class HomeModule {
 }
 
 // export HomeComponent;
+export * from './title';
+export * from './x-large';
+export * from './ng-zone-demo';
+export * from './home.component';

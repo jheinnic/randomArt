@@ -3,43 +3,59 @@ import {MdDialogRef} from "@angular/material";
 import {UserApi} from "../shared/sdk/services";
 import {Observable} from "rxjs/Observable";
 
-interface Credentials {
+interface Credentials
+{
   username: string | null;
   password: string | null;
 }
 
 export const LOGIN_TITLE: OpaqueToken = new OpaqueToken('LOGIN_TITLE');
 
-@Component({
-  selector: 'login_modal', templateUrl: './_login_modal.view.html'
-})
-export class LoginModal {
-  private modalRef: MdDialogRef<LoginModal>;
-  private userApi: UserApi;
-  private loginTitle: string;
+@Component(
+  {
+    selector: 'login_modal', templateUrl: './_login_modal.view.html'
+  }
+)
+export class LoginModal
+{
   private cred: Credentials = {
     username: null, password: null
   };
+  private error: any;
 
-  constructor(modalRef: MdDialogRef<LoginModal>, userApi: UserApi, @Optional() @Inject(LOGIN_TITLE) loginTitle: string = 'Login') {
-    this.modalRef = modalRef;
-    this.userApi = userApi;
-    this.loginTitle = loginTitle;
+  constructor(
+    private modalRef: MdDialogRef<LoginModal>, private userApi: UserApi,
+    @Optional() @Inject(LOGIN_TITLE) private loginTitle: string = 'Login'
+  ) {
+    this.cred = { username: null, password: null };
   }
 
   // This close function doesn't need to use jQuery or bootstrap, because
   // the button has the 'data-dismiss' attribute.
   login() {
     return this.userApi.login(this.cred, undefined, true)
-      .do((userInfo) => {
-        console.log("Logged in as ", userInfo);
+      .subscribe(
+        (userInfo) => {
+          console.log("Logged in as ", userInfo);
 
-        this.modalRef.close(userInfo);
-        return userInfo
-      }).catch((err, caught) => {
-        console.error("Failed to login with ", this.cred, err, caught);
-        return Observable.throw(err);
-      });
+          this.modalRef.close(userInfo);
+          return userInfo
+        }, (error) => {
+          console.error("Failed to login with " + this.cred, error);
+
+          // TODO: Keep the modal open and display the error there
+          this.showError(error);
+          return Observable.throw(error);
+        }
+      );
+  }
+
+  private showError(error) {
+    this.error = error;
+  }
+
+  private hideError() {
+    this.error = null;
   }
 
   register() {

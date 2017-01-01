@@ -1,0 +1,5 @@
+<div>
+  <input type="number" min="0" max="896" [(ngModel)]="size" value="640"/>
+  <input type="number" min="0" max="896" [(ngModel)]="workUnit" value="20"/>
+</div>
+<wordPaint #myCanvas [size]="size" [workUnit]="workUnit" (ready)="onCanvasReady()" (completed)="onWordCompleted();"></wordPaint>
