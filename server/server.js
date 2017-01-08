@@ -15,7 +15,10 @@ require.context('./views', false, /\.ejs$/);
 // configure body parser
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(loopback.token());
+app.use(loopback.token({
+  model: app.models.accessToken,
+  currentUserLiteral: 'me'
+}));
 
 app.start = function() {
   // start the web server
@@ -46,7 +49,7 @@ ins.dataSources = require('./datasources.json');
 var execute = require('loopback-boot/lib/executor');
 execute(app, ins, function (err) {
     if (err) throw err;
- 
+
     // NOTE/TODO: the require.main === module check fails here under webpack
     // so we're not doing it.
     // if (require.main === module)

@@ -1,0 +1,50 @@
+{
+  "name": "loopback-component-peerjs",
+  "description": "LoopBack peerjs integration to support managing a directory of connected peers",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "keywords": [
+    "StrongLoop",
+    "LoopBack",
+    "social",
+    "login",
+    "security"
+  ],
+  "homepage": "https://github.com/jheinnic/loopback-component-peerjs",
+  "version": "0.0.1",
+  "maintainers": [
+    {
+      "name": "John Heinnickel",
+      "email": "jheinnic@hotmail.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/jheinnic/loopback-component-peerjs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jheinnic/loopback-component-peerjs.git"
+  },
+  "dependencies": {
+    "strong-globalize": "^2.6.2",
+    "lodash": "*",
+    "peer": "1.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^2.13.1",
+    "eslint-config-loopback": "^4.0.0",
+    "loopback": "^3.0.0",
+    "mocha": "^3.0.1",
+    "mock-require": "^1.3.0",
+    "sinon": "^1.17.5",
+    "supertest": "^2.0.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "./node_modules/.bin/mocha -R spec --timeout 10000 test/*.js",
+    "posttest": "npm run lint"
+  },
+  "main": "./lib/index.js",
+  "license": "Artistic-2.0"
+}

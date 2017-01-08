@@ -1,4 +1,7 @@
 {
+  "initial:before": {
+    "loopback#favicon": {}
+  },
   "final:after": {
     "loopback#errorHandler": {
       "params": {

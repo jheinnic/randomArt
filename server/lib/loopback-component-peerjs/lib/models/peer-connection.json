@@ -1,0 +1,45 @@
+{
+  "name": "PeerConnection",
+  "plural": "PeerConnections",
+  "base": "PersistedModel",
+  "properties": {
+    "peerId": {
+      "type": "String",
+      "id": true,
+      "comments": "The peer's identity key"
+    },
+    "active": {
+      "type": "Boolean"
+    }
+  },
+  "mixins": {
+    "Timestamp": {
+      "required" : false,
+      "createdAt" : "created",
+      "updatedAt" : "modified",
+      "validateUpsert": true,
+      "silenceWarnings": false
+    }
+  },
+  "acls": [{
+    "principalType": "ROLE",
+    "principalId": "$everyone",
+    "permission": "DENY"
+  }, {
+    "principalType": "ROLE",
+    "principalId": "$authenticated",
+    "requestType": "READ",
+    "permission": "ALLOW"
+  }, {
+    "principalType": "ROLE",
+    "principalId": "$owner",
+    "permission": "ALLOW"
+  }],
+  "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": "userId"
+    }
+  }
+}

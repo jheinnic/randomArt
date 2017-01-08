@@ -6,8 +6,7 @@ import * as path from "path";
 @Component({
   moduleId: path.relative(__dirname, __filename),
   selector: 'lobby',
-  templateUrl: './_lobby.view.html',
-  styleUrls: ['./_lobby.scss']
+  templateUrl: './_lobby.view.html'
 })
 export class LobbyComponent {
  constructor() {

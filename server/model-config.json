@@ -4,6 +4,7 @@
       "loopback/common/models",
       "loopback/server/models",
       "../common/models",
+      // "./lib/loopback-component-peerjs/lib/models",
       "./models"
     ],
     "mixins": [
@@ -11,6 +12,7 @@
       "loopback/server/mixins",
       "../common/mixins",
       "./mixins",
+      "../node_modules/loopback-ds-timestamp-mixin",
       "../node_modules/loopback-component-realtime/dist/mixins"
     ]
   },
@@ -33,6 +35,10 @@
   "Role": {
     "dataSource": "db",
     "public": false
+  },
+  "PeerConnection": {
+    "dataSource": "db",
+    "public": true
   },
   "Email": {
     "dataSource": "emailDs"

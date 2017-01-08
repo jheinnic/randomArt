@@ -1,0 +1,15 @@
+<md-card>
+  <md-card-header [ngClass]="{'md-primary': isRecentRequest(), 'md-warn': isStaleRequest(), 'md-alert': isExpiresSoon()}">
+    <div md-card-avatar class="category-image" [ngStyle]="{backgroundImage: candidate.avatarImage}"></div>
+    <md-card-title>{{candidate.titlePhrase}}</md-card-title>
+    <md-card-subtitle>{{campaign|shortCategoryId}}</md-card-subtitle>
+  </md-card-header>
+  <img md-card-image src="{{candidate.voteImage}}"/>
+  <md-card-content>{{campaign.voterInstruction}}</md-card-content>
+  <md-card-actions>
+    <button md-button *ngFor="let action of campaign.actions" (click)="selectAction(index)">{{action.label}}</button>
+  </md-card-actions>
+  <md-card-footer>
+    <response-timer [mode]="countdown" [warn-in]="222" [alert-in]="333" [expire-in]="444"/>
+  </md-card-footer>
+</md-card>

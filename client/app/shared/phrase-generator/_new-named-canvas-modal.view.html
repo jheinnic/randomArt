@@ -1,0 +1,47 @@
+<h1 class="modal-title" md-dialog-title>New Word Image</h1>
+<md-dialog-content flex="80">
+  <form class="form-horizontal" role="form" layout="column">
+    <md-input-container>
+      <input md-input type="text" disabled="true" placeholder="Phrase To Paint" [value]="phraseToPaint">
+      <button md-mini-fab (click)="generateNewPhrase()"><md-icon>refresh</md-icon></button>
+    </md-input-container>
+    <md-input-container layout="row" layout-xs="column" md-no-float>
+      <label for="width" flex="15" flex-xs="25" class="control-label">Width</label>
+      <input type="text" class="form-control" id="width" flex="85" flex-xs="25" min="64" max="1800" placeholder="Width"
+             [(ngModel)]="width">
+    </md-input-container>
+    <md-input-container layout="row" layout-xs="column" md-no-float>
+      <label for="height" flex="15" flex-xs="25" class="control-label">Height</label>
+      <input type="number" class="form-control" id="height" flex="85" flex-xs="25" min="64" max="900" placeholder="Height"
+             [(ngModel)]="height">
+    </md-input-container>
+  </form>
+</md-dialog-content>
+<md-dialog-actions flex="80">
+  <button md-dialog-close class="close">&times;</button>
+  <button md-dialog-close class="md-warn md-raised">Cancel</button>
+  <button (click)="ok()" class="md-primary md-raised">Login</button>
+</md-dialog-actions>
+
+<!--
+<md-card>
+  <md-card-title></md-card-title>
+  <md-card-subtitle>{{phraseToPaint}}</md-card-subtitle>
+  <md-card-content>
+    <h2>Canvas Dimensions</h2>
+    <span class="dimension">
+          <md-input-container align="end" hint="width">
+            <input md-input type="number" name="width" max="900" min="64" [(ngModel)]="canvasWidth"/>
+          </md-input-container>
+          <md-input-container align="end" hint="height">
+            <input md-input name="height" type="number" max="900" min="64" [(ngModel)]="canvasHeight"/>
+          </md-input-container>
+        </span>
+  </md-card-content>
+  <md-card-actions>
+    <button md-button (click)="generateName()"><md-icon>refresh</md-icon></button>
+    <button md-fab (click)="newCanvas()"><md-icon>add</md-icon></button>
+    <button md-button #sizeCanvasBtn (click)="sizeCanvas()">SET SIZE</button>
+  </md-card-actions>
+</md-card>
+-->

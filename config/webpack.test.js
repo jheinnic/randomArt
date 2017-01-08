@@ -45,7 +45,7 @@ module.exports = function (options) {
        *
        * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
        */
-      extensions: ['.ts', '.js', ''],
+      extensions: ['.ts', '.js', '.min.js', '.scss', '.css'],
 
       /**
        * Make sure root is client
@@ -97,7 +97,6 @@ module.exports = function (options) {
             sourceMap: false,
             inlineSourceMap: true,
             compilerOptions: {
-
               // Remove TypeScript helpers to be injected
               // below by DefinePlugin
               removeComments: true
@@ -114,8 +113,7 @@ module.exports = function (options) {
          */
         {
           test: /\.json$/,
-          loader: 'json-loader',
-          exclude: [helpers.root('client/index.html')]
+          use: 'json-loader'
         },
 
         /**
@@ -126,9 +124,17 @@ module.exports = function (options) {
          */
         {
           test: /\.css$/,
-          loader: ['to-string-loader', 'css-loader'],
-          exclude: [helpers.root('client/index.html')]
+          use: ['to-string-loader', 'css-loader']
         },
+        {
+          test: /\.scss$/,
+          use: ['to-string-loader', 'css-loader', 'sass-loader']
+        },
+        // {
+        //   test: /\.css$/,
+        //   loader: ['to-string-loader', 'css-loader'],
+        //   exclude: [helpers.root('client/index.html')]
+        // },
 
         /**
          * Raw loader support for *.html
@@ -138,8 +144,15 @@ module.exports = function (options) {
          */
         {
           test: /\.html$/,
-          loader: 'raw-loader',
+          use: 'raw-loader',
           exclude: [helpers.root('client/index.html')]
+        },
+
+        /* File loader for supporting images, for example, in CSS files.
+         */
+        {
+          test: /\.(jpg|png|gif)$/,
+          use: 'file-loader'
         },
 
         /**
@@ -151,14 +164,13 @@ module.exports = function (options) {
         {
           enforce: 'post',
           test: /\.(js|ts)$/,
-          loader: 'istanbul-instrumenter-loader',
+          use: 'istanbul-instrumenter-loader',
           include: helpers.root('client'),
           exclude: [
             /\.(e2e|spec)\.ts$/,
             /node_modules/
           ]
         }
-
       ]
     },
 
@@ -205,16 +217,37 @@ module.exports = function (options) {
         }
       ),
 
-       /**
+      /**
+       * Plugin: UglifyJsPlugin
+       * Description: Minimize all JavaScript output of chunks.
+       * Loaders are switched into minimizing mode.
+       *
+       * See: https://webpack.github.io/docs/list-of-plugins.html#uglifyjsplugin
+       */
+      new UglifyJsPlugin({
+        compress: {
+          angular: true,
+          hoist_vars: true,
+          reduce_vars: true,
+          collapse_vars: true
+        },
+        mangle: true,
+        output: {
+          keep_quoted_props: true,
+          wrap_iife: true        // we need this for lazy v8
+        },
+        sourceMap: true,
+        exclude: /\/genjs\.js$/
+      }),
+
+      /**
        * Plugin LoaderOptionsPlugin (experimental)
        *
        * See: https://gist.github.com/sokra/27b24881210b56bbaff7
        */
       new LoaderOptionsPlugin({
         debug: true,
-        options: {
-
-        }
+        options: { }
       }),
 
     ],

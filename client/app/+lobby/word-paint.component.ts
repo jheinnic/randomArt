@@ -15,7 +15,8 @@ import * as path from "path";
 @Component({
   moduleId: path.relative(__dirname, __filename),
   selector: 'wordPaint',
-  templateUrl: './_word-paint.view.html'
+  template: require('./_word-paint.view.html'),
+  styles: [ require('./_word-paint.scss') ]
 })
 export class WordPaintComponent implements OnInit, AfterViewInit, OnDestroy, WordPaintEventVisitor {
   private subscription: Subscription;

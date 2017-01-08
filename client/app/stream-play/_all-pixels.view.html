@@ -1,0 +1,3 @@
+<template ngFor let-nextMap [ngForOf]="paintPointList" let-nextIndex="index" [ngForTrackBy]="trackByFn">
+  <P><B>#</B><I>{{nextIndex}}</I>: {{nextMap|paintPoint}}</P>
+</template>

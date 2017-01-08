@@ -17,7 +17,6 @@ import _ = require('lodash');
 export class AutoPaintCardComponent implements AfterViewInit {
   private _size:number = 360;
   private _workUnit: number = 10;
-  private chance;
   private subscription;
   @ViewChild("myCanvas") wordPaintComponent: WordPaintComponent;
 
@@ -43,10 +42,9 @@ export class AutoPaintCardComponent implements AfterViewInit {
   }
 
   constructor(
-    private wordPaintService: WordPaintService, @Inject(Chance) chance
-  ) {
-    this.chance = chance;
-  }
+    private readonly wordPaintService: WordPaintService,
+    @Inject(Chance) private readonly chance
+  ) { }
 
   private doNextSubmit = () => {
     let nextPhrase = this.createNextPhrase();

@@ -16,7 +16,6 @@ const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 const NormalModuleReplacementPlugin = require('webpack/lib/NormalModuleReplacementPlugin');
 const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
-const WebpackMd5Hash = require('webpack-md5-hash');
 const V8LazyParseWebpackPlugin = require('v8-lazy-parse-webpack-plugin');
 /**
  * Webpack Constants
@@ -40,7 +39,7 @@ module.exports = function (env) {
      * See: http://webpack.github.io/docs/configuration.html#devtool
      * See: https://github.com/webpack/docs/wiki/build-performance#sourcemaps
      */
-    devtool: 'source-map',
+    // devtool: 'source-map',
 
     /**
      * Options affecting the output of the compilation.
@@ -48,7 +47,6 @@ module.exports = function (env) {
      * See: http://webpack.github.io/docs/configuration.html#output
      */
     output: {
-
       /**
        * The output directory as absolute path (required).
        *
@@ -79,7 +77,6 @@ module.exports = function (env) {
        * See: http://webpack.github.io/docs/configuration.html#output-chunkfilename
        */
       chunkFilename: '[id].[chunkhash].chunk.js'
-
     },
 
     /**
@@ -88,15 +85,6 @@ module.exports = function (env) {
      * See: http://webpack.github.io/docs/configuration.html#plugins
      */
     plugins: [
-
-      /**
-       * Plugin: WebpackMd5Hash
-       * Description: Plugin to replace a standard webpack chunkhash with md5.
-       *
-       * See: https://www.npmjs.com/package/webpack-md5-hash
-       */
-      new WebpackMd5Hash(),
-
       /**
        * Plugin: DedupePlugin
        * Description: Prevents the inclusion of duplicate code into your bundle
@@ -136,41 +124,50 @@ module.exports = function (env) {
        */
       // NOTE: To debug prod builds uncomment //debug lines and comment //prod lines
       new UglifyJsPlugin({
-        // beautify: true, //debug
-        // mangle: false, //debug
-        // dead_code: false, //debug
-        // unused: false, //debug
-        // deadCode: false, //debug
-        // compress: {
-        //   screw_ie8: true,
-        //   keep_fnames: true,
-        //   drop_debugger: false,
-        //   dead_code: false,
-        //   unused: false
-        // }, // debug
-        // comments: true, //debug
-
-
-        beautify: false, //prod
-        output: {
-          comments: false
-        }, //prod
-        mangle: {
-          screw_ie8: true
-        }, //prod
         compress: {
-          screw_ie8: true,
-          warnings: false,
-          conditionals: true,
-          unused: true,
-          comparisons: true,
-          sequences: true,
-          dead_code: true,
-          evaluate: true,
-          if_return: true,
-          join_vars: true,
-          negate_iife: false // we need this for lazy v8
+          angular: true,
+          hoist_vars: true,
+          reduce_vars: true,
+          collapse_vars: true,
+          warnings: false
         },
+        mangle: true,
+        output: {
+          keep_quoted_props: true,
+          wrap_iife: true        // we need this for lazy v8
+        },
+        sourceMap: true,
+        exclude: /\/genjs\.js$/
+      }),
+
+      /**
+       * Plugin LoaderOptionsPlugin (experimental)
+       *
+       * See: https://gist.github.com/sokra/27b24881210b56bbaff7
+       */
+      new LoaderOptionsPlugin({
+        minimize: true,
+        debug: false,
+        options: {
+
+          /**
+           * Html loader advanced options
+           *
+           * See: https://github.com/webpack/html-loader#advanced-options
+           */
+          // TODO: Need to workaround Angular 2's html syntax => #id [bind] (event) *ngFor
+          htmlLoader: {
+            minimize: true,
+            removeAttributeQuotes: false,
+            caseSensitive: true,
+            customAttrSurround: [
+              [/#/, /(?:)/],
+              [/\*/, /(?:)/],
+              [/\[?\(?/, /(?:)/]
+            ],
+            customAttrAssign: [/\)?\]?=/]
+          },
+        }
       }),
 
       /**
@@ -234,37 +231,27 @@ module.exports = function (env) {
       //   threshold: 2 * 1024
       // })
 
-      /**
-       * Plugin LoaderOptionsPlugin (experimental)
-       *
-       * See: https://gist.github.com/sokra/27b24881210b56bbaff7
-       */
-      new LoaderOptionsPlugin({
-        minimize: true,
-        debug: false,
-        options: {
+      new SourceMapDevToolPlugin({
+        // asset matching
+        test: /\.ts$/,
 
-          /**
-           * Html loader advanced options
-           *
-           * See: https://github.com/webpack/html-loader#advanced-options
-           */
-          // TODO: Need to workaround Angular 2's html syntax => #id [bind] (event) *ngFor
-          htmlLoader: {
-            minimize: true,
-            removeAttributeQuotes: false,
-            caseSensitive: true,
-            customAttrSurround: [
-              [/#/, /(?:)/],
-              [/\*/, /(?:)/],
-              [/\[?\(?/, /(?:)/]
-            ],
-            customAttrAssign: [/\)?\]?=/]
-          },
+        // file and reference
+        filename: isProd ? [file]-[id].map : undefined,
 
-        }
+        // sources naming
+        moduleFilenameTemplate: '[resource-path]',
+        fallbackModuleFilenameTemplate: function(info) {
+          "use strict";
+
+          console.log(info);
+          return `${info.resourcePath}?${info.shortIdentifier}&${info.moduleId}&${info.hash}`
+        },
+
+        // quality/performance
+        module: true,
+        columns: isProd,
+        lineToLine: false
       }),
-
     ],
 
     /*
@@ -281,6 +268,5 @@ module.exports = function (env) {
       clearImmediate: false,
       setImmediate: false
     }
-
   });
 }

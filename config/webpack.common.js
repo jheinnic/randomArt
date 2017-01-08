@@ -4,22 +4,39 @@
 
 const webpack = require('webpack');
 const helpers = require('./helpers');
+const UglifyJs = require('uglify-js');
 console.log(helpers.root('client/index.html'));
 
 /*
  * Webpack Plugins
  */
 // problem with copy-webpack-plugin
+const AppCachePlugin = require('appcache-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 const NormalModuleReplacementPlugin = require('webpack/lib/NormalModuleReplacementPlugin');
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 const HtmlElementsPlugin = require('./html-elements-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
+const SourceMapDevToolPlugin = require('webpack/lib/SourceMapDevToolPlugin');
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const WebpackMd5HashPlugin = require('webpack-md5-hash');
+
+
+// multiple extract instances would be needed to support both CSS and SCSS as original source.
+// In that case, separate files would occur...
+// const extractCSS = new ExtractTextPlugin('stylesheets/[name].css');
+const extractSCSS = new ExtractTextPlugin({
+  id: 'extractThemeStyles',
+  filename: 'assets/css/[name].css'
+});
 
 /*
  * Webpack Constants
@@ -38,6 +55,7 @@ const METADATA = {
  */
 module.exports = function (options) {
   isProd = options.env === 'production';
+
   return {
 
     /*
@@ -48,6 +66,8 @@ module.exports = function (options) {
      * See: http://webpack.github.io/docs/configuration.html#cache
      */
     //cache: false,
+
+    context: helpers.root('client'),
 
     /*
      * The entry point for the bundle
@@ -69,7 +89,6 @@ module.exports = function (options) {
      * See: http://webpack.github.io/docs/configuration.html#resolve
      */
     resolve: {
-
       /*
        * An array of extensions that should be used to resolve modules.
        *
@@ -91,6 +110,22 @@ module.exports = function (options) {
     module: {
 
       rules: [
+        /**
+         * Source map loader support for *.js files
+         * Extracts SourceMaps for source files that as added as sourceMappingURL comment.
+         *
+         * See: https://github.com/webpack/source-map-loader
+         */
+        {
+          enforce: 'pre',
+          test: /\.js$/,
+          use: 'source-map-loader',
+          exclude: [
+            // these packages have problems with their sourcemaps
+            helpers.root('node_modules/rxjs'),
+            helpers.root('node_modules/@angular')
+          ]
+        },
 
         /*
          * Typescript loader support for .ts and Angular 2 async routes via .async.ts
@@ -109,7 +144,8 @@ module.exports = function (options) {
             'angular-router-loader'
           ],
           exclude: [
-            /\.(spec|e2e)\.ts$/, /\/(node_modules|build|dist|server|tests|config)\//
+            /\.(spec|e2e)\.ts$/,
+            /\/(node_modules|build|dist|server|tests|config)\//
           ]
         },
 
@@ -124,17 +160,32 @@ module.exports = function (options) {
         },
 
         /*
-         * to string and css loader support for *.css files
-         * Returns file content as string
+         * Prefix CSS and SCSS files with _ to indicate they are meant for inline inclusion
+         * because they apply to a certain view template fragment scope.
          *
+         * Omit the _ prefix from any CSS or SCSS file intended to apply unconditionally to
+         * the entire document model of any page where it is included.  Themes and core utility
+         * styles should be handled this way.
+         *
+         * If a CSS/SCSS files is a partial fragment intended for import into other theme-like
+         * style sheets, it should still be prefixed with a _.
+         * TODO: Verify whether style sheet imports still work with the above assertion!!
          */
         {
-          test: /\.css$/,
+          test: /\/_[^/.]+\.css$/,
           use: ['to-string-loader', 'css-loader']
         },
         {
-          test: /\.scss$/,
+          test: /\/_[^/.]+\.scss$/,
           use: ['to-string-loader', 'css-loader', 'sass-loader']
+        },
+        {
+          test: /\/[a-z][^/]+\.scss$/,
+          // test: [ /app\/app\.scss$/, /app\/app.theme.scss$/ ],
+          loader: extractSCSS.extract({
+            loader: ['css-loader', 'sass-loader'],
+            fallbackLoader: ['style-loader']
+          })
         },
 
         /* Raw loader support for *.html
@@ -145,10 +196,7 @@ module.exports = function (options) {
         {
           test: /\.html$/,
           use: 'raw-loader',
-          exclude: [
-            helpers.root('client/index.html'),
-            /\/index\.html$/
-          ]
+          exclude: [helpers.root('client/index.html')]
         },
 
         /* File loader for supporting images, for example, in CSS files.
@@ -156,10 +204,8 @@ module.exports = function (options) {
         {
           test: /\.(jpg|png|gif)$/,
           use: 'file-loader'
-        },
-
+        }
       ],
-
     },
 
     /*
@@ -168,15 +214,28 @@ module.exports = function (options) {
      * See: http://webpack.github.io/docs/configuration.html#plugins
      */
     plugins: [
+      new ProgressBarPlugin(),
+
+      /**
+       * Plugin: WebpackMd5HashPlugin
+       * Description: Plugin to replace a standard webpack chunkhash with md5.
+       *
+       * See: https://www.npmjs.com/package/webpack-md5-hash
+       */
+      new WebpackMd5HashPlugin(),
+
       new AssetsPlugin({
         path: helpers.root('dist'),
         filename: 'webpack-assets.json',
         prettyPrint: true
       }),
 
+      extractSCSS,
+
       /*
        * Plugin: ForkCheckerPlugin
-       * Description: Do type checking in a separate process, so webpack don't need to wait.
+       * Description: Do type checking in a separate process, so webpack
+       *              doesn't need to wait.
        *
        * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
        */
@@ -304,6 +363,30 @@ module.exports = function (options) {
         /facade(\\|\/)math/,
         helpers.root('node_modules/@angular/core/src/facade/math.js')
       ),
+      new NormalModuleReplacementPlugin(
+        /util(\\|\/)decorators/,
+        helpers.root('node_modules/@angular/core/src/util/decorators.js')
+      ),
+      new NormalModuleReplacementPlugin(
+        /util(\\|\/)lang/,
+        helpers.root('node_modules/@angular/core/src/util/lang.js')
+      ),
+
+      new SWPrecacheWebpackPlugin({
+        cacheId: 'portfolio-randomArt',
+        filename: 'portfolio-cache-service-worker.js',
+        maximumFileSizeToCacheInBytes: 4194304,
+        verbose: true
+      }),
+
+      new AppCachePlugin({
+        cache: [],
+        network: ['*'],
+        fallback: [],
+        settings: ['prefer-online'],
+        exclude: [],
+        output: 'randomArt-portfolio.manifest'
+      })
     ],
 
     /*
@@ -320,6 +403,5 @@ module.exports = function (options) {
       clearImmediate: false,
       setImmediate: false
     }
-
   };
 }

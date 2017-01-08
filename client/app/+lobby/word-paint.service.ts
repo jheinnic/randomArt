@@ -53,7 +53,7 @@ function computeAffinePixelPoints(pointCount, minValue, maxValue) {
   }
 
   const translate: number = 0 + minValue;
-  const scale: number = (maxValue - minValue) / (pointCount - 1 - 0);
+  const scale: number = (maxValue - minValue) / (pointCount - 0);
 
   let pointsArray = [];
   for (let ii = initial; ii < pointCount; ii += 1) {

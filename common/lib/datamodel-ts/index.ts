@@ -1,6 +1,7 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 import builder = require('fluent-interface-builder');
 import {Builder} from "fluent-interface-builder";
+import { makeDecorator, makeParamDecorator, makePropDecorator } from '@angular/core/src/util/decorators';
 
 //
 // Generic Helper Methods
@@ -63,3 +64,24 @@ export function copyMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapp
     return wrapper.unwrap();
   };
 }
+
+
+//
+// Experimental: ES7 annotation-driven behavior
+//
+/**
+ * DataModel decorator and default metadata.
+ *
+ * @Annotation
+ */
+export var /** @type {?} */ DataModel = (makeDecorator('DataModel', {
+  name: undefined,
+  builder: "default"
+}));
+
+/**
+ * Collection decorator and default metadata.
+ *
+ * @Annotation
+ */
+export var /** @type {?} */ Collection = (makePropDecorator('Collection', undefined));

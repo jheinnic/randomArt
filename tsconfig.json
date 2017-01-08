@@ -31,7 +31,7 @@
       "webpack",
       "socket.io-client",
       "q",
-      // "uuid",
+      "uuid",
       "chai",
       // "es6-promise",
       "jasmine",

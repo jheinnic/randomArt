@@ -17,11 +17,14 @@ app.set('views', path.join(__dirname, 'views'));
 // configure body parser
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(loopback.token());
+app.use(loopback.token({
+  model: app.models.accessToken,
+  currentUserLiteral: 'me'
+}));
 
 app.start = function() {
   // start the web server
-  var server =  app.listen(function() {
+  var server = app.listen(function() {
     app.emit('started', server);
     var baseUrl = app.get('url').replace(/\/$/, '');
     console.log('Web server listening at: %s', baseUrl);

@@ -1,7 +1,4 @@
 {
-  "initial:before": {
-    "loopback#favicon": {}
-  },
   "initial": {
     "compression": {},
     "cors": {
@@ -10,7 +7,7 @@
         "credentials": true,
         "maxAge": 86400
       }
-  }
+    }
   },
   "session": {
   },

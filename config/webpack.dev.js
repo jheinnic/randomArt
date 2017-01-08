@@ -12,13 +12,14 @@ const commonConfig = require('./webpack.common.js'); // the settings that are co
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
 /**
  * Webpack Constants
  */
 const ENV = process.env.ENV = process.env.NODE_ENV = 'development';
 const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const HMR = helpers.hasProcessFlag('hot');
 const METADATA = webpackMerge(commonConfig({env: ENV}).metadata, {
   host: HOST,
@@ -42,7 +43,7 @@ module.exports = function (options) {
      * See: https://github.com/webpack/docs/wiki/build-performance#sourcemaps
      */
     // devtool: 'cheap-module-source-map',
-    devtool: 'source-map',
+    devtool: 'inline-source-map',
 
     /**
      * Options affecting the output of the compilation.
@@ -71,8 +72,9 @@ module.exports = function (options) {
        * They are inside the output.path directory.
        *
        * See: http://webpack.github.io/docs/configuration.html#output-sourcemapfilename
-       */
+       * See: SourceMapDevToolsPlugin
       sourceMapFilename: '[name].map',
+       */
 
       /** The filename of non-entry chunks as relative path
        * inside the output.path directory.
@@ -86,7 +88,6 @@ module.exports = function (options) {
     },
 
     plugins: [
-
       /**
        * Plugin: DefinePlugin
        * Description: Define free variables.
@@ -107,6 +108,30 @@ module.exports = function (options) {
         }
       }),
 
+      /*
+      new UglifyJsPlugin({
+        beautify: true,
+        comments: true,
+        compress: {
+          angular: true,
+          drop_debugger: false,
+          dead_code: false,
+          keep_fnames: true,
+          sequences: false,
+          unused: false
+        },
+        mangle: false,
+        output: {
+          indent_level: 2,
+          quote_style: 2,
+          keep_quoted_props: true,
+          wrap_iife: true        // we need this for lazy v8
+        },
+        sourceMap: true,
+        exclude: /\/genjs\.js$/
+      }),
+      */
+
       /**
        * Plugin: NamedModulesPlugin (experimental)
        * Description: Uses file names as module name.
@@ -122,11 +147,8 @@ module.exports = function (options) {
        */
       new LoaderOptionsPlugin({
         debug: true,
-        options: {
-
-        }
+        options: { }
       }),
-
     ],
 
     /**
@@ -161,6 +183,5 @@ module.exports = function (options) {
       clearImmediate: false,
       setImmediate: false
     }
-
   });
 };

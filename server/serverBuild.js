@@ -18,7 +18,10 @@ app.set('views', path.join(__dirname, 'views'));
 // configure body parser
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(loopback.token());
+app.use(loopback.token({
+  model: app.models.accessToken,
+  currentUserLiteral: 'me'
+}));
 
 app.start = function() {
   // start the web server
@@ -39,7 +42,7 @@ app.start = function() {
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
   if (err) throw err;
- 
+
   // start the server if `$ node serverBuild.js`
   if (require.main === module)
     app.start();

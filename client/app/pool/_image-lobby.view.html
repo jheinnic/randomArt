@@ -1,0 +1,41 @@
+<md-sidenav-container>
+  <md-sidenav #sidenav class="portfolio-dark" mode="side" opened="false">
+
+  </md-sidenav>
+  <md-grid-list [cols]="7" [rowHeight]="100" [gutterSize]="8">
+    <md-grid-tile [colspan]="6" [rowspan]="1" style.background="lightpink" style.backgroundColor="lightpink"></md-grid-tile>
+    <md-grid-tile [colspan]="1" [rowspan]="1" style.background="accent" style.backgroundColor="lightpink">
+      <button md-fab (mouseover)="sidenav.open()" (click)="sidenav.toggle()"><md-icon>more_vert</md-icon></button>
+    </md-grid-tile>
+
+    <md-grid-tile [colspan]="2" [rowspan]="1" [style.backgroundColor]="'lightpink'"></md-grid-tile>
+    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="'lightblue'">
+      <P>Currently painting "{{phraseToPaint}}"</P>
+    </md-grid-tile>
+
+    <md-grid-tile [colspan]="2" [rowspan]="1" [style.backgroundColor]="lightpink">
+      <button md-button #newCanvasBtn (click)="sizeCanvas()">CREATE</button>
+    </md-grid-tile>
+    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="lightpink">
+      <button md-button #generateNameBtn (click)="generateName()">CHANGE NAME</button>
+      <button md-button #beginPaintingBtm (click)="beginPainting()">BEGIN PAINTING</button>
+    </md-grid-tile>
+
+    <md-grid-tile [colspan]="2" [rowspan]="3" [style.backgroundColor]="lightpink">
+      <md-chip-list>
+        <md-chip *ngFor="let paintJob of paintJobs" [selected]="false" [color]="accent"
+                 (selected)="onSelectChip(this, $event)">{{paintJob}}
+        </md-chip>
+        <md-chip [selected]="false" [color]="warn" (selected)="onSelectChip(this, $event)">fixedChip
+        </md-chip>
+      </md-chip-list>
+    </md-grid-tile>
+    <md-grid-tile [colspan]="5" [rowspan]="2" [style.backgroundColor]="lightblue">
+      <canvas #activeCanvas [style.width.px]="canvasWidth" [style.height.px]="canvasHeight"></canvas>
+    </md-grid-tile>
+    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="lightblue">
+      <md-progress-bar></md-progress-bar>
+    </md-grid-tile>
+    <md-grid-tile [colspan]="7" [rowspan]="1" [style.backgroundColor]="lightblue"></md-grid-tile>
+  </md-grid-list>
+</md-sidenav-container>

@@ -12,15 +12,14 @@ require("rxjs/add/operator/share");
 export class NavbarDataService {
   private dataModel = new NavbarData();
   private dataSubject = new ReplaySubject<NavbarData>(1);
-  private observableData = this.dataSubject.asObservable().share();
+  private observableData = this.dataSubject.asObservable();
 
   get navbarData(): Observable<NavbarData> {
     return this.observableData;
   }
 
   public updateNavbar(director: NavbarDataDirector) {
-    this.dataSubject.next(
-      this.dataModel.copy(director)
-    );
+    this.dataModel = this.dataModel.copy(director)
+    this.dataSubject.next(this.dataModel);
   }
 }

@@ -19,8 +19,12 @@ import * as _ from "lodash";
  */
 import {AppModule} from "./app";
 import {HttpModule} from "@angular/http"
+import {NgModule, NgModuleRef} from "@angular/core";
+import {DurableCanvasService} from "./app/shared/canvas-cache/durable-canvas.service";
 
-import "@angular/material/core/theming/prebuilt/purple-green";
+// import "@angular/material/core/theming/prebuilt/purple-green";
+require("./app/app.scss");
+require("./app/app.theme.scss");
 
 /*
 function onConnectToNet(index, id) {
@@ -103,6 +107,12 @@ export function main(): Promise<any> {
   return platformBrowserDynamic()
     .bootstrapModule(AppModule)
     .then(decorateModuleRef)
+    .then((rootModule: NgModuleRef<AppModule>) => {
+      let injector = rootModule.injector;
+      let canvasCache = injector.get(DurableCanvasService);
+      let canvasCacheDOM = document.getElementById('canvas-store');
+      canvasCache._bootstrapPortalHost(canvasCacheDOM);
+    })
     .catch(err => console.error(err));
 }
 
