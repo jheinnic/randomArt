@@ -6,7 +6,8 @@ import {RouterModule, Routes} from "@angular/router";
 import {HttpModule, Http, CookieXSRFStrategy, BaseRequestOptions} from "@angular/http";
 import {
   MdButtonModule, MdCardModule, MdIconModule, MdInputModule, MdTabsModule, MdToolbarModule,
-  MdDialogModule, OverlayModule, PortalModule, MdChipsModule, MdSidenavModule, MdGridListModule
+  MdDialogModule, OverlayModule, PortalModule, MdChipsModule, MdSidenavModule, MdGridListModule,
+  MdTooltipModule, MdCheckboxModule, MdMenuModule
 } from "@angular/material";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {Chance} from "chance";
@@ -21,6 +22,9 @@ import {GlobalNavbarComponent, NavbarDataService} from "./navigation";
 import {SDKBrowserModule, ErrorHandler} from "./shared/sdk";
 import {CanvasCacheModule} from "./shared/canvas-cache";
 import {NewNamedCanvasModalComponent} from "./shared/phrase-generator/new-named-canvas-modal.component";
+import {NavBallsDirective} from "./navigation/navballs.directive";
+import {CanvasAccessDirective} from "./shared/canvas-util/canvas-access.directive";
+import {PhraseGeneratorService} from "./shared/phrase-generator/phrase-generator.service";
 
 function httpOverrideFactory(
   xhrBackend: TokenCheckXHRBackend, requestOptions: BaseRequestOptions
@@ -35,10 +39,11 @@ function configureXSRFStrategy() {
 @NgModule({
   declarations: [
     AppRootComponent,
-    BlankAreaComponent,
+    CanvasAccessDirective,
     NoContentComponent,
     LoginModalComponent,
     GlobalNavbarComponent,
+    NavBallsDirective,
     NewNamedCanvasModalComponent,
     PointMapPipe,
     PaintablePointPipe,
@@ -51,16 +56,19 @@ function configureXSRFStrategy() {
     FormsModule,
     HttpModule,
     PoolModule,
-    MdCardModule.forRoot(),
-    MdChipsModule.forRoot(),
     MdButtonModule.forRoot(),
-    MdIconModule.forRoot(),
-    MdInputModule.forRoot(),
+    MdCardModule.forRoot(),
+    MdCheckboxModule.forRoot(),
+    MdChipsModule.forRoot(),
     MdDialogModule.forRoot(),
     MdGridListModule.forRoot(),
+    MdIconModule.forRoot(),
+    MdInputModule.forRoot(),
+    MdMenuModule.forRoot(),
     MdSidenavModule.forRoot(),
     MdTabsModule.forRoot(),
     MdToolbarModule.forRoot(),
+    MdTooltipModule.forRoot(),
     OverlayModule.forRoot(),
     PortalModule.forRoot(),
     NgbModule.forRoot(),
@@ -79,24 +87,13 @@ function configureXSRFStrategy() {
       deps: []
     },
     NavbarDataService,
+    PhraseGeneratorService,
     PointStreamService
     // TokenCheckXHRBackend,
     // {provide: Http, useFactory: httpOverrideFactory, deps: [TokenCheckXHRBackend, BaseRequestOptions]},
     // {provide: XSRFStrategy, useFactory: configureXSRFStrategy }
   ], // exports: [HttpModule],
   exports: [
-    /*OverlayModule,
-    PortalModule,
-    MdButtonModule,
-    MdCardModule,
-    MdChipsModule,
-    MdIconModule,
-    MdInputModule,
-    MdDialogModule,
-    MdSidenavModule,
-    MdTabsModule,
-    MdToolbarModule,
-    MdGridListModule,*/
     LoginModalComponent,
     NewNamedCanvasModalComponent,
     GlobalNavbarComponent

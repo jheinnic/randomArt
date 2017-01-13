@@ -1,11 +1,23 @@
 /**
  * Created by jheinnic on 1/2/17.
  */
-import {Component, ViewChild, AfterViewInit, Inject, ElementRef} from "@angular/core";
+import {Component, ViewChild, AfterViewInit, Inject, ElementRef, NgZone} from "@angular/core";
 import {PointStreamService, PointMap, PaintablePoint} from "../stream-play";
 import {Observable, Subject} from "rxjs";
 import {Chance} from "chance";
+import Tether = require('tether');
 import path = require('path');
+import _ = require('lodash');
+import {PhraseGeneratorService} from "../shared/phrase-generator/phrase-generator.service";
+
+interface PaintDone {
+  phrasePainted: string,
+  whenDismissed: Date,
+  imageData: ImageData
+};
+interface PaintToDo {
+  phraseToPaint: string
+};
 
 @Component({
   moduleId: path.resolve(__dirname, __filename),
@@ -15,7 +27,8 @@ import path = require('path');
 })
 export class ImageLobbyComponent implements AfterViewInit
 {
-  private phraseToPaint: string;
+  private phrasePainting: string;
+  private phrasePainted: string;
 
   private cancelSignal: boolean = false;
   private progressInterval: number = 100000;
@@ -23,30 +36,70 @@ export class ImageLobbyComponent implements AfterViewInit
   private canvasHeight = 480;
   private canvasWidth = 640;
   private scalePoints: Observable<PointMap>;
+  private context: CanvasRenderingContext2D | null;
 
-  @ViewChild('activeCanvas') activeCanvas: ElementRef;
-  @ViewChild('sizeCanvasBtn') sizeCanvasBtn: ElementRef;
+  private sidenav: ElementRef = null;
+
+  public paintJobsNext: PaintToDo[];
+  public paintJobsDone: PaintDone[];
+
+  private iconToText() {
+    // TODO
+  };
+
+
+  @ViewChild('wordPaint') wordPaintCanvas: ElementRef;
+  @ViewChild('resizeCanvasBtn') resizeCanvasBtn: ElementRef;
   @ViewChild('generateNameBtn') generateNameBtn: ElementRef;
-  @ViewChild('beginPaintingBtn') beginPaintingBtm: ElementRef;
+  @ViewChild('startPaintingBtn') startPaintingBtm: ElementRef;
 
-  private paintJobs = ['phraseToPaint'];
+  get hasPainted(): boolean {
+    return _.isString(this.phrasePainted);
+  }
 
-  constructor(private pointService: PointStreamService, @Inject(Chance) private chance) {
-    this.createNextPhrase();
+  get isPainting(): boolean {
+    return _.isString(this.phrasePainting);
+  }
+
+  get willPaint(): boolean {
+    return !this.isPainting && (this.paintJobsNext.length > 0);
+  }
+
+  constructor(
+    private ngZone: NgZone,
+    private pointService: PointStreamService,
+    private phraseGenerator: PhraseGeneratorService
+  ) {
+    this.paintJobsNext = [
+      { phraseToPaint: this.phraseGenerator.createNextPhrase() }
+    ];
+    this.paintJobsDone = [
+      {phrasePainted: 'Placeholder One', whenDismissed: new Date(), imageData: null},
+      {phrasePainted: 'Placeholder Two', whenDismissed: new Date(), imageData: null}
+    ];
   }
 
   public ngAfterViewInit() {
+    /*
+    new Tether({
+      element: '#open-sidenav',
+      target: '#image-create-panel',
+      attachment: 'top left',
+      targetAttachment: 'top left',
+      constraints: [{
+        to: 'window',
+        pin: true
+      }]
+    });
+    */
   }
 
-  private createNextPhrase() {
-    let lenOne = this.chance.rpg('1d5')[0] + this.chance.rpg('1d3')[0] + 1;
-    let lenTwo = this.chance.rpg('1d5')[0] + this.chance.rpg('1d3')[0] + 1;
-    this.phraseToPaint =
-      this.chance.word(
-        {length: lenOne}
-      ) + ' ' + this.chance.word(
-        {length: lenTwo}
-      );
+  get phraseToPaint() {
+    let retVal:string = '';
+    if (this.paintJobsNext.length >= 1) {
+      retVal = this.paintJobsNext[0].phraseToPaint;
+    }
+    return retVal;
   }
 
   public sizeCanvas() {
@@ -75,51 +128,95 @@ export class ImageLobbyComponent implements AfterViewInit
     console.log('New Canvas TODO');
   }
 
-  public generateName() {
-    this.createNextPhrase();
+  public renameNext() {
+    this.paintJobsNext.unshift();
+    this.scheduleNext();
+  }
+
+  public scheduleNext() {
+    this.paintJobsNext.push({
+      phraseToPaint: this.phraseGenerator.createNextPhrase()
+    });
   }
 
   public beginPainting() {
-    let canvasBefore: HTMLCanvasElement = this.activeCanvas.nativeElement;
+    let canvasBefore: HTMLCanvasElement = this.wordPaintCanvas.nativeElement;
 
-    let context: CanvasRenderingContext2D | null = canvasBefore.getContext("2d");
-    if (context === null) {
+    if (this.paintJobsNext.length < 1) {
+      throw new Error("No jobs in queue left to paint!");
+    }
+    if (this.isPainting) {
+      throw new Error('A paint job is already in progress!');
+    }
+    this.context = canvasBefore.getContext('2d', {storage: true});
+    if (this.context === null) {
       throw new Error("Could not get 2D context from canvas element");
-    } else {
-      context = context;
     }
 
-    this.onWordPaintBegin(this.phraseToPaint);
+    if (! this.scalePoints) {
+      this.sizeCanvas();
+    }
+
+    this.ngZone.runOutsideAngular( () => {
+      setTimeout( () => { this.doPaintWord(); }, 5);
+    });
+  }
+
+  private doPaintWord() {
+    this.phrasePainting = this.paintJobsNext.shift().phraseToPaint;
+
+    this.onWordPaintBegin(this.phrasePainting);
     let counter = 0;
     let outputSubject: Observable<PaintablePoint> =
       this.pointService.performGradualColorTransform(
-        this.scalePoints, this.phraseToPaint);
-
+        this.scalePoints, this.phrasePainting);
     // Get calculation result, then...
     outputSubject.subscribe((paintPoint: PaintablePoint) => {
       // ...paint into context
-      paintPoint.paintTo(context);
+      paintPoint.paintTo(this.context);
       if (counter++ === this.progressInterval) {
-        if (this.cancelSignal === true) {
-          // TODO: Cancel
-          this.onWordPaintCancel(this.phraseToPaint);
-          this.cancelSignal = false;
-        } else {
-          this.onWordPaintProgress(this.phraseToPaint, 0.25)
-          counter = 0;
-        }
+        this.ngZone.run( () => {
+          if (this.cancelSignal === true) {
+            // TODO: Cancel
+            this.phrasePainting = null;
+            this.onWordPaintCancel(this.phrasePainting);
+            console.log('Cancelled');
+            this.cancelSignal = false;
+          } else {
+            this.onWordPaintProgress(this.phrasePainting, 0.25)
+            counter = 0;
+          }
+        });
       }
     }, (error) => {
       console.error('Failed to complete paint step!', error);
       this.onWordPaintFail(this.phraseToPaint);
     }, () => {
+        this.ngZone.run( () => {
+        this.phrasePainted = this.phrasePainting;
+        this.phrasePainting = null;
+        this.onWordPaintDone(this.phrasePainted);
+      })
       console.log('Done');
-      this.onWordPaintDone(this.phraseToPaint);
     });
   }
 
   public cancelPainting() {
     this.cancelSignal = true;
+  }
+
+  public dismissIfFinished() {
+    if (this.phrasePainted > '') {
+      let imageData = this.wordPaintCanvas.nativeElement.getImageData();
+      let whenDismissed = new Date()
+      this.paintJobsDone.push({
+         phrasePainted: this.phrasePainted,
+         whenDismissed: whenDismissed,
+         imageData: imageData
+      });
+      this.phrasePainted = null;
+      this.onCanvasReady(whenDismissed);
+    }
   }
 
   public onSelectChip(self, $event) {
@@ -137,7 +234,6 @@ export class ImageLobbyComponent implements AfterViewInit
   }
 
   public onWordPaintBegin(currentWord) {
-
   }
 
   public onWordPaintProgress(currentWord, pctDone) {

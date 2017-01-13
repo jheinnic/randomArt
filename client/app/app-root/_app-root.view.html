@@ -1,11 +1,15 @@
-<main>
-  <global-navbar></global-navbar>
-  <router-outlet></router-outlet>
-</main>
-<footer>
-  <div class="row">
-    <div class="col-sm-12">
-      <p>&copy; John C. Heinnickel, 2016</p>
-    </div>
+<div class="container-fluid">
+  <div class="fixed-top row">
+    <global-navbar (navbar)="onNavbarChange($event)"></global-navbar>
   </div>
-</footer>
+  <main [ngClass]="{'with-navbar': hasNavbar, 'without-navbar': !hasNavbar}">
+    <router-outlet></router-outlet>
+  </main>
+  <footer>
+    <div class="fixed-bottom row">
+      <div class="col-12">
+        <span class="footer-text">&copy; John C. Heinnickel, 2017</span>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -13,7 +13,12 @@ export const LOGIN_TITLE: OpaqueToken = new OpaqueToken('LOGIN_TITLE');
 
 @Component(
   {
-    selector: 'login-modal', templateUrl: './_login-modal.view.html'
+    selector: 'login-modal',
+    templateUrl: './_login-modal.view.html',
+    host: {
+      '[class.d-flex]': 'true',
+      '[class.flex-column]': 'true'
+    }
   }
 )
 export class LoginModalComponent

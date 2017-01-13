@@ -8,8 +8,10 @@ import {Routes, RouterModule} from "@angular/router";
 import {ImageLobbyComponent} from "./image-lobby.component";
 import {
   MdChipsModule, MdGridList, MdCardModule, MdButtonModule, MdIconModule, MdProgressBarModule,
-  MdTooltipModule, MdDialogModule, MdGridListModule, MdSidenavModule, MdInputModule
+  MdTooltipModule, MdDialogModule, MdGridListModule, MdSidenavModule, MdInputModule,
+  MdToolbarModule, MdCheckboxModule, MdTabsModule
 } from "@angular/material";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
   declarations: [ImageLobbyComponent],
@@ -17,15 +19,17 @@ import {
     CommonModule,
     FormsModule,
     MdChipsModule,
-    MdGridListModule,
     MdCardModule,
+    MdCheckboxModule,
     MdButtonModule,
     MdIconModule,
     MdInputModule,
     MdSidenavModule,
     MdProgressBarModule,
+    MdTabsModule,
+    MdToolbarModule,
     MdTooltipModule,
-    MdDialogModule,
+    NgbModule,
     RouterModule.forChild(PoolModule.routes)
   ],
   exports: [ImageLobbyComponent]

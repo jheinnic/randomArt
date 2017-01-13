@@ -1,41 +1,130 @@
 <md-sidenav-container>
-  <md-sidenav #sidenav class="portfolio-dark" mode="side" opened="false">
-
+  <md-sidenav #sidenav class="control-theme" mode="side" opened="false">
+    <button md-icon-button class="md-primary" (click)="sidenav.close()">
+      <md-icon>exit_to_app</md-icon>
+    </button>
+    <md-card>
+      <md-card-content>
+        <div class="d-flex flex-row">
+          <md-input-container>
+            <md-placeholder>Width</md-placeholder>
+            <input md-input type="number" [(ngModel)]="canvasWidth"/>
+          </md-input-container>
+          <md-input-container floatingPlaceholder="Height">
+            <!--md-placeholder>Height:</md-placeholder-->
+            <input md-input type="number" [(ngModel)]="canvasHeight"/>
+          </md-input-container>
+        </div>
+      </md-card-content>
+      <md-card-actions>
+        <button md-raised-button #newCanvasBtn class="md-primary" (click)="sizeCanvas()">RESIZE CANVAS</button>
+      </md-card-actions>
+    </md-card>
+    <md-card>
+      <md-card-content>
+        <md-input-container>
+          <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
+        </md-input-container>
+      </md-card-content>
+      <md-card-actions>
+        <button md-raised-button #changeNameBtn class="md-accent" (click)="generateName()">CHANGE NAME</button>
+        <button md-raised-button #beginPaintingBtm class="md-primary" (click)="beginPainting()">START PAINTING</button>
+      </md-card-actions>
+    </md-card>
   </md-sidenav>
-  <md-grid-list [cols]="7" [rowHeight]="100" [gutterSize]="8">
-    <md-grid-tile [colspan]="6" [rowspan]="1" style.background="lightpink" style.backgroundColor="lightpink"></md-grid-tile>
-    <md-grid-tile [colspan]="1" [rowspan]="1" style.background="accent" style.backgroundColor="lightpink">
-      <button md-fab (mouseover)="sidenav.open()" (click)="sidenav.toggle()"><md-icon>more_vert</md-icon></button>
-    </md-grid-tile>
 
-    <md-grid-tile [colspan]="2" [rowspan]="1" [style.backgroundColor]="'lightpink'"></md-grid-tile>
-    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="'lightblue'">
-      <P>Currently painting "{{phraseToPaint}}"</P>
-    </md-grid-tile>
-
-    <md-grid-tile [colspan]="2" [rowspan]="1" [style.backgroundColor]="lightpink">
-      <button md-button #newCanvasBtn (click)="sizeCanvas()">CREATE</button>
-    </md-grid-tile>
-    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="lightpink">
-      <button md-button #generateNameBtn (click)="generateName()">CHANGE NAME</button>
-      <button md-button #beginPaintingBtm (click)="beginPainting()">BEGIN PAINTING</button>
-    </md-grid-tile>
-
-    <md-grid-tile [colspan]="2" [rowspan]="3" [style.backgroundColor]="lightpink">
-      <md-chip-list>
-        <md-chip *ngFor="let paintJob of paintJobs" [selected]="false" [color]="accent"
-                 (selected)="onSelectChip(this, $event)">{{paintJob}}
-        </md-chip>
-        <md-chip [selected]="false" [color]="warn" (selected)="onSelectChip(this, $event)">fixedChip
-        </md-chip>
-      </md-chip-list>
-    </md-grid-tile>
-    <md-grid-tile [colspan]="5" [rowspan]="2" [style.backgroundColor]="lightblue">
-      <canvas #activeCanvas [style.width.px]="canvasWidth" [style.height.px]="canvasHeight"></canvas>
-    </md-grid-tile>
-    <md-grid-tile [colspan]="5" [rowspan]="1" [style.backgroundColor]="lightblue">
-      <md-progress-bar></md-progress-bar>
-    </md-grid-tile>
-    <md-grid-tile [colspan]="7" [rowspan]="1" [style.backgroundColor]="lightblue"></md-grid-tile>
-  </md-grid-list>
+  <div id="image-create-panel" class="row">
+    <div class="col-6 col-md-4 d-flex flex-column justify-content-around">
+      <!--
+      <md-toolbar class="md-accent justify-content-center">
+        <h4>Shortcuts</h4>
+        <button md-icon-button><md-icon class="ml-auto">trash</md-icon></button>
+      </md-toolbar>
+      <md-tab-group>
+      -->
+      <md-card>
+        <md-card-title class="md-accent">Paint Queue
+          <button md-icon-button disabled>
+            <md-icon>delete</md-icon>
+          </button>
+        </md-card-title>
+        <md-card-content>
+          <md-chip-list>
+            <template ngFor let-queueItem [ngForOf]="paintJobsNext">
+              <md-checkbox></md-checkbox>
+              <md-chip selectable="false">{{queueItem.phraseToPaint}}</md-chip>
+            </template>
+          </md-chip-list>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-accent">"Recently Painted"</md-card-title>
+        <md-card-content>
+          <md-chip-list>
+            <template ngFor let-recentItem [ngForOf]="paintJobsDone">
+              <md-chip selectable="true" color="primary" (select)="recentItem.showCard=true"
+                       (deselect)="recentItem.showCard=false" [ngClass]="{hidden: selected}">
+                {{recentItem.phrasePainted}}
+              </md-chip>
+              <md-card *ngIf="recentItem.showCard">
+                <md-card-header>
+                  <md-card-title>{{recentItem.phrasePainted}}</md-card-title>
+                  <md-card-subtitle>TODO: WIP</md-card-subtitle>
+                </md-card-header>
+                <md-card-content>See preview image here TODO</md-card-content>
+                <md-card-actions>
+                  <button md-mini-fab (click)="iconToText()">
+                    <md-icon>trash</md-icon>
+                  </button>
+                  <button md-mini-fab (click)="iconToText()">
+                    <md-icon>close</md-icon>
+                  </button>
+                  <button md-mini-fab (click)="iconToText()">
+                    <md-icon>bookmark</md-icon>
+                  </button>
+                  <button md-mini-fab (click)="iconToText()">
+                    <md-icon>open</md-icon>
+                  </button>
+                </md-card-actions>
+              </md-card>
+            </template>
+          </md-chip-list>
+        </md-card-content>
+      </md-card>
+      <!--
+        <md-tab label="Recently Displayed"></md-tab>
+        <md-tab label="Watchlist"></md-tab>
+        -->
+    </div>
+    <div ngSwitch="canvasStatus" class="col-6 col-md-8">
+      <div class="right-button-panel d-flex flex-column justify-content-between">
+        <button id="open-sidenav" md-fab (click)="sidenav.open();" [ngClass]="{hidden: sidenav.opened}">
+          <md-icon>settings</md-icon>
+        </button>
+        <br>
+        <button *ngIf="willPaint" md-fab (click)="beginPainting()"><md-icon>play_arrow</md-icon></button>
+        <button *ngIf="isPainting" md-fab (click)="scheduleNext()"><md-icon>add</md-icon></button>
+      </div>
+      <!--
+      <md-toolbar class="control-theme md-primary justify-content-center">
+        <h4>Workspace</h4>
+      </md-toolbar>
+      -->
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
+  </div>
 </md-sidenav-container>

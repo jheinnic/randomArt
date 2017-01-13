@@ -42,6 +42,9 @@ module.exports = {
   meta: [
     { name: 'msapplication-TileColor', content: '#00bcd4' },
     { name: 'msapplication-TileImage', content: '/assets/icon/ms-icon-144x144.png', '=content': true },
-    { name: 'theme-color', content: '#00bcd4' }
+    { name: 'theme-color', content: '#00bcd4' },
+    { charset: 'utf-8' },
+    { 'http-equiv':'x-ua-compatible', content: 'ie=edge'},
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no' }
   ]
 };

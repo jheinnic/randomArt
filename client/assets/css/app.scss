@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700i');
+
+html, body{
+  height: 100%;
+  // font-family: Arial, Helvetica, sans-serif
+  // font-family: 'Anonymous Pro', monospace;
+}
+
+// Expanding the navbar adds 49 pixels to the base toolbar's 64px.
+// TODO: Responsively resize toolbar and navbar
+main {
+  padding-bottom: 50px;
+}
+
+.right-button-panel, main {
+  &.without-navbar {
+    padding-top: 72px;
+  }
+  &.with-navbar {
+    padding-top: 121px;
+  }
+}
+
+.right-button-panel {
+  position: fixed;
+  right: 0px;
+  z-index: 10;
+}
+
+footer {
+  background-color: #f0f0f0;
+}
+
+span.brand-name {
+  font-size: 24px;
+  padding-left: 10px;
+}
+
+/*
+span.active {
+  background-color: gray;
+}
+
+span.flex-fill {
+  flex: 1 1 auto;
+}
+
+.modal-title {
+  flex: 80% 1 auto
+}
+*/

@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy, AfterViewInit} from "@angular/core";
+import {Component, OnInit, OnDestroy, AfterViewInit, Output, EventEmitter} from "@angular/core";
 import {MdDialog, MdDialogRef} from "@angular/material";
 import {LoginModalComponent} from "../authentication";
 import {NavbarDataService} from "./navbar-data.service";
@@ -11,7 +11,7 @@ import {Subscription} from "rxjs/Subscription";
 import * as path from "path";
 
 const NO_USER_INFO: UserInterface = {
-  id: undefined, username: 'anonymous', password: undefined, email: undefined
+  username: 'anonymous', password: undefined, email: undefined
 };
 
 @Component(
@@ -28,7 +28,10 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
 
   private navbarData: NavbarData = new NavbarData();
   private navbarSubscription: Subscription;
-  private rlaSafe: boolean;
+  private rlaSafe = false;
+
+  private _showNav = false;
+  @Output('navbar') private showNavEvent = new EventEmitter<boolean>();
 
   constructor(
     private navbarDataService: NavbarDataService, private modalService: MdDialog, private userApi: UserApi
@@ -59,6 +62,17 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
     this.navbarSubscription.unsubscribe();
   }
 
+  public get showNav() {
+    return this._showNav;
+  }
+
+  public set showNav(value: boolean) {
+    if (this._showNav !== value) {
+      this._showNav = value;
+      this.showNavEvent.next(value);
+    }
+  }
+
   public onClickLogin() {
     this.loginModalRef = this.modalService.open(
       LoginModalComponent, { disableClose: false } );
@@ -75,25 +89,6 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
       );
   }
 
-  /**
-   * @param {object} event
-   */
-  public onSessionChangeEvent(event) {
-    if (event.eventType.isAuthenticated()) {
-      event.userInfo.then(
-        function onUserInfoAvailable(data) {
-          this.userInfo = data || this.NO_USER_INFO;
-        }
-      )
-        .catch(
-          function onError(err) {
-            this.userInfo = this.NO_USER_INFO;
-            // console.error(err);
-          }
-        );
-    }
-  }
-
   public isLoggedIn() {
     return this.userApi.isAuthenticated();
   }
@@ -101,7 +96,5 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
   public logout() {
     this.userApi.logout();
   }
-
-  // $scope.$on('jchptf.site.authentication.sessionChangeEvent', onSessionChangeEvent);
 }
 
