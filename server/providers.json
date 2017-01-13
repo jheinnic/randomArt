@@ -4,7 +4,7 @@
     "module": "passport-facebook",
     "clientID": "",
     "clientSecret": "",
-    "callbackURL": "https://www.myproject.com/auth/facebook/callback",
+    "callbackURL": "http://portfolio.jchein.name:4000/auth/facebook/callback",
     "authPath": "/auth/facebook",
     "callbackPath": "/auth/facebook/callback",
     "successRedirect": "/auth/success",
@@ -12,5 +12,18 @@
       "email"
     ],
     "failureFlash": true
+  },
+  "google-link": {
+    "provider": "google",
+    "module": "passport-google-oauth",
+    "strategy": "OAuth2Strategy",
+    "clientID": "913722222985-375ivqul95thc7gngjp2o9m256iq35o6.apps.googleusercontent.com",
+    "clientSecret": "aOzPtGA64rjp_NhO1nNUX6rQ",
+    "callbackURL": "http://localhost:3000/link/google/callback",
+    "authPath": "/link/google",
+    "callbackPath": "/link/google/callback",
+    "successRedirect": "/link/account",
+    "scope": ["email", "profile"],
+    "link": true
   }
 }
