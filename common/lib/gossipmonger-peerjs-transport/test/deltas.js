@@ -1,6 +1,6 @@
 /*
 
-digest.js - gossipmongerTcpTransport.digest() test
+deltas.js - gossipmongerTcpTransport.deltas() test
 
 The MIT License (MIT)
 
@@ -36,11 +36,11 @@ var net = require('net'),
 
 var test = module.exports = {};
 
-test['digest() connects to remotePeer.host:remotePeer.port'] = function (test) {
+test['deltas() connects to remotePeer.host:remotePeer.port'] = function (test) {
     test.expect(1);
     var tcpTransport = new TcpTransport();
-    var localPeer = {id: "local", transport: {host: 'localhost', port: 9742}};
-    var remotePeer = {id: "remote", transport: {host: 'localhost', port: 11234}};
+    var localPeer = {id: "local", transport: {host: 'localhost', port: 8500, id: '7110aee7-61d6-4454-85c8-c185f24f64be'}};
+    var remotePeer = {id: "remote", transport: {host: 'localhost', port: 8500, id: '6c3bb0ad-0bed-4d6a-94cc-c115a1e86a51'}};
     var server = net.createServer(function (connection) {
         test.equal(connection.remoteAddress, connection.localAddress);
         connection.on('data', function () {}); // consume data
@@ -51,15 +51,15 @@ test['digest() connects to remotePeer.host:remotePeer.port'] = function (test) {
         });
     });
     server.listen(remotePeer.transport.port, function () {
-        tcpTransport.digest(remotePeer, localPeer, [localPeer]);
+        tcpTransport.deltas(remotePeer, localPeer, [["local", "foo", "bar", 17]]);
     });
 };
 
-test['digest() sends payload including digest and sender'] = function (test) {
+test['deltas() sends payload including deltas and sender'] = function (test) {
     test.expect(2);
     var tcpTransport = new TcpTransport();
-    var localPeer = {id: "local", transport: {host: 'localhost', port: 9742}};
-    var remotePeer = {id: "remote", transport: {host: 'localhost', port: 11234}};
+    var localPeer = {id: "local", transport: {host: 'localhost', port: 8500, id: '7110aee7-61d6-4454-85c8-c185f24f64be'}};
+    var remotePeer = {id: "remote", transport: {host: 'localhost', port: 8500, id: '6c3bb0ad-0bed-4d6a-94cc-c115a1e86a51'}};
     var server = net.createServer(function (connection) {
         var data = "";
         connection.on('data', function (chunk) {
@@ -68,13 +68,13 @@ test['digest() sends payload including digest and sender'] = function (test) {
         connection.on('end', function () {
             data = JSON.parse(data);
             test.deepEqual(data.sender, localPeer);
-            test.deepEqual(data.digest, [localPeer]);
+            test.deepEqual(data.deltas, [["local", "foo", "bar", 17]]);
             server.close(function () {
                 test.done();
             });
         });
     });
     server.listen(remotePeer.transport.port, function () {
-        tcpTransport.digest(remotePeer, localPeer, [localPeer]);
-    });    
+        tcpTransport.deltas(remotePeer, localPeer, [["local", "foo", "bar", 17]]);
+    });
 };

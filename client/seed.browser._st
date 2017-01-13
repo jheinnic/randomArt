@@ -1,0 +1,82 @@
+import seeds = require('./seeds.json');
+import uuid = require('uuid');
+import Gossipmonger = require('gossipmonger');
+import PeerjsTransport = require('../common/lib/gossipmonger-peerjs-transport');
+
+const NUM_SEEDS = 3;
+let seedIds = seeds.slice(0, NUM_SEEDS);
+
+
+function joinCluster(seedId:number = -1) {
+  let localId;
+  if ((seedId < 0) || (seedId >= NUM_SEEDS)) {
+    seedId = -1;
+    localId = uuid.v4();
+  } else {
+    localId = seedIds.splice(seedId, 1)[0];
+  }
+
+  if (localId === undefined) {
+    throw new Error(`Invalid argument, ${seedId}.  Could not determine local Id.`);
+  }
+
+  let localConfig = {
+    host: '192.168.5.3',
+    port: 8500,
+    id: localId
+  };
+  let localTransport = new PeerjsTransport(localConfig);
+
+  let seedTransports = seedIds.map(function (remoteId) {
+    let remoteConfig = {
+      host: '192.168.5.3',
+      port: 8500,
+      id: remoteId
+    };
+    return {
+      id: remoteId,
+      transport: new PeerjsTransport(remoteConfig)
+    };
+  });
+
+  localTransport.listen(function (err, data) {
+    console.log(err);
+    console.log(data);
+
+    runGossip(localId, localTransport, seedTransports);
+  });
+}
+
+
+function runGossip(localId, localTransport, seedTransports) {
+  let gossipmonger = new Gossipmonger(
+    { // peerInfo
+      id: localId,
+      transport: localTransport
+    },
+    { // options
+      seeds: seedTransports
+    }
+  );
+
+  gossipmonger.on('error', function (error) {
+    console.dir(error);
+  });
+
+  gossipmonger.on('new peer', function (newPeer) {
+    console.log("found new peer " + newPeer.id + " at " + newPeer.transport);
+  });
+
+  gossipmonger.on('peer dead', function (deadPeer) {
+    console.log("peer " + deadPeer.id + " is now assumed unreachable");
+  });
+
+  gossipmonger.on('peer live', function (livePeer) {
+    console.log("peer " + livePeer.id + " is live again");
+  });
+
+  gossipmonger.on('update', function (peerId, key, value) {
+    console.log("peer " + peerId + " updated key " + key + " with " + value);
+  });
+}
+

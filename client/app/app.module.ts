@@ -128,6 +128,10 @@ export class AppModule
       component: ImageLobbyComponent
     },
     {
+      path: 'peernet',
+      loadChildren: './+peernet#PeernetModule'
+    },
+    {
       path: '**',
       component: NoContentComponent
     }

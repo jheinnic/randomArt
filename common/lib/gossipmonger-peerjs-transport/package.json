@@ -1,7 +1,7 @@
 {
-  "name": "gossipmonger-tcp-transport",
+  "name": "gossipmonger-peerjs-transport",
   "version": "0.1.6",
-  "description": "TCP Transport for Gossipmonger",
+  "description": "PeerJS Transport for Gossipmonger",
   "scripts": {
     "test": "node scripts/test.js"
   },
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:tristanls/gossipmonger-tcp-transport.git"
+    "url": "git@github.com:jheinnic/gossipmonger-peerjs-transport.git"
   },
   "keywords": [
     "gossip",
@@ -20,7 +20,7 @@
     "replication",
     "real-time",
     "storage",
-    "tcp",
+    "peerjs",
     "transport"
   ],
   "contributors": [

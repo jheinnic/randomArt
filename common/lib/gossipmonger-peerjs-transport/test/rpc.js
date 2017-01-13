@@ -40,7 +40,7 @@ test['rpc() captures client error and propagates it to a transport event'] = fun
     test.expect(1);
     var webRtcTransport = new WebRtcTransport();
     var remotePeer = {id: "remote", transport: {
-      ice: [{urls: "stun:stun.services.mozilla.com"}], host: 'localhost', port: 11234}};
+      ice: [{urls: "stun:stun.services.mozilla.com"}], host: 'localhost', port: 8500, id: '7110aee7-61d6-4454-85c8-c185f24f64be'}};
     webRtcTransport.on('error', function () {
         test.ok(true); // client connection error caught
         test.done();

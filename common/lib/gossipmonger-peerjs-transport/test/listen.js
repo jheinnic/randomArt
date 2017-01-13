@@ -36,11 +36,11 @@ var net = require('net'),
 
 var test = module.exports = {};
 
-test['listen() starts a TCP server on localhost:9742 by default'] = function (test) {
+test['listen() starts a TCP server on localhost:8500, id: "uuid01" by default'] = function (test) {
     test.expect(1);
     var tcpTransport = new TcpTransport();
     tcpTransport.listen(function () {
-        var client = net.connect({host: 'localhost', port: 9742}, function () {
+        var client = net.connect({host: 'localhost', port: 8500, id: 'uuid01'}, function () {
             test.ok(true); // assert connection
             tcpTransport.close(function () {
                 test.done();
@@ -54,9 +54,9 @@ test['listen() starts a TCP server on localhost:9742 by default'] = function (te
 
 test['listen() starts a TCP server on host:port from constructor options'] = function (test) {
     test.expect(1);
-    var tcpTransport = new TcpTransport({host: '127.0.0.1', port: 6744});
+    var tcpTransport = new TcpTransport({host: '127.0.0.1', port: 8500, id: 'uid6744'});
     tcpTransport.listen(function () {
-        var client = net.connect({host: '127.0.0.1', port: 6744}, function () {
+        var client = net.connect({host: '127.0.0.1', port: 8500, id: 'uid6744'}, function () {
             test.ok(true); // assert connection
             tcpTransport.close(function () {
                 test.done();
@@ -70,7 +70,7 @@ test['listen() starts a TCP server on host:port from constructor options'] = fun
 
 test['listen() starts a TCP server on host:port from listen call options if specified'] = function (test) {
     test.expect(1);
-    var tcpTransport = new TcpTransport({host: '127.0.0.1', port: 6744});
+    var tcpTransport = new TcpTransport({host: '127.0.0.1', port: 8500, id: 'uid6744'});
     tcpTransport.listen({host: 'localhost', port: 9999}, function () {
         var client = net.connect({host: '127.0.0.1', port: 9999}, function () {
             test.ok(true); // assert connection
@@ -89,7 +89,7 @@ test['listen() can start without args'] = function (test) {
     var tcpTransport = new TcpTransport();
     tcpTransport.listen();
     tcpTransport.on('listening', function () {
-        var client = net.connect({host: 'localhost', port: 9742}, function () {
+        var client = net.connect({host: 'localhost', port: 8500, id: 'uuid01'}, function () {
             test.ok(true); // assert connection
             tcpTransport.close(function () {
                 test.done();
@@ -103,11 +103,11 @@ test['listen() can start without args'] = function (test) {
 
 test['listening transport emits `deltas` event when it receives deltas'] = function (test) {
     test.expect(2);
-    var localPeer = {id: "local", transport: {host: 'localhost', port: 9742}};
-    var remotePeer = {id: "remote", transport: {host: '127.0.0.1', port: 11111}};
+    var localPeer = {id: "local", transport: {host: 'localhost', port: 8500, id: 'uuid01'}};
+    var remotePeer = {id: "remote", transport: {host: '127.0.0.1', port: 8500, id: '11111'}};
     var tcpTransport = new TcpTransport();
     tcpTransport.listen(function () {
-        var client = net.connect({host: 'localhost', port: 9742}, function () {
+        var client = net.connect({host: 'localhost', port: 8500, id: 'uuid01'}, function () {
             var rpc = {
                 deltas: [["remote", "foo", "bar", 3]],
                 sender: remotePeer
@@ -129,16 +129,16 @@ test['listening transport emits `deltas` event when it receives deltas'] = funct
 
 test['listening transport emits `digest` event when it receives digest'] = function (test) {
     test.expect(2);
-    var localPeer = {id: "local", transport: {host: 'localhost', port: 9742}};
-    var remotePeer = {id: "remote", transport: {host: '127.0.0.1', port: 11111}};
+    var localPeer = {id: "local", transport: {host: 'localhost', port: 8500, id: 'uuid01'}};
+    var remotePeer = {id: "remote", transport: {host: '127.0.0.1', port: 8500, id: '1111'}};
     var digestPeer = {
-        id: "digest", 
-        maxVersionSeen: 17, 
-        transport: {host: '127.0.0.1', port: 12222}
+        id: "digest",
+        maxVersionSeen: 17,
+        transport: {host: '127.0.0.1', port: 8500, id: '12222'}
     };
     var tcpTransport = new TcpTransport();
     tcpTransport.listen(function () {
-        var client = net.connect({host: 'localhost', port: 9742}, function () {
+        var client = net.connect({host: 'localhost', port: 8500, id: 'uuid01'}, function () {
             var rpc = {
                 digest: [digestPeer],
                 sender: remotePeer
