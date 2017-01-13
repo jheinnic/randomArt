@@ -2,6 +2,7 @@
 
 declare var Object: any;
 export interface UserInterface {
+  userId?: string;
   realm?: string;
   username?: string;
   password: string;
@@ -12,11 +13,11 @@ export interface UserInterface {
   status?: string;
   created?: Date;
   lastUpdated?: Date;
-  id?: number;
   accessTokens?: Array<any>;
 }
 
 export class User implements UserInterface {
+  userId: string;
   realm: string;
   username: string;
   password: string;
@@ -27,7 +28,6 @@ export class User implements UserInterface {
   status: string;
   created: Date;
   lastUpdated: Date;
-  id: number;
   accessTokens: Array<any>;
   constructor(data?: UserInterface) {
     Object.assign(this, data);
@@ -60,6 +60,10 @@ export class User implements UserInterface {
       name: 'User',
       plural: 'Users',
       properties: {
+        userId: {
+          name: 'userId',
+          type: 'string'
+        },
         realm: {
           name: 'realm',
           type: 'string'
@@ -103,10 +107,6 @@ export class User implements UserInterface {
         lastUpdated: {
           name: 'lastUpdated',
           type: 'Date'
-        },
-        id: {
-          name: 'id',
-          type: 'number'
         },
       },
       relations: {

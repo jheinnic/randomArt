@@ -4,7 +4,6 @@
       "loopback/common/models",
       "loopback/server/models",
       "../common/models",
-      // "./lib/loopback-component-peerjs/lib/models",
       "./models"
     ],
     "mixins": [

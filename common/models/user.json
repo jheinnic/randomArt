@@ -2,7 +2,12 @@
   "name": "user",
   "base": "User",
   "idInjection": true,
-  "properties": {},
+  "properties": {
+    "userId": {
+      "type": "string",
+      "id": true
+    }
+  },
   "validations": [],
   "relations": {},
   "acls": [

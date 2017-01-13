@@ -76,11 +76,9 @@ module.exports = function (options) {
      * See: http://webpack.github.io/docs/configuration.html#entry
      */
     entry: {
-
       'polyfills': './polyfills.browser.ts',
       'vendor':    './vendor.browser.ts',
       'main':      './main.browser.ts'
-
     },
 
     /*
@@ -145,7 +143,8 @@ module.exports = function (options) {
           ],
           exclude: [
             /\.(spec|e2e)\.ts$/,
-            /\/(node_modules|build|dist|server|tests|config)\//
+	    /\/(node_modules|build|dist|server|temp2|tests|config)\//,
+            /\/common\/lib\/weavesilk\//
           ]
         },
 
@@ -180,7 +179,8 @@ module.exports = function (options) {
           use: ['to-string-loader', 'css-loader', 'sass-loader']
         },
         {
-          test: /\/[a-z][^/]+\.scss$/,
+          test: /\/assets\/css\/.+\.scss$/,
+          // test: /\/[a-z][^/]+\.scss$/,
           // test: [ /app\/app\.scss$/, /app\/app.theme.scss$/ ],
           loader: extractSCSS.extract({
             loader: ['css-loader', 'sass-loader'],
@@ -196,7 +196,7 @@ module.exports = function (options) {
         {
           test: /\.html$/,
           use: 'raw-loader',
-          exclude: [helpers.root('client/index.html')]
+          exclude: [ helpers.root('client/index.html') ]
         },
 
         /* File loader for supporting images, for example, in CSS files.

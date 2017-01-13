@@ -15,8 +15,6 @@
   "mixins": {
     "Timestamp": {
       "required" : false,
-      // "createdAt" : "created",
-      // "updatedAt" : "modified",
       "validateUpsert": true,
       "silenceWarnings": false
     }
