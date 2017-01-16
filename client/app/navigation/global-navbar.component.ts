@@ -14,17 +14,16 @@ const NO_USER_INFO: UserInterface = {
   username: 'anonymous', password: undefined, email: undefined
 };
 
-@Component(
-  {
-    moduleId   : path.relative(__dirname, __filename),
-    selector   : 'global-navbar',
-    templateUrl: './_global-navbar.view.html',
-  }
-)
+@Component({
+  moduleId   : path.relative(__dirname, __filename),
+  selector   : 'global-navbar',
+  templateUrl: './_global-navbar.view.html',
+})
 export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
 {
   private userInfo: UserInterface;
   private loginModalRef: MdDialogRef<LoginModalComponent>;
+  private loginResultSubscription: Subscription;
 
   private navbarData: NavbarData = new NavbarData();
   private navbarSubscription: Subscription;
@@ -58,10 +57,6 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
     this.rlaSafe = true;
   }
 
-  public ngOnDestroy() {
-    this.navbarSubscription.unsubscribe();
-  }
-
   public get showNav() {
     return this._showNav;
   }
@@ -74,14 +69,21 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
   }
 
   public onClickLogin() {
-    this.loginModalRef = this.modalService.open(
-      LoginModalComponent, { disableClose: false } );
+    this.loginModalRef =
+      this.modalService.open(
+        LoginModalComponent, { disableClose: false }
+      );
 
-    this.loginModalRef.afterClosed()
+    this.loginResultSubscription = this.loginModalRef.afterClosed()
       .subscribe(
         result => {
           console.log('result: ' + result);
           this.loginModalRef = undefined;
+
+          if (this.loginResultSubscription) {
+            this.loginResultSubscription.unsubscribe();
+            this.loginResultSubscription = undefined;
+          }
           if (result.userInfo) {
             this.userInfo = result.userInfo;
           }
@@ -95,6 +97,19 @@ export class GlobalNavbarComponent implements AfterViewInit, OnDestroy
 
   public logout() {
     this.userApi.logout();
+  }
+
+  public ngOnDestroy() {
+    this.navbarSubscription.unsubscribe();
+
+    if (this.loginResultSubscription) {
+      this.loginResultSubscription.unsubscribe();
+      this.loginResultSubscription = undefined;
+    }
+    if (this.loginModalRef) {
+      this.loginModalRef.close();
+      this.loginModalRef = undefined;
+    }
   }
 }
 

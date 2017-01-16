@@ -1,17 +1,56 @@
 {
+  "local": {
+    "provider": "local",
+    "module": "passport-local",
+    "usernameField": "username",
+    "passwordField": "password",
+    "authPath": "/auth/local",
+    "successRedirect": "/home",
+    "failureRedirect": "/login",
+    "failureFlash": true
+  },
+  "facebook-link": {
+    "provider": "facebook",
+    "module": "passport-facebook",
+    "clientID": "{facebook-client-id-2}",
+    "clientSecret": "{facebook-client-secret-2}",
+    "callbackURL": "/link/facebook/callback",
+    "authPath": "/link/facebook",
+    "callbackPath": "/link/facebook/callback",
+    "successRedirect": "/auth/success",
+    "failureRedirect": "/login",
+    "scope": ["email", "user_likes"],
+    "link": true,
+    "failureFlash": true
+  },
   "facebook-login": {
     "provider": "facebook",
     "module": "passport-facebook",
-    "clientID": "",
-    "clientSecret": "",
-    "callbackURL": "http://portfolio.jchein.name:4000/auth/facebook/callback",
+    "clientID": "a",
+    "clientSecret": "a",
+    "callbackURL": "http://ptf.jchein.name/auth/facebook/callback",
     "authPath": "/auth/facebook",
     "callbackPath": "/auth/facebook/callback",
     "successRedirect": "/auth/success",
-    "scope": [
-      "email"
-    ],
+    "failureRedirect": "/login",
+    "scope": ["email"],
     "failureFlash": true
+  },
+  "google-login": {
+    "provider": "google",
+    "module": "passport-google-oauth",
+    "strategy": "OAuth2Strategy",
+    "clientID": "913722222985-375ivqul95thc7gngjp2o9m256iq35o6.apps.googleusercontent.com",
+    "clientSecret": "aOzPtGA64rjp_NhO1nNUX6rQ",
+    "callbackURL": "http://portfolio-api.dev.jchein.name:3000/auth/google/callback",
+    "authPath": "/auth/google",
+    "callbackPath": "/auth/google/callback",
+    "successRedirect": "/auth/success",
+    "failureRedirect": "/login",
+    "scope": ["email", "profile"],
+    "setAccessToken" : true,
+    "failureFlash": true,
+    "session" : true
   },
   "google-link": {
     "provider": "google",
@@ -19,11 +58,15 @@
     "strategy": "OAuth2Strategy",
     "clientID": "913722222985-375ivqul95thc7gngjp2o9m256iq35o6.apps.googleusercontent.com",
     "clientSecret": "aOzPtGA64rjp_NhO1nNUX6rQ",
-    "callbackURL": "http://localhost:3000/link/google/callback",
+    "callbackURL": "http://portfolio-api.dev.jchein.name:3000/link/google/callback",
     "authPath": "/link/google",
     "callbackPath": "/link/google/callback",
-    "successRedirect": "/link/account",
+    "successRedirect": "/home",
+    "failureRedirect": "/auth/success",
     "scope": ["email", "profile"],
+    "setAccessToken" : true,
+    "failureFlash": true,
+    "session" : true,
     "link": true
   }
 }

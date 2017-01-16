@@ -1,8 +1,11 @@
 /* tslint:disable */
 import { Injectable } from '@angular/core';
+import { User } from '../../models/User';
 import { PeerConnection } from '../../models/PeerConnection';
 import { Email } from '../../models/Email';
-import { User } from '../../models/User';
+import { StormpathUser } from '../../models/StormpathUser';
+import { Container } from '../../models/Container';
+import { Artwork } from '../../models/Artwork';
 
 interface Models { [name: string]: any }
 
@@ -10,9 +13,12 @@ interface Models { [name: string]: any }
 export class SDKModels {
 
   private models: Models = {
+    User: User,
     PeerConnection: PeerConnection,
     Email: Email,
-    User: User,
+    StormpathUser: StormpathUser,
+    Container: Container,
+    Artwork: Artwork,
     
   };
 

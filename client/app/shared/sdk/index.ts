@@ -48,9 +48,12 @@ import { SocketBrowser } from './sockets/socket.browser';
 import { SocketDriver } from './sockets/socket.driver';
 import { SocketConnection } from './sockets/socket.connections';
 import { RealTime } from './services/core/real.time';
+import { UserApi } from './services/custom/User';
 import { PeerConnectionApi } from './services/custom/PeerConnection';
 import { EmailApi } from './services/custom/Email';
-import { UserApi } from './services/custom/User';
+import { StormpathUserApi } from './services/custom/StormpathUser';
+import { ContainerApi } from './services/custom/Container';
+import { ArtworkApi } from './services/custom/Artwork';
 /**
 * @module SDKBrowserModule
 * @description
@@ -79,9 +82,12 @@ export class SDKBrowserModule {
         JSONSearchParams,
         SDKModels,
         RealTime,
+        UserApi,
         PeerConnectionApi,
         EmailApi,
-        UserApi,
+        StormpathUserApi,
+        ContainerApi,
+        ArtworkApi,
         { provide: InternalStorage, useClass: CookieBrowser },
         { provide: SDKStorage, useClass: StorageBrowser },
         { provide: SocketDriver, useClass: SocketBrowser }

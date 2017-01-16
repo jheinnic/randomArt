@@ -247,8 +247,8 @@ $inverse-color: map_get($md-light-theme-foreground, 'disabled-button');
 
 $font-family-sans-serif: Roboto, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 // $font-family-serif:      Georgia, "Times New Roman", Times, serif !default;
-$font-family-monospace:  "Anonymous Pro", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
-// $font-family-base:       $font-family-sans-serif !default;
+$font-family-monospace:  "Anonymous Pro", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-base:       $font-family-sans-serif;
 
 // $font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
 // $font-size-lg:   1.25rem !default;
@@ -269,7 +269,7 @@ $font-family-monospace:  "Anonymous Pro", Menlo, Monaco, Consolas, "Liberation M
 // $font-size-h6: 1rem !default;
 
 // $headings-margin-bottom: ($spacer / 2) !default;
-// $headings-font-family:   inherit !default;
+$headings-font-family:   inherit;
 // $headings-font-weight:   500 !default;
 // $headings-line-height:   1.1 !default;
 // $headings-color:         inherit !default;

@@ -3,11 +3,13 @@
  */
 import {AsyncScheduler} from "rxjs/scheduler/AsyncScheduler";
 import {ReplaySubject} from "rxjs/ReplaySubject";
-import PeerjsTransport = require('../../../common/lib/gossipmonger-peerjs-transport');
-import Gossipmonger = require('gossipmonger');
-import uuid = require('uuid');
 import {Observable} from "rxjs/Observable";
 import {Scheduler} from "rxjs";
+import {IGossipmonger} from './gossipmonger.d';
+import PeerjsTransport = require('../../../common/lib/gossipmonger-peerjs-transport');
+import Gossipmonger = require('gossipmonger');
+import GossipmongerPeer = require('gossipmonger-peer');
+import uuid = require('uuid');
 
 const NUM_SEEDS: number = 3;
 
@@ -15,7 +17,7 @@ export class PeerConnectService
 {
   constructor() { }
 
-  seedCluster(seedIndex: number): Observable<Gossipmonger> {
+  seedCluster(seedIndex: number): Observable<IGossipmonger> {
     let localId: String;
     let seedIds: string[];
 
@@ -31,58 +33,70 @@ export class PeerConnectService
     return this.connectAsLocalId(localId, seedIds);
   }
 
-  joinCluster() {
+  joinCluster(): Observable<IGossipmonger> {
     let localId: String = new String(uuid.v4());
     let allSeeds: string[] = require('./seeds.json');
 
     return this.connectAsLocalId(localId, allSeeds);
   }
 
-  private connectAsLocalId(localId: String, seedIds: string[]): Observable<Gossipmonger> {
-    let retVal = new ReplaySubject<Gossipmonger>(4, 30000);
+  private connectAsLocalId(localId: String, seedIds: string[]): Observable<IGossipmonger> {
+    let retVal = new ReplaySubject<IGossipmonger>(4, 30000);
 
-    // Must remove the constructor to convince PeerJS that this is a string, not an object.
-    // delete this.localId['constructor'];
-    // Object.defineProperty(this.localId, 'constructor', {
-    //   value: null
-    // });
-    // this.localId.constructor = null;
+    // Must use String instead of string to convince PeerJS that localId is a string, not a
+    // configuration object.
     let localConfig = {
       host: '192.168.5.3',
       port: 8500,
       id: localId
     };
+
     let localTransport = new PeerjsTransport(localConfig);
-
-    let seedTransports = seedIds.map(function (remoteId) {
-      let remoteConfig = {
-        host: '192.168.5.3',
-        port: 8500,
-        id: remoteId
-      };
-      return {
-        id: remoteId,
-        transport: new PeerjsTransport(remoteConfig)
-      };
-    });
-
-    localTransport.listen((peerId: string) => {
-      if (peerId != localId) {
-        throw new Error(`Listen acknowledged ${peerId} when ${localId} was requested.`);
-      } else {
-        console.log(`Broker validly acknowledges ${peerId}`);
+    let seedTransports = seedIds.map(
+      function (remoteId) {
+        let remoteConfig = {
+          host: '192.168.5.3',
+          port: 8500,
+          id: remoteId
+        };
+        return new GossipmongerPeer(
+          remoteId, {
+            data: {},
+            intervals: [750],
+            intervalsMean: 750,
+            lastTimme: new Date().getTime(),
+            live: true,
+            maxVersionSeen: 0,
+            MAX_INTERVALS: 100,
+            sum: 750,
+            transport: new PeerjsTransport(remoteConfig)
+          }
+        );
       }
+    );
 
-      this.runGossip(retVal, localId, localTransport, seedTransports);
-    });
+    localTransport.listen(
+      (peerId: string) => {
+        if (peerId != localId) {
+          throw new Error(`Listen acknowledged ${peerId} when ${localId} was requested.`);
+        } else {
+          console.log(`Broker validly acknowledges ${peerId}`);
+        }
+
+        retVal.next(
+          this.runGossip(localId, localTransport, seedTransports));
+      }
+    );
 
     return retVal.asObservable();
   }
 
-  runGossip(subject:ReplaySubject<Gossipmonger>, localId: String, localTransport, seedTransports) {
+  runGossip( localId: String, localTransport:any, seedTransports:any[] ) {
     let gossipmonger = new Gossipmonger({ // peerInfo
       id: localId,
-      transport: localTransport
+      data: {},
+      transport: localTransport,
+      maxVersionSeen: 0
     }, { // options
       seeds: seedTransports,
       transport: localTransport
@@ -107,5 +121,7 @@ export class PeerConnectService
     gossipmonger.on('update', function (peerId, key, value) {
       console.log("peer " + peerId + " updated key " + key + " with " + value);
     });
+
+    return gossipmonger;
   }
 }

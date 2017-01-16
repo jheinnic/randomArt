@@ -36,6 +36,16 @@ span.brand-name {
   padding-left: 10px;
 }
 
+md-dialog-content > input {
+  display:block;
+}
+
+md-dialog-actions {
+  & > button, & > a {
+    margin-left: 10px;
+  }
+}
+
 /*
 span.active {
   background-color: gray;

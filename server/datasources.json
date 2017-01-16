@@ -1,7 +1,24 @@
 {
-  "db": {
+  "db": { 
     "name": "db",
-    "connector": "memory"
+    "host": "127.0.0.1",
+    "port": 27017,
+    "database": "portfolio",
+    "password": "abcd1234", 
+    "connector": "mongodb",
+    "user": "jheinnic"
+  },
+  "memdb": {
+    "name": "memdb",
+    "connector": "memory",
+    "file": "modelCache.json"
+  },
+  "stormpath": {
+    "name": "stormpath",
+    "connector": "stormpath",
+    "apiKeyId": "6DK0B4LNDYFGEXPWWIRLC8U2B",
+    "apiKeySecret": "DKC3pz+rbG3XULATgtDhK19+6w9ypw99vvqXUNGHh+g",
+    "applicationHref": "https://api.stormpath.com/v1/applications/7mfFNBXqPTbNP3ZMlahygf" 
   },
   "emailDs": {
     "name": "emailDs",
@@ -21,5 +38,12 @@
         }
       }
     ]
+  },
+  "artStore": {
+    "name": "artStore",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem", 
+    "root": "/var/www/storage",
+    "maxFileSize": "52428800"
   }
 }

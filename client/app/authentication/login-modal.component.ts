@@ -1,7 +1,11 @@
 import {Component, Inject, Optional, OpaqueToken} from "@angular/core";
+import {Location} from "@angular/common";
 import {MdDialogRef} from "@angular/material";
-import {UserApi} from "../shared/sdk/services";
 import {Observable} from "rxjs/Observable";
+import {UserApi} from "../shared/sdk/services";
+import {LoopBackConfig} from "../shared/sdk/lb.config";
+import {BASE_URL, API_VERSION} from "../shared/base-url.values";
+import {User} from "../shared/sdk/models/User";
 
 interface Credentials
 {
@@ -9,16 +13,14 @@ interface Credentials
   password: string | null;
 }
 
-export const LOGIN_TITLE: OpaqueToken = new OpaqueToken('LOGIN_TITLE');
-
 @Component(
   {
     selector: 'login-modal',
-    templateUrl: './_login-modal.view.html',
-    host: {
-      '[class.d-flex]': 'true',
-      '[class.flex-column]': 'true'
-    }
+    templateUrl: './_login-modal.view.html'
+    // host: {
+    //   '[class.d-flex]': 'true',
+    //   '[class.flex-column]': 'true'
+    // }
   }
 )
 export class LoginModalComponent
@@ -29,9 +31,11 @@ export class LoginModalComponent
   private error: any;
 
   constructor(
-    private modalRef: MdDialogRef<LoginModalComponent>, private userApi: UserApi,
-    @Optional() @Inject(LOGIN_TITLE) private loginTitle: string = 'Login'
+    private modalRef: MdDialogRef<LoginModalComponent>,
+    private userApi: UserApi, private location: Location
   ) {
+    LoopBackConfig.setBaseURL(BASE_URL);
+    LoopBackConfig.setApiVersion(API_VERSION);
     this.cred = { username: null, password: null };
   }
 
@@ -40,11 +44,12 @@ export class LoginModalComponent
   login() {
     return this.userApi.login(this.cred, undefined, true)
       .subscribe(
-        (userInfo) => {
+        (userData) => {
+          let userInfo = this.extractProfile(userData);
           console.log("Logged in as ", userInfo);
 
           this.modalRef.close(userInfo);
-          return userInfo
+          return userInfo;
         }, (error) => {
           console.error("Failed to login with " + this.cred, error);
 
@@ -53,6 +58,34 @@ export class LoginModalComponent
           return Observable.throw(error);
         }
       );
+  }
+
+  private extractProfile(userData: User) {
+    let firstName = '';
+    let lastName = '';
+    let photo = '';
+    let email = '';
+
+    if (userData && userData.identities && userData.identities[0] && userData.identities[0].profile) {
+      let profile = userData.identities[0].profile;
+      let name = profile.name;
+
+      if (profile.photos && profile.photos[0] && profile.photos[0].value) {
+        let photo = profile.photos[0].value;
+      }
+
+      if (profile.emails && profile.emails[0] && profile.emails[0].value) {
+        let email = profile.emails[0].value;
+      }
+    }
+
+    return {
+      id: userData.id,
+      firstName: firstName,
+      lastName: lastName,
+      photo: photo,
+      email: email
+    };
   }
 
   private showError(error) {

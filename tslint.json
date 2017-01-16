@@ -83,7 +83,7 @@
     "trailing-comma": [
       true,
       {
-        "multiline": false,
+        "multiline": "always",
         "singleline": "never"
       }
     ],
@@ -98,11 +98,10 @@
     "jsdoc-format": true,
     "no-consecutive-blank-lines": false,
     "one-line": [
-      false,
+      true,
       "check-open-brace",
       "check-catch",
       "check-else",
-      "check-finally",
       "check-whitespace"
     ],
     "quotemark": [
@@ -110,7 +109,7 @@
       "single",
       "avoid-escape"
     ],
-    "semicolon": [true, "always"],
+    "semicolon": true,
     "variable-name": [
       true,
       "check-format",

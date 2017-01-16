@@ -2,6 +2,13 @@
   "initial:before": {
     "loopback#favicon": {}
   },
+  "session": {
+    "loopback#session": {
+      "params": {
+        "secret": "c56d82fa8c959c0221f2b013b07141de"
+      }
+    }
+  },
   "final:after": {
     "loopback#errorHandler": {
       "params": {

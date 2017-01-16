@@ -4,6 +4,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
+import {SeedConnectResolver} from './seed-connect.resolver';
 import {SeedComponent} from "./seed.component";
 
 @NgModule({
@@ -17,7 +18,9 @@ import {SeedComponent} from "./seed.component";
 })
 export class PeernetModule {
   static routes:Routes = [
-    {path: 'seeds/:seedId', component: SeedComponent, pathMatch: 'full'}
+    {path: 'seeds/:seedId', component: SeedComponent, pathMatch: 'full', resolve: {
+      gossipmonger: SeedConnectResolver
+    }}
   ];
   constructor() {
     console.log('PeerNet Loads');

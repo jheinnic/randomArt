@@ -81,6 +81,8 @@ module.exports = function (options) {
       'main':      './main.browser.ts'
     },
 
+    externals: [ 'gossipmonger-tcp-transport' ],
+
     /*
      * Options affecting the resolving of modules.
      *

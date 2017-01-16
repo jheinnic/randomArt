@@ -1,26 +1,66 @@
 {
+  "initial:before": {
+    "loopback#favIcon": {
+    }
+  },
   "initial": {
     "compression": {},
     "cors": {
       "params": {
-        "origin": true,
+        "origin": "*",
         "credentials": true,
         "maxAge": 86400
       }
     }
   },
+  "session:before": {
+    "cookie-parser": {
+      "params": "development sessions"
+    }
+  },
   "session": {
+    "express-session": {
+      "params": {
+        "secret": "development sessions",
+        "resave": true,
+        "saveUninitialized": true
+      }
+    }
   },
   "auth": {
+    "loopback#token": {
+      "params": {
+        "headers": [
+          "Authorization"
+        ]
+      }
+    }
   },
   "parse": {
+    "body-parser#json": {
+      "params": {
+        "limit": "768000"
+      }
+    },
+    "body-parser#urlencoded": {
+      "params": {
+        "limit": "768000",
+        "extended": true
+      }
+    }
   },
   "routes": {
     "loopback#rest": {
-      "paths": ["${restApiRoot}"]
+      "paths": [
+        "${restApiRoot}"
+      ]
     }
   },
   "files": {
+    "loopback#static": {
+      "name": "app",
+      "params": "$!../dist"
+    }
   },
   "final": {
     "loopback#urlNotFound": {}

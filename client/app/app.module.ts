@@ -17,7 +17,7 @@ import {TokenCheckXHRBackend} from "./token-check-xhr-backend.service";
 import {BlankAreaComponent} from "./shared";
 import {AllPointsComponent, AllPixelsComponent, PaintablePointPipe, PointMapPipe, PointStreamService} from "./stream-play";
 import {PoolModule, ImageLobbyComponent} from "./pool";
-import {LoginModalComponent, RedirectingErrorHandler} from "./authentication";
+import {LoginModalComponent, PassportComponent, RedirectingErrorHandler} from "./authentication";
 import {GlobalNavbarComponent, NavbarDataService} from "./navigation";
 import {SDKBrowserModule, ErrorHandler} from "./shared/sdk";
 import {CanvasCacheModule} from "./shared/canvas-cache";
@@ -25,6 +25,8 @@ import {NewNamedCanvasModalComponent} from "./shared/phrase-generator/new-named-
 import {NavBallsDirective} from "./navigation/navballs.directive";
 import {CanvasAccessDirective} from "./shared/canvas-util/canvas-access.directive";
 import {PhraseGeneratorService} from "./shared/phrase-generator/phrase-generator.service";
+import {DIKeys} from './shared/keys/keys.dictionary';
+import {GoogleLoginComponent} from "./authentication/google-login.component";
 
 function httpOverrideFactory(
   xhrBackend: TokenCheckXHRBackend, requestOptions: BaseRequestOptions
@@ -41,7 +43,9 @@ function configureXSRFStrategy() {
     AppRootComponent,
     CanvasAccessDirective,
     NoContentComponent,
+    GoogleLoginComponent,
     LoginModalComponent,
+    PassportComponent,
     GlobalNavbarComponent,
     NavBallsDirective,
     NewNamedCanvasModalComponent,
@@ -86,6 +90,9 @@ function configureXSRFStrategy() {
       useFactory: Chance,
       deps: []
     },
+    { provide: DIKeys.authHomeRoute, useValue: '/home' },
+    { provide: DIKeys.apiUriHost, useValue: 'portfolio-api.dev.jchein.name:3000' },
+    { provide: DIKeys.googleLoginUrl, useValue: 'http://portfolio-api.dev.jchein.name:3000/auth/google' },
     NavbarDataService,
     PhraseGeneratorService,
     PointStreamService
@@ -93,45 +100,22 @@ function configureXSRFStrategy() {
     // {provide: Http, useFactory: httpOverrideFactory, deps: [TokenCheckXHRBackend, BaseRequestOptions]},
     // {provide: XSRFStrategy, useFactory: configureXSRFStrategy }
   ], // exports: [HttpModule],
-  exports: [
-    LoginModalComponent,
-    NewNamedCanvasModalComponent,
-    GlobalNavbarComponent
-  ],
+  exports: [ RouterModule, LoginModalComponent, NewNamedCanvasModalComponent, GlobalNavbarComponent ],
   entryComponents: [AppRootComponent, LoginModalComponent, NewNamedCanvasModalComponent],
   bootstrap: [AppRootComponent]
 })
 export class AppModule
 {
   static routes: Routes = [
-    {
-      path: 'home',
-      loadChildren: './+home#HomeModule'
-    },
-    {
-      path: 'lobby',
-      loadChildren: './+lobby#LobbyModule'
-    },
-    {
-      path: 'pixelMaps',
-      component: AllPixelsComponent
-    },
-    {
-      path: 'pointMaps',
-      component: AllPointsComponent
-    },
-    {
-      path: 'images',
-      component: ImageLobbyComponent
-    },
-    {
-      path: 'peernet',
-      loadChildren: './+peernet#PeernetModule'
-    },
-    {
-      path: '**',
-      component: NoContentComponent
-    }
+    { path: 'login/google', component: GoogleLoginComponent },
+    { path: 'passport/:tokenId/:userId', component: PassportComponent },
+    { path: 'home', loadChildren: './+home#HomeModule' },
+    { path: 'lobby', loadChildren: './+lobby#LobbyModule' },
+    { path: 'pixelMaps', component: AllPixelsComponent },
+    { path: 'pointMaps', component: AllPointsComponent },
+    { path: 'images', component: ImageLobbyComponent },
+    { path: 'peernet', loadChildren: './+peernet#PeernetModule' },
+    { path: '**', component: NoContentComponent }
   ];
 }
 

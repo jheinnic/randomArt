@@ -1,22 +1,36 @@
-<div class="row">
-  <h2 md-dialog-title class="float-left">Please login</h2>
-  <button md-dialog-close md-icon-button class="btn-danger float-right" aria-controls="Close"><md-icon aria-hidden="true">close</md-icon></button>
-</div>
+<h5 md-dialog-title class="md-primary">Login</h5>
 <md-dialog-content>
-  <form class="form-horizontal" role="form" layout="column">
-    <md-input-container class="row">
-      <input md-input type="text" id="username" name="username" placeholder="Username" [(ngModel)]="cred.username">
-    </md-input-container>
-    <!--Forgot your username?  a ui-sref="public.forgot.username">Click Here</a-->
-    <md-input-container class="row">
-      <input md-input type="password" id="password" name="password" placeholder="Password" [(ngModel)]="cred.password">
-    </md-input-container>
-    <!--Forgot your password?  a ui-sref="public.forgot.password">Click Here</a-->
-  </form>
-  <p *ngIf="error != null">{{error}}</p>
+  <div class="d-flex flex-md-row flex-column">
+    <md-card>
+      <md-card-actions>
+        <button md-raised-button class="p-1 p-md-3 md-primary" [routerLink]="['/login/google']">Login with Google
+        </button>
+      </md-card-actions>
+    </md-card>
+    <h5 class="p-3 align-self-center">- or -</h5>
+    <md-card>
+      <md-card-content>
+        <div class="d-flex flex-column">
+          <span>Login with local account</span>
+            <md-input-container md-floatingPlaceholder="Username">
+              <input md-input type="text" required [(ngModel)]="cred.username">
+            </md-input-container>
+            <!--Forgot your username?  a ui-sref="public.forgot.username">Click Here</a-->
+            <md-input-container>
+              <md-placeholder>Password</md-placeholder>
+              <input md-input type="password" required [(ngModel)]="cred.password">
+            </md-input-container>
+            <!--Forgot your password?  a ui-sref="public.forgot.password">Click Here</a-->
+          <span *ngIf="error != null">{{error}}</span>
+        </div>
+      </md-card-content>
+      <md-card-actions>
+        <div class="d-flex flex-row-reverse">
+          <button md-raised-button (click)="login()" class="md-primary">Login</button>
+          <button md-raised-button (click)="register()" class="md-primary">Sign Up</button>
+          <button md-raised-button md-dialog-close class="mr-auto md-warn">Cancel</button>
+        </div>
+      </md-card-actions>
+    </md-card>
+  </div>
 </md-dialog-content>
-<md-dialog-actions class="d-flex flex-row-reverse">
-  <button md-raised-button (click)="login()" class="md-primary">Login</button>
-  <button md-raised-button (click)="register()" class="md-primary">Sign Up</button>
-  <button md-raised-button md-dialog-close class="mr-auto btn-danger">Cancel</button>
-</md-dialog-actions>

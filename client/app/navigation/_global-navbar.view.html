@@ -4,12 +4,12 @@
       <md-icon>menu</md-icon>
     </button>
     <span class="brand-name">{{navbarData.brandName}}</span>
-    <button *ngIf="isLoggedIn()" md-raised-button class="md-accent ml-auto" (click)="onClickSettings()">
+    <button *ngIf="isLoggedIn()" md-mini-fab class="md-accent ml-auto" (click)="onClickSettings()">
       <md-icon>settings</md-icon>
     </button>
-    <h4 *ngIf="isLoggedIn()" class="ml-auto">Hello, {{userInfo?.username}}</h4>
+    <span *ngIf="isLoggedIn()" class="ml-1">Hello, {{userInfo?.username}}</span>
     <button *ngIf="!isLoggedIn()" md-raised-button class="md-accent ml-auto" (click)="onClickRegister()">
-      <span mdTooltip="Tooltip!" mdTooltipPosition="left">REGISTER</span>
+      <span mdTooltip="Tooltip!" mdTooltipPosition="below">REGISTER</span>
     </button>
     <button *ngIf="!isLoggedIn()" md-mini-fab class="md-accent ml-1" (click)="onClickLogin()" mdTooltip="Tooltip!" mdTooltipPosition="left">
       <md-icon>cloud_off</md-icon>

@@ -2,7 +2,6 @@
 
 declare var Object: any;
 export interface UserInterface {
-  userId?: string;
   realm?: string;
   username?: string;
   password: string;
@@ -13,11 +12,13 @@ export interface UserInterface {
   status?: string;
   created?: Date;
   lastUpdated?: Date;
+  id?: any;
   accessTokens?: Array<any>;
+  identities?: Array<any>;
+  credentials?: Array<any>;
 }
 
 export class User implements UserInterface {
-  userId: string;
   realm: string;
   username: string;
   password: string;
@@ -28,7 +29,10 @@ export class User implements UserInterface {
   status: string;
   created: Date;
   lastUpdated: Date;
+  id: any;
   accessTokens: Array<any>;
+  identities: Array<any>;
+  credentials: Array<any>;
   constructor(data?: UserInterface) {
     Object.assign(this, data);
   }
@@ -60,10 +64,6 @@ export class User implements UserInterface {
       name: 'User',
       plural: 'Users',
       properties: {
-        userId: {
-          name: 'userId',
-          type: 'string'
-        },
         realm: {
           name: 'realm',
           type: 'string'
@@ -108,10 +108,24 @@ export class User implements UserInterface {
           name: 'lastUpdated',
           type: 'Date'
         },
+        id: {
+          name: 'id',
+          type: 'any'
+        },
       },
       relations: {
         accessTokens: {
           name: 'accessTokens',
+          type: 'Array<any>',
+          model: ''
+        },
+        identities: {
+          name: 'identities',
+          type: 'Array<any>',
+          model: ''
+        },
+        credentials: {
+          name: 'credentials',
           type: 'Array<any>',
           model: ''
         },

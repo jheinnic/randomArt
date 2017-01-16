@@ -117,118 +117,55 @@ export class PointStreamService
     });
   }
 
-  public performGradualColorTransform(
-    region: Observable<PointMap>, seedPhrase: string
-  ): Observable<PaintablePoint> {
-    // Prepare a delay function that staggers the inputs.
-    const initialDelay = 2;
-    const incrementalDelay = 3;
-    let delaySubject = Observable.of(initialDelay)
-      .expand(function (val: number, index: number) {
-        let delay = val + incrementalDelay;
-        return Observable.of(delay)
-      });
-
-    const phraseModel = randomArtFactory.new_picture(seedPhrase);
-    // let output = new ReplaySubject<PaintablePoint>(10000, 2500);
-    // let retVal: Observable<PaintablePoint> = output.asObservable();
-
-    let counter = 0;
-    let intervalSource = Observable.interval(1);
-    let step2 = region.bufferCount(1920)
-      .do<PointMap[]>(function (val: PointMap[]) { console.log(`Observed ${JSON.stringify(val)} window emission at ${new Date()}`);});
-    // .delayWhen<PointMap[]>(function () {
-    //   return partial.do(function (val) { })
-    //     .delay(10);
-    // })
-    // .do<PointMap[]>(function (val) { console.log(`Observed ${val.length} delay emission at ${new Date()}`);}
-    let retZip = step2.zip(Observable.interval(1500));
-    let retVal = retZip.map<[PointMap[], number],PointMap[]>((pointMapsPair: [PointMap[], number]) => {
-      return pointMapsPair[0];
-    })
-      .flatMap<PointMap[],PaintablePoint>(function (pointMap: PointMap[]) {
-        return Observable.from(pointMap.filter(function (pointMap: PointMap) {
-          return typeof pointMap === 'object';
-        })
-          .map(function (pointMap: PointMap) {
-            return pointMap.from.withFillStyle(randomArtFactory.compute_pixel(phraseModel, pointMap.to.x, pointMap.to.y, 1, 1));
-          }));
-      });
-    // .do<PaintablePoint[]>(function (val) {
-    //   console.log(`Observed ${val.length} output emission at ${new Date()}`);
-    // });
-
-    // const subscription = partial.subscribe(function (computedPixels: PaintablePoint[]) {
-    //   counter = counter + computedPixels.length;
-    //   computedPixels.forEach( function(paintPoint: PaintablePoint) {
-    //     console.log(`Sending ${PaintablePoint.asString(paintPoint)}`);
-    //     output.next(paintPoint);
-    //   });
-    // }, function (error) {
-    //   console.error(`Error while computing ${counter} pixels for phrase <${seedPhrase}>: ${error}`);
-    // }, function () {
-    //   console.log(`Finished computing ${counter} pixels for phrase <${seedPhrase}>`);
-    // });
-
-    return retVal;
-  }
-
-  /*
-   public
-   oldPerformGradualColorTransform(region
-   :
-   Observable < PointMap >, seedPhrase
-   :
-   string, output
-   :
-   Subject < PaintablePoint >
-   )
-   {
-   region.count(function () { return true; })
-   .subscribe(function (numPoints: number) {
-   console.log(`Counted ${numPoints} values in PointMap stream.`);
-
-   const phraseModel = randomArtFactory.new_picture(seedPhrase);
-   const interval$: Observable<number> = Observable.interval(100)
-   .do(function (value: number) {
-   console.log(`Tick #${value} at ${new Date}`);
-   });
-
-   const repeatablePath = region.publish()
-   .do((value: PointMap) => { console.log(`Saw ${PointMap.asString(value)} come in...`); })
-   .map<PointMap,PaintablePoint>((pointMap: PointMap) => {
-   return pointMap.from.withFillStyle(randomArtFactory.compute_pixel(phraseModel, pointMap.to.x, pointMap.to.y, 1, 1));
-   })
-   .takeUntil(interval$);
-
-   const recurrentMap = repeatablePath.repeatWhen(function (notifications: Observable<any>) {
-   return notifications.delay(150)
-   .withLatestFrom(doneCounter)
-   .takeWhile(function (latestOutput) {
-   console.log(`Considering replay at ${new Date()} ${latestOutput[0]} and ${JSON.stringify(latestOutput[1])}`);
-   return latestOutput[1][0] < numPoints;
-   });
-   });
-
-   const doneCounter = Observable.range(1, numPoints)
-   .zip(recurrentMap);
-
-   const timeSubscription = interval$.subscribe(function (value) {
-   console.log(`Tock #${value} at ${new Date}`);
-   });
-
-   const subscription = doneCounter.map(function (values) {
-   return values[1];
-   })
-   .subscribe(function (computedPixel: PaintablePoint) {
-   output.next(computedPixel);
-   }, function (error) {
-   console.error(`Error while computing pixels for phrase <${seedPhrase}>: ${error}`);
-   }, function () {
-   console.log(`Finished computing pixels for phrase <${seedPhrase}>`);
-   timeSubscription.unsubscribe();
-   });
-   });
-   }
+  /**
+   * @param region          A stream of logical coordinate to canvas pixel mappings.
+   * @param seedPhrase      A text phrase that will deterministically seed a function mapping
+   *                        coordinates in the logical domain to color values.
+   * @param integralBufSize The size of the buffer to fill each livenessLatency interval.
+   *                        It is very imporant that this value be chosen such that the total
+   *                        pixel count is an even multiple of it, otherwise this routine will
+   *                        never finish working!
+   * @param livenessLatency The computation pause duration between filled buffers of size
+   *                        integralBufSize.  Implemented since this computation occurs on the
+   *                        UI thread and that UI would therefore become unresponsive if this
+   *                        work were done all in one loop through all required iterations.
+   * @returns {Observable<PaintablePoint>} A stream of canvas coordinate to logial color pairs.
    */
+  public performGradualColorTransform(
+    region: Observable<PointMap>, seedPhrase: string,
+    integralBufSize: number = 100, livenessLatency: number = 750
+  ): Observable<PaintablePoint> {
+    const phraseModel = randomArtFactory.new_picture(seedPhrase);
+
+    // For this to work, the the total pixel count MUST be an even multiple of
+    // the overall pixel count.  Otherwise, the final buffer never can flush
+    // and the sequence may repeat from the beginning, attempting to force that to
+    // happen!
+    return region.bufferCount(integralBufSize)
+      .zip(Observable.interval(livenessLatency))
+      .map<[PointMap[], number],PointMap[]>(
+        function (pointMapsPair: [PointMap[], number]) {
+          return pointMapsPair[0];
+        }
+      ).flatMap<PointMap[],PaintablePoint>(
+        function (pointMap: PointMap[]) {
+          return Observable.from(
+            pointMap.filter(
+              function (pointMap: PointMap) {
+                return typeof pointMap === 'object';
+              }
+            ).map(
+              function (pointMap: PointMap) {
+                return pointMap.from.withFillStyle(
+                  randomArtFactory.compute_pixel(
+                    phraseModel, pointMap.to.x, pointMap.to.y, 1, 1
+                  )
+                );
+              }
+            )
+          );
+        }
+      );
+  }
 }
+

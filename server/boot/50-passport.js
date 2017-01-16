@@ -3,11 +3,11 @@ module.exports = function(server) {
   var PassportConfigurator =
     require('loopback-component-passport').PassportConfigurator;
   var passportConfigurator = new PassportConfigurator(server);
-  
+
   // Enable http session
-  server.use(
-    loopback.session({ secret: 'keyboard cat' }));
-  
+//  server.use(
+//    server.loopback.session({ secret: 'keyboard cat' }));
+
   // Load the provider configurations
   var config = {};
   try {
@@ -20,7 +20,7 @@ module.exports = function(server) {
 
   // Initialize passport
   passportConfigurator.init();
-  
+
   // Set up related models
   passportConfigurator.setupModels({
     userModel: server.models.user,
@@ -34,11 +34,19 @@ module.exports = function(server) {
     passportConfigurator.configureProvider(s, c);
   }
 
-/*
+  var webAppUrl = server.get('webAppUrl');
   var router = server.loopback.Router();
+
   router.get('/auth/success', function (req, res, next) {
-    res.redirect('https://www.myproject.com/passport/' + req.accessToken.id + '/' +  req.accessToken.userId);
+    console.log(req.accessToken);
+    console.log(req.accessToken.userId);
+    // var User = server.models.User;
+    // User.findById(req.accessToken.userId, function(err, user) {
+    //   "use strict";
+    //   console.log(err);
+    //   console.log(user);
+    res.redirect(webAppUrl + '/passport/' + req.accessToken.id + '/' + req.accessToken.userId);
+    // });
   });
   server.use(router);
-*/
 };

@@ -7,14 +7,14 @@ declare var Object: any;
 export interface PeerConnectionInterface {
   peerId?: string;
   active?: boolean;
-  userId?: number;
+  userId?: any;
   user?: User;
 }
 
 export class PeerConnection implements PeerConnectionInterface {
   peerId: string;
   active: boolean;
-  userId: number;
+  userId: any;
   user: User;
   constructor(data?: PeerConnectionInterface) {
     Object.assign(this, data);
@@ -57,7 +57,7 @@ export class PeerConnection implements PeerConnectionInterface {
         },
         userId: {
           name: 'userId',
-          type: 'number'
+          type: 'any'
         },
       },
       relations: {
