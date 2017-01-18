@@ -16,7 +16,7 @@ import {Component, NgZone} from "@angular/core";
    `,
   }
 )
-export class NgZoneDemo
+export class NgZoneDemoComponent
 {
   progress: number = 0;
   label: string;

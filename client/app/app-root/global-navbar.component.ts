@@ -1,8 +1,8 @@
-import {Component, OnInit, OnDestroy, AfterViewInit, Output, EventEmitter} from "@angular/core";
+import {Component, OnDestroy, AfterViewInit, Output, EventEmitter} from "@angular/core";
 import {MdDialog, MdDialogRef} from "@angular/material";
 import {LoginModalComponent} from "../authentication";
 import {NavbarDataService} from "./navbar-data.service";
-import {NavbarData, NavbarTabData} from "./navbar-data.datamodel";
+import {NavbarData} from "./navbar-data.datamodel";
 import {UserInterface} from "../shared/sdk/models";
 import {UserApi} from "../shared/sdk/services";
 import {LoopBackConfig} from "../shared/sdk";

@@ -5,3 +5,5 @@
 
 export * from "./pool.module";
 export * from "./image-lobby.component";
+export * from "./image-lobby-side.component";
+export * from "./image-lobby-action.component";

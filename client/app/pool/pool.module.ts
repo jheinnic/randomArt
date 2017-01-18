@@ -6,22 +6,25 @@ import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {Routes, RouterModule} from "@angular/router";
 import {ImageLobbyComponent} from "./image-lobby.component";
+import {ImageLobbySideComponent} from "./image-lobby-side.component";
+import {ImageLobbyActionComponent} from "./image-lobby-action.component";
+import {NavbarDataResolver} from "../app-root/navbar-data.resolver";
 import {
-  MdChipsModule, MdGridList, MdCardModule, MdButtonModule, MdIconModule, MdProgressBarModule,
-  MdTooltipModule, MdDialogModule, MdGridListModule, MdSidenavModule, MdInputModule,
-  MdToolbarModule, MdCheckboxModule, MdTabsModule
+  MdChipsModule, MdCardModule, MdButtonModule, MdIconModule, MdProgressBarModule,
+  MdTooltipModule, MdSidenavModule, MdInputModule, MdToolbarModule, MdCheckboxModule,
+  MdTabsModule
 } from "@angular/material";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
-  declarations: [ImageLobbyComponent],
+  declarations: [ImageLobbyComponent, ImageLobbySideComponent, ImageLobbyActionComponent],
   imports: [
     CommonModule,
     FormsModule,
+    MdButtonModule,
     MdChipsModule,
     MdCardModule,
     MdCheckboxModule,
-    MdButtonModule,
     MdIconModule,
     MdInputModule,
     MdSidenavModule,
@@ -30,23 +33,40 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
     MdToolbarModule,
     MdTooltipModule,
     NgbModule,
-    RouterModule.forChild(PoolModule.routes)
+    // RouterModule.forChild(PoolModule.routes)
   ],
-  exports: [ImageLobbyComponent]
+  exports: [ImageLobbyComponent, ImageLobbySideComponent, ImageLobbyActionComponent]
 })
 export class PoolModule
 {
+  /*
   static routes: Routes = [
     {
-      path: '',
+      path: 'images',
       component: ImageLobbyComponent,
-      pathMatch: 'full'
-    }, {
-      path: 'lobby',
-      component: ImageLobbyComponent,
-      pathMatch: 'full'
+      children: [
+        {
+          path: '',
+          pathMatch: 'full',
+          component: ImageLobbyComponent
+        }, {
+          path: '',
+          pathMatch: 'full',
+          outlet: 'side',
+          component: ImageLobbySideComponent
+        }, {
+          path: '',
+          pathMatch: 'full',
+          outlet: 'action',
+          component: ImageLobbyActionComponent,
+          resolve: {
+            navbarData: NavbarDataResolver
+          }
+        }
+      ]
     }
   ];
+*/
 
   constructor() {
   }

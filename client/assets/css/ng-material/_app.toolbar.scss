@@ -1,0 +1,74 @@
+@import '~@angular/material/toolbar/toolbar';
+
+$md-toolbar-height-desktop: 64px;
+$md-toolbar-height-mobile-portrait: 56px;
+$md-toolbar-height-mobile-landscape: 48px;
+
+@mixin md-toolbar-spacers($height) {
+  .toolbar-spacer {
+    height: $height;
+    display: inline-block;
+    flex: none;
+  }
+
+  .navbar-spacer {
+    height: $height + 50px;
+    display: inline-block;
+    flex: none;
+  }
+
+  .toolbar-scrollable {
+    display: inline-block;
+    flex: none;
+    height: 100vh;
+    padding-top: $height;
+    padding-bottom: 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .navbar-scrollable {
+    display: inline-block;
+    flex: none;
+    height: 100vw;
+    padding-top: $height + 50px;
+    padding-bottom: 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .absolute-top {
+    position: fixed;
+    top: $height;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+  }
+
+  .right-button-panel {
+    position: fixed;
+    float: right;
+    top: $height + 50px;
+    right: $height / 2;
+    z-index: 10;
+  }
+}
+
+.footer-spacer {
+  height: 32px;
+  display: inline-block;
+  flex: none;
+}
+
+// Set the default height for the toolbar.
+@include md-toolbar-spacers($md-toolbar-height-desktop);
+
+// Specific height for mobile devices in portrait mode.
+@media ($md-xsmall) and (orientation: portrait) {
+  @include md-toolbar-spacers($md-toolbar-height-mobile-portrait);
+}
+
+// Specific height for mobile devices in landscape mode.
+@media ($md-small) and (orientation: landscape) {
+  @include md-toolbar-spacers($md-toolbar-height-mobile-landscape);
+}

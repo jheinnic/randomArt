@@ -1,0 +1,39 @@
+<md-card>
+  <md-card-title-group>
+    <md-card-title>
+      <h1 x-large class="sample-content">Your Content Here</h1>
+    </md-card-title>
+    <md-card-subtitle>
+      <h4>Local State</h4>
+    </md-card-subtitle>
+  </md-card-title-group>
+  <form (ngSubmit)="submitState(localState.value)" autocomplete="off">
+    <md-card-content>
+      <section>
+        For material design components use the <a
+        href="https://github.com/AngularClass/angular2-webpack-starter/tree/material2"><b>material2</b></a> branch
+      </section>
+      <section>
+        For hot module reloading run
+        <pre>npm run start:hmr</pre>
+      </section>
+      <section>
+        <md-input-container>
+          <md-placeholder>Submit Local State to App State</md-placeholder>
+          <input md-input name="eventTextInput" [value]="localState.value" (input)="localState.value = $event.target.value"
+                    autofocus>
+        </md-input-container>
+        <md-input-container>
+          <input md-input type="text" name="ngTextInput" [(ngModel)]="localState.value" autofocus>
+        </md-input-container>
+      </section>
+
+      <section>
+        <pre>this.localState = {{ localState | json }}</pre>
+      </section>
+    </md-card-content>
+    <md-card-actions>
+      <button md-raised-button class="md-primary">Submit Value</button>
+    </md-card-actions>
+  </form>
+</md-card>

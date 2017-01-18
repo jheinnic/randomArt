@@ -1,0 +1,8 @@
+<div class="right-button-panel d-flex flex-column justify-content-between">
+  <button id="open-sidenav" md-mini-fab (click)="openSidenav();" [ngClass]="{hidden: sidenavOpen}">
+    <md-icon>settings</md-icon>
+  </button>
+  <br>
+  <button *ngIf="willPaint" md-mini-fab (click)="beginPainting()"><md-icon>play_arrow</md-icon></button>
+  <button *ngIf="isPainting" md-mini-fab (click)="scheduleNext()"><md-icon>add</md-icon></button>
+</div>

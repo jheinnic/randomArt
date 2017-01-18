@@ -6,14 +6,17 @@
 @include md-core();
 
 $light-theme: md-light-theme($light-primary, $light-accent, $warn);
+$control-theme: md-dark-theme($control-primary, $control-accent, $warn);
+$dark-theme: md-dark-theme($dark-primary, $dark-accent, $warn);
+
 @include angular-material-theme($light-theme);
 
 .portfolio-dark {
-  $dark-theme: md-dark-theme($dark-primary, $dark-accent, $warn);
   @include angular-material-theme($dark-theme);
 }
 
 .control-theme {
-  $control-theme: md-dark-theme($control-primary, $control-accent, $warn);
   @include angular-material-theme($control-theme);
 }
+
+@include md-toolbar-theme($control-theme)

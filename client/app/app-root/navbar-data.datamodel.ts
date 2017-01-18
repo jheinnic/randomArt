@@ -57,34 +57,44 @@ import _ = require('lodash');
 
 const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
   .chain('brandName', (brandName: string) => (context: NavbarData) => {
-    return Object.assign(new NavbarData(), context, {brandName: brandName}) as NavbarData;
+    return new NavbarData(context, {brandName: brandName});
+  })
+  .chain('openSidenav', () => (context: NavbarData) => {
+    return new NavbarData(context, {sidenavOpen: true});
+  })
+  .chain('closeSidenav', () => (context: NavbarData) => {
+    return new NavbarData(context, {sidenavOpen: false});
+  })
+  .chain('toggleSidenav', () => (context: NavbarData) => {
+    return new NavbarData(context, {sidenavOpen: !context.sidenavOpen});
   })
   .chain('addTab', (
     displayName: string, routerLink: string, isDefault: boolean = false
   ) => (context: NavbarData) => {
-    let tabs = context.tabs;
+    let tabs:Immutable.List<NavbarTabData> = context.tabs;
     if (isDefault) {
-      let oldDefault = tabs.findKey(function (val) { return val.isDefault;});
-      if (typeof oldDefault === 'object') {
-        tabs = tabs.set(oldDefault[0], Object.assign(new NavbarTabData(), oldDefault[1], {isDefault: false}));
+      let oldDefault = tabs.findEntry(function (val) { return val.isDefault;});
+      if (! _.isUndefined(oldDefault)) {
+        tabs = tabs.set(oldDefault[0], new NavbarTabData(oldDefault[1], {isDefault: false}));
       }
     }
 
-    let entry = tabs.findKey(function (val) { return val.displayName === displayName; });
-    if (typeof entry === 'object') {
-      tabs = tabs.set(entry[0], Object.assign(new NavbarTabData(), {
+    let entry = tabs.findEntry(function (val) { return val.displayName === displayName; });
+    if (! _.isUndefined(entry)) {
+      tabs = tabs.set(entry[0], new NavbarTabData(entry[1], {
         displayName: displayName,
         routerLink: routerLink,
         isDefault: isDefault
-      }) as NavbarTabData);
+      }));
     } else {
-      tabs = tabs.push(Object.assign(new NavbarTabData(), {
+      tabs = tabs.push(new NavbarTabData(undefined, {
         displayName: displayName,
         routerLink: routerLink,
         isDefault: isDefault
-      }) as NavbarTabData);
+      }));
     }
-    return Object.assign(new NavbarData(), context, {tabs: tabs}) as NavbarData;
+
+    return new NavbarData(context, {tabs: tabs});
   })
   .chain('resetTabs', () => (context: NavbarData) => {
     return Object.assign(new NavbarTabData(), context, {tabs: []});
@@ -92,57 +102,55 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
   .chain('addMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    let wrapper: MenuNavDataWrapper = wrapMenuNavData.value(new MenuNavData());
-
-    director(wrapper as MenuNavDataModelBuilder);
-
     return Object.assign(new NavbarData(), context, {
-      menuItems: context.menuItems.push(wrapper.unwrap() as MenuNavData)
+      menuItems: context.menuItems.push(MenuNavData.build(director) as MenuNavData)
     } as NavbarData);
   })
   .chain('editMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    // TODO
-    let wrapper: MenuNavDataWrapper = wrapMenuNavData.value(new MenuNavData());
+    let entry = context.menuItems.findEntry((item) => {
+      return item.displayName === displayName
+    });
 
-    director(wrapper as MenuNavDataModelBuilder);
+    // TODO: Handle error if displayName matches nothing
 
-    return Object.assign(new NavbarData(), context, {
-      menuItems: context.menuItems.push(wrapper.unwrap() as MenuNavData)
-    } as NavbarData);
+    return new NavbarData(context, {
+      menuItems: context.menuItems.set(
+        entry[0], entry[1].copy(director))
+    });
   })
   .chain('deleteMenuNav', (displayName: string) => (context: NavbarData) => {
-    return Object.assign(new NavbarData(), context, {
+    return new NavbarData(context, {
       menuItems: context.menuItems.filter( function(nextItem) {
         return nextItem.displayName != displayName;
-      })
+      }).toList()
     });
   }).unwrap('unwrap', unwrapHelper);
 
 
 const wrapNavbarTabData = builder.build<NavbarTabDataWrapper,NavbarTabData>()
   .chain('displayName', (displayName: string) => (context: NavbarTabData) => {
-    return Object.assign(new NavbarTabData(), {displayName: displayName});
+    return new NavbarTabData(context, {displayName: displayName});
   })
   .chain('routerLink', (routerLink: string) => (context: NavbarTabData) => {
-    return Object.assign(new NavbarTabData(), {routerLink: routerLink});
+    return new NavbarTabData(context, {routerLink: routerLink});
   })
   .unwrap('unwrap', unwrapHelper);
 
 
 const wrapNavbarDataTwo = builder.build<NavbarDataTwoWrapper,NavbarData>()
   .chain('brandName', (brandName: string) => (context: NavbarData) => {
-    return Object.assign(new NavbarData(), context, {brandName: brandName}) as NavbarData;
+    return new NavbarData(context, {brandName: brandName}) as NavbarData;
   })
   .chain('addTab', (director: NavbarTabDataDirector) => (context: NavbarData) => {
     let wrapper: NavbarTabDataWrapper = wrapNavbarTabData.value(new NavbarTabData());
 
     director(wrapper as NavbarTabDataModelBuilder);
 
-    return Object.assign(new NavbarData(), context, {
+    return new NavbarData(context, {
       tabs: context.tabs.push(wrapper.unwrap())
-    }) as NavbarData;
+    });
   })
   .unwrap('unwrap', unwrapHelper);
 
@@ -167,32 +175,44 @@ let wrapMenuNavData = builder.build<MenuNavDataWrapper, MenuNavData>()
 // Data Models
 //
 
+export type NavbarDataType = {
+  brandName?: string;
+  sidenavOpen?: boolean;
+  tabs?: Immutable.List<NavbarTabData>
+  menuItems?: Immutable.List<MenuNavData>
+}
+
 export class NavbarData
 {
   readonly brandName: string;
+  readonly sidenavOpen: boolean;
   readonly tabs: Immutable.List<NavbarTabData> = Immutable.List<NavbarTabData>();
   readonly menuItems: Immutable.List<MenuNavData> = Immutable.List<MenuNavData>();
 
-  static build(director: NavbarDataDirector) {
-    let wrapper: NavbarDataWrapper = wrapNavbarData.value(new NavbarData());
-
-    director(wrapper);
-
-    return wrapper.unwrap();
+  constructor(predecessor?: NavbarData, data?: NavbarDataType) {
+    Object.assign(this, predecessor || {}, data || {});
   }
 
-  static build2 = buildMethodFactory(wrapNavbarData, NavbarData);
+  static build = buildMethodFactory(wrapNavbarData, NavbarData);
+
+  // static build(director: NavbarDataDirector) {
+  //   let wrapper: NavbarDataWrapper = wrapNavbarData.value(new NavbarData());
+  //   director(wrapper);
+  //   return wrapper.unwrap();
+  // }
 
   copy(director: NavbarDataDirector) {
     let wrapper: NavbarDataWrapper = wrapNavbarData.value(this);
-
     director(wrapper);
-
     return wrapper.unwrap();
-
   }
 }
 
+export type NavbarTabDataType = {
+  displayName?: string;
+  routerLink?: string;
+  isDefault?: boolean;
+}
 
 export class NavbarTabData
 {
@@ -200,13 +220,15 @@ export class NavbarTabData
   readonly routerLink: string;
   readonly isDefault: boolean;
 
+  constructor(predecessor?: NavbarTabData, data?: NavbarTabDataType) {
+    Object.assign(this, predecessor || {}, data || {});
+  }
+
   static build = buildMethodFactory(wrapNavbarTabData, NavbarTabData);
 
   copy(director: NavbarTabDataDirector) {
     let wrapper: NavbarTabDataWrapper = wrapNavbarTabData.value(this);
-
     director(wrapper);
-
     return wrapper.unwrap();
   }
 }
@@ -230,6 +252,14 @@ export class MenuNavData
   constructor(predecessor?: MenuNavData, data?: MenuNavDataType) {
     Object.assign(this, predecessor || {}, data || {});
   }
+
+  static build = buildMethodFactory(wrapMenuNavData, MenuNavData);
+
+  copy(director: MenuNavDataDirector) {
+    let wrapper: MenuNavDataWrapper = wrapMenuNavData.value(this);
+    director(wrapper);
+    return wrapper.unwrap();
+  }
 }
 
 //
@@ -250,6 +280,9 @@ type NavbarTabDataDirector = (builder: NavbarTabDataModelBuilder) => void;
 type NavbarDataWrapper =
   {
     brandName(brandName: string): NavbarDataWrapper;
+    openSidenav(): NavbarDataWrapper;
+    closeSidenav(): NavbarDataWrapper;
+    toggleSidenav(): NavbarDataWrapper;
     addTab(displayName: string, routerLink: string, isDefault: boolean): NavbarDataWrapper;
     resetTabs(): NavbarDataWrapper;
     addMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataWrapper;
@@ -288,6 +321,9 @@ type NavbarDataTwoWrapper =
 export interface NavbarDataModelBuilder extends ModelBuilder<NavbarData, NavbarDataModelBuilder>
 {
   brandName(brandName: string): NavbarDataModelBuilder;
+  openSidenav(): NavbarDataModelBuilder;
+  closeSidenav(): NavbarDataModelBuilder;
+  toggleSidenav(): NavbarDataModelBuilder;
   addTab(displayName: string, routerLink: string, isDefault: boolean): NavbarDataModelBuilder;
   resetTabs(): NavbarDataModelBuilder;
   addMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataModelBuilder;

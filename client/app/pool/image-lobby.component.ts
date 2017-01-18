@@ -27,26 +27,22 @@ const LIVE_LATENCY: number = 600;
 
 
 @Component({
-  moduleId: path.resolve(__dirname, __filename),
+  moduleId: "./app/pool",
   selector: "image-lobby",
   template: require("./_image-lobby.view.html"),
-  styles: [require("./_image-lobby.scss")]
+  styleUrls: ["./_image-lobby.scss"]
 })
-export class ImageLobbyComponent implements AfterViewInit
+export class ImageLobbyComponent
 {
   private phrasePainting: string;
   private phrasePainted: string;
-
   private cancelSignal: boolean = false;
-  private progressInterval: number = 100000;
 
   private canvasHeight = 480;
   private canvasWidth = 640;
-  private jpegQuality = 0.95;
 
   private scalePoints: Observable<PointMap>;
   private context: CanvasRenderingContext2D | null;
-  private imageData: Blob;
 
   public paintJobsNext: PaintToDo[];
   public paintJobsDone: PaintDone[];
@@ -73,21 +69,6 @@ export class ImageLobbyComponent implements AfterViewInit
     ];
   }
 
-  public ngAfterViewInit() {
-    /*
-     new Tether({
-     element: '#open-sidenav',
-     target: '#image-create-panel',
-     attachment: 'top left',
-     targetAttachment: 'top left',
-     constraints: [{
-     to: 'window',
-     pin: true
-     }]
-     });
-     */
-  }
-
   get phraseToPaint(): string {
     let retVal: string = '';
     if (this.paintJobsNext.length >= 1) {
@@ -108,26 +89,9 @@ export class ImageLobbyComponent implements AfterViewInit
     return !this.isPainting && (this.paintJobsNext.length > 0);
   }
 
-  private iconToText() {
-    // TODO
-  };
-
   public sizeCanvas() {
-    console.log('Dialog box TODO');
-
-    let x2, y2;
-    if (this.canvasWidth > this.canvasHeight) {
-      x2 = this.canvasWidth * 1.0 / this.canvasHeight;
-      y2 = 1.0;
-    } else {
-      x2 = 1.0;
-      y2 = this.canvasHeight * 1.0 / this.canvasWidth;
-    }
-
-    this.scalePoints = this.pointService.mapRectangularRegion(this.canvasWidth, this.canvasHeight, -1.0
-      * x2, -1.0 * y2, 2.0 * x2, 2.0 * y2);
-
-    console.log(JSON.stringify(this.scalePoints));
+    this.scalePoints =
+      this.pointService.mapRectangularRegion(this.canvasWidth, this.canvasHeight);
   }
 
   public newCanvas() {
@@ -174,50 +138,45 @@ export class ImageLobbyComponent implements AfterViewInit
 
   private doPaintWord() {
     const pixelCount = this.canvasWidth * this.canvasHeight;
-    const bufferSize = findOptimalDivisor(pixelCount, MAX_BUFFER_SIZE);
-    const numIterations = pixelCount / bufferSize;
-    const outputSubject: Observable<PaintablePoint> =
+    const outputSubject: Observable<[PaintablePoint[], number]> =
       this.pointService.performGradualColorTransform(
-        this.scalePoints, this.phrasePainting, bufferSize, LIVE_LATENCY);
+        this.scalePoints, pixelCount, this.phrasePainting, LIVE_LATENCY, MAX_BUFFER_SIZE);
 
     // Get calculation result, then...
     let iterCounter = 0;
     let pixelCounter = 0;
-    outputSubject.subscribe((paintPoint: PaintablePoint) => {
+    outputSubject.subscribe((paintPoints: [PaintablePoint[],number]) => {
       // ...paint into context
-      paintPoint.paintTo(this.context);
-      if (pixelCounter++ === this.progressInterval) {
-        pixelCounter = 0;
-        iterCounter += 1;
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            if (this.cancelSignal === true) {
-              let temp = this.phrasePainting;
-              this.phrasePainting = null;
-              this.cancelSignal = false;
-              console.log('Cancelled');
-              this.onWordPaintCancel(temp);
-            } else {
-              this.onWordPaintProgress(this.phrasePainting, iterCounter / numIterations)
-            }
-          });
-        }, 1);
-      }
-    }, (error) => {
-      setTimeout(() => {
-        this.ngZone.run(() => {
-          console.error('Failed to complete paint step!', error);
-          this.onWordPaintFail(this.phraseToPaint);
-        });
-      }, 1);
-    }, () => {
-      setTimeout(() => {
-        this.ngZone.run(() => {
-          this.phrasePainted = this.phrasePainting;
+      paintPoints[0].forEach(function (paintPoint) {
+        paintPoint.paintTo(this.context);
+      });
+
+      this.ngZone.run(() => {
+        this.onWordPaintProgress(this.phrasePainting, paintPoints[1]);
+
+        if (this.cancelSignal === true) {
+          let temp = this.phrasePainting;
           this.phrasePainting = null;
-          this.onWordPaintDone(this.phrasePainted);
-        });
-      }, 1);
+          this.cancelSignal = false;
+          console.log('Cancelled');
+          this.onWordPaintCancel(temp);
+        }
+      });
+    }, (error) => {
+      console.error('Failed to complete paint step!', error);
+      this.ngZone.run(() => {
+        let temp = this.phrasePainting;
+        this.phrasePainting = null;
+        this.cancelSignal = false;
+        this.onWordPaintFail(temp);
+      });
+    }, () => {
+      this.ngZone.run(() => {
+        this.phrasePainted = this.phrasePainting;
+        this.phrasePainting = null;
+        this.cancelSignal = false;
+        this.onWordPaintDone(this.phrasePainted);
+      });
     });
 
     console.log('Done');
@@ -278,13 +237,13 @@ export class ImageLobbyComponent implements AfterViewInit
     let canvas = this.context.canvas
 
     // TODO: Try using the toBlob() method instead of this hackish looking snippet
-    let base64: string = canvas.toDataURL('image/png')
+    let base64Data: string = canvas.toDataURL('image/png')
       .replace(/^data:image\/(png|jpeg|jpg|gif);base64,/, '');
-    console.log(base64);
-    let imageData: Blob = base64toBlob(base64, 'image/png');
+    console.log(base64Data);
+    let imageData: Blob = base64toBlob(base64Data, 'image/png');
 
     let result: Observable<any> = this.artworkApi.upload(
-      completedPhrase, this.canvasWidth, this.canvasHeight, base64);
+      completedPhrase, this.canvasWidth, this.canvasHeight, base64Data);
 
     result.subscribe(
       (data) => { }, (err) => { console.error(err); },
@@ -299,123 +258,18 @@ export class ImageLobbyComponent implements AfterViewInit
 function base64toBlob(
   base64Data: string, contentType: string = '', sliceSize: number = 512
 ): Blob {
-  var byteCharacters = atob(base64Data);
-  var byteArrays = [];
+  const byteCharacters = atob(base64Data);
+  const byteArrays = [];
 
-  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    var slice = byteCharacters.slice(offset, offset + sliceSize);
-    var byteNumbers = new Array(slice.length);
-    for (var i = 0; i < slice.length; i++) {
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
       byteNumbers[i] = slice.charCodeAt(i);
     }
-    var byteArray = new Uint8Array(byteNumbers);
+    const byteArray = new Uint8Array(byteNumbers);
     byteArrays.push(byteArray);
   }
 
   return new Blob(byteArrays, {type: contentType});
-}
-
-function gcf(width, height) {
-  return ( height == 0 ) ? (width) : ( gcf(height, width % height) );
-}
-
-function listDivisors(n) {
-  if (n < 1) {
-    throw "Argument error";
-  }
-
-  var small = [];
-  var large = [];
-  var end = Math.floor(Math.sqrt(n));
-  for (var i = 1; i <= end; i++) {
-    if (n % i == 0) {
-      small.push(i);
-      if (i * i != n)  // Don't include a square root twice
-      {
-        large.push(n / i);
-      }
-    }
-  }
-  large.reverse();
-  return small.concat(large);
-}
-
-/**
- * Find the largest possible divisor of multiplicand that no greater than maxDivisor.
- *
- * @param multiplicand
- * @param maxDivisor
- */
-function findOptimalDivisor(multiplicand: number, maxDivisor: number) {
-  if ((multiplicand % maxDivisor) === 0) {
-    return maxDivisor;
-  }
-
-  var ii;
-  var sqrt = Math.floor(Math.sqrt(multiplicand));
-  if (sqrt > maxDivisor) {
-    for (ii = maxDivisor; ii > 1; ii--) {
-      if ((multiplicand % ii) == 0) {
-        // console.log('a');
-        return ii;
-      }
-    }
-
-    return 1;
-  } else {
-    var highLowHigh = 0;
-    for (ii = sqrt; highLowHigh === 0; ii--) {
-      // console.log(ii);
-      if ((multiplicand % ii) == 0) {
-        highLowHigh = ii;
-      }
-    }
-
-    var firstFound = true;
-    var lowLowHigh = 0;
-    for (ii = 2; ii < highLowHigh && lowLowHigh === 0; ii++) {
-      // console.log(ii);
-      if ((multiplicand % ii) == 0) {
-        lowLowHigh = multiplicand / ii;
-        if (lowLowHigh > maxDivisor) {
-          lowLowHigh = 0;
-          firstFound = false;
-        }
-      }
-    }
-    if ((lowLowHigh > 0) && firstFound) {
-      // console.log('b');
-      return lowLowHigh;
-    }
-
-    var minHighHigh = 0;
-    var altHighLowHigh = multiplicand / highLowHigh;
-    if (altHighLowHigh <= maxDivisor) {
-      highLowHigh = altHighLowHigh;
-      minHighHigh = highLowHigh;
-    } else {
-      minHighHigh = sqrt;
-    }
-
-    // console.log(lowLowHigh, minHighHigh, highLowHigh, altHighLowHigh);
-
-    if (lowLowHigh > highLowHigh) {
-      highLowHigh = lowLowHigh;
-      minHighHigh = lowLowHigh;
-    }
-
-    /*
-     var half = Math.floor(multiplicand / 2);
-     for(ii=Math.min(half, maxDivisor); ii>minHighHigh; ii--) {
-     // console.log(ii);
-     if ((multiplicand % ii) === 0) {
-     // console.log('c');
-     return ii;
-     }
-     }
-     */
-
-    // console.log('d');
-    return highLowHigh
-  }
 }

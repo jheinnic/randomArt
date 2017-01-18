@@ -8,7 +8,7 @@ import { NavbarData } from "./navbar-data.datamodel";
 import { Observable } from "rxjs/Observable";
 
 @Injectable()
-class NavbarDataResolver implements Resolve<NavbarData>
+export class NavbarDataResolver implements Resolve<NavbarData>
 {
   constructor(private dataService: NavbarDataService) {}
 

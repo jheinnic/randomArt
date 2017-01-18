@@ -1,0 +1,54 @@
+<div class="scroll-content">
+<md-card>
+  <md-card-content>
+    <div class="d-flex flex-row">
+      <md-input-container>
+        <md-placeholder>Width</md-placeholder>
+        <input md-input type="number" [(ngModel)]="canvasWidth"/>
+      </md-input-container>
+      <md-input-container floatingPlaceholder="Height">
+        <md-placeholder>Height:</md-placeholder>
+        <input md-input type="number" [(ngModel)]="canvasHeight"/>
+      </md-input-container>
+    </div>
+  </md-card-content>
+  <md-card-actions>
+    <button md-raised-button #newCanvasBtn class="md-primary" (click)="sizeCanvas()">RESIZE CANVAS</button>
+  </md-card-actions>
+</md-card>
+</div>
+<div class="scroll-content">
+<md-card>
+  <md-card-content>
+    <md-input-container>
+      <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
+    </md-input-container>
+  </md-card-content>
+  <md-card-actions>
+    <button md-raised-button #changeNameBtn class="md-accent" (click)="generateName()">CHANGE NAME</button>
+    <button md-raised-button #beginPaintingBtm class="md-primary" (click)="beginPainting()">START PAINTING</button>
+  </md-card-actions>
+</md-card>
+</div>
+<div class="scroll-content">
+  <canvas height="200" width="100"></canvas>
+</div>
+<div class="scroll-content">
+  <canvas height="200" width="100"></canvas>
+</div>
+<div class="scroll-content">
+  <canvas height="200" width="100"></canvas>
+</div>
+<div class="scroll-content">
+  <md-card>
+    <md-card-content>
+      <md-input-container>
+        <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
+      </md-input-container>
+    </md-card-content>
+    <md-card-actions>
+      <button md-raised-button #changeNameBtn class="md-accent" (click)="generateName()">CHANGE NAME</button>
+      <button md-raised-button #beginPaintingBtm class="md-primary" (click)="beginPainting()">START PAINTING</button>
+    </md-card-actions>
+  </md-card>
+</div>

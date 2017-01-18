@@ -1,47 +1,6 @@
-<md-sidenav-container>
-  <md-sidenav #sidenav class="control-theme" mode="side" opened="false">
-    <button md-icon-button class="md-primary" (click)="sidenav.close()">
-      <md-icon>exit_to_app</md-icon>
-    </button>
-    <md-card>
-      <md-card-content>
-        <div class="d-flex flex-row">
-          <md-input-container>
-            <md-placeholder>Width</md-placeholder>
-            <input md-input type="number" [(ngModel)]="canvasWidth"/>
-          </md-input-container>
-          <md-input-container floatingPlaceholder="Height">
-            <!--md-placeholder>Height:</md-placeholder-->
-            <input md-input type="number" [(ngModel)]="canvasHeight"/>
-          </md-input-container>
-        </div>
-      </md-card-content>
-      <md-card-actions>
-        <button md-raised-button #newCanvasBtn class="md-primary" (click)="sizeCanvas()">RESIZE CANVAS</button>
-      </md-card-actions>
-    </md-card>
-    <md-card>
-      <md-card-content>
-        <md-input-container>
-          <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
-        </md-input-container>
-      </md-card-content>
-      <md-card-actions>
-        <button md-raised-button #changeNameBtn class="md-accent" (click)="generateName()">CHANGE NAME</button>
-        <button md-raised-button #beginPaintingBtm class="md-primary" (click)="beginPainting()">START PAINTING</button>
-      </md-card-actions>
-    </md-card>
-  </md-sidenav>
-
+<div class="scroll-container">
   <div id="image-create-panel" class="row">
     <div class="col-6 col-md-4 d-flex flex-column justify-content-around">
-      <!--
-      <md-toolbar class="md-accent justify-content-center">
-        <h4>Shortcuts</h4>
-        <button md-icon-button><md-icon class="ml-auto">trash</md-icon></button>
-      </md-toolbar>
-      <md-tab-group>
-      -->
       <md-card>
         <md-card-title class="md-accent">Paint Queue
           <button md-icon-button disabled>
@@ -97,19 +56,97 @@
         -->
     </div>
     <div ngSwitch="canvasStatus" class="col-6 col-md-8">
-      <div class="right-button-panel d-flex flex-column justify-content-between">
-        <button id="open-sidenav" md-fab (click)="sidenav.open();" [ngClass]="{hidden: sidenav.opened}">
-          <md-icon>settings</md-icon>
-        </button>
-        <br>
-        <button *ngIf="willPaint" md-fab (click)="beginPainting()"><md-icon>play_arrow</md-icon></button>
-        <button *ngIf="isPainting" md-fab (click)="scheduleNext()"><md-icon>add</md-icon></button>
-      </div>
-      <!--
-      <md-toolbar class="control-theme md-primary justify-content-center">
-        <h4>Workspace</h4>
-      </md-toolbar>
-      -->
+
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-title class="md-primary">Workspace</md-card-title>
+        <md-card-subtitle>
+          <span *ngIf="willPaint" class="align-text-top">Waiting to paint "{{phraseToPaint}}"</span>
+          <span *ngIf="isPainting" class="align-text-top">Currently painting "{{phrasePainting}}"</span>
+          <span *ngIf="hasPainted" class="align-text-top">Finished Painting "{{phrasePainted}}"</span>
+        </md-card-subtitle>
+        <md-card-content>
+          <div class="d-flex flex-column align-items-center justify-content-around">
+            <canvas #wordPaint class="align-self-center border-2" [width]="canvasWidth"
+                    [height]="canvasHeight"></canvas>
+            <md-progress-bar *ngIf="isPainting" class="mt-1 mb-auto"></md-progress-bar>
+          </div>
+        </md-card-content>
+      </md-card>
       <md-card>
         <md-card-title class="md-primary">Workspace</md-card-title>
         <md-card-subtitle>
@@ -127,4 +164,7 @@
       </md-card>
     </div>
   </div>
+</div>
+<!--
 </md-sidenav-container>
+-->
