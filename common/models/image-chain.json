@@ -1,0 +1,71 @@
+{
+  "name": "ImageChain",
+  "plural": "ImageChains",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "properties": {
+    "guid": {
+      "type": "string",
+      "id": true,
+      "required": false,
+      "defaultFn": "guid"
+    },
+    "displayName": {
+      "type": "string",
+      "required": true
+    },
+    "pixelWidth": {
+      "type": "number",
+      "required": true
+    },
+    "pixelHeight": {
+      "type": "number",
+      "required": true
+    },
+    "fitOrFill": {
+      "type": "string",
+      "required": true
+    },
+    "pixelCount": {
+      "type": "number",
+      "required": false
+    },
+    "widthPoints": {
+      "type": "array",
+      "required": false
+    },
+    "heightPoints": {
+      "type": "array",
+      "required": false
+    },
+    "owner": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {
+
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "Admin",
+      "property": "create",
+      "permission": "ALLOW"
+    }
+  ],
+  "methods": {}
+}

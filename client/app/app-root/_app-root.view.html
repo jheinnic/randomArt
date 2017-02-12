@@ -3,15 +3,11 @@
   <md-icon>done</md-icon>
 </button>
 <router-outlet name="action" (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
-<md-sidenav-container>
+<md-sidenav-container #sidenav>
   <inner-navbar></inner-navbar>
-  <md-sidenav #sidenav class="control-theme" mode="side" opened="true">
+  <md-sidenav #sidenav class="control-theme" mode="side" [opened]="isSideNavOpen()">
     <div class="side-panel-container scroll-container">
       <!--
-      <div class="toolbar-scrollable">
-        <router-outlet name="side" (deactivate)="onDeactivate($event)"
-                       (activate)="onActivate($event)"></router-outlet>
-      </div>
       <div class="toolbar-spacer"></div>
       -->
       <div class="scrollable">
@@ -35,9 +31,7 @@
   </div>
 </md-sidenav-container>
 <div class="fixed-bottom">
-  <div class="d-flex flex-column align-items-center">
-    <footer>
-      <span class="footer-text">&copy; John C. Heinnickel, 2017</span>
-    </footer>
-  </div>
+  <footer class="d-flex flex-column align-items-center">
+    <span class="footer-text">&copy; John C. Heinnickel, 2017</span>
+  </footer>
 </div>

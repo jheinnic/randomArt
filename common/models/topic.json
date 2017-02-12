@@ -4,8 +4,8 @@
   "idInjection": false,
   "properties": {
     "guid": {
-      "id": true,
       "type": "string",
+      "id": true,
       "required": false,
       "defaultFn": "guid"
     }
@@ -21,11 +21,11 @@
   },
   "acls": [
     {
+      "accessType": "READ",
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "accessType": "READ",
       "permission": "ALLOW"
     }
   ],
-  "methods": []
+  "methods": {}
 }

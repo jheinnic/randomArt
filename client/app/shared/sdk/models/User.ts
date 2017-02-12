@@ -13,9 +13,9 @@ export interface UserInterface {
   created?: Date;
   lastUpdated?: Date;
   id?: any;
-  accessTokens?: Array<any>;
-  identities?: Array<any>;
-  credentials?: Array<any>;
+  accessTokens?: any[];
+  identities?: any[];
+  credentials?: any[];
 }
 
 export class User implements UserInterface {
@@ -30,9 +30,9 @@ export class User implements UserInterface {
   created: Date;
   lastUpdated: Date;
   id: any;
-  accessTokens: Array<any>;
-  identities: Array<any>;
-  credentials: Array<any>;
+  accessTokens: any[];
+  identities: any[];
+  credentials: any[];
   constructor(data?: UserInterface) {
     Object.assign(this, data);
   }
@@ -116,17 +116,17 @@ export class User implements UserInterface {
       relations: {
         accessTokens: {
           name: 'accessTokens',
-          type: 'Array<any>',
+          type: 'any[]',
           model: ''
         },
         identities: {
           name: 'identities',
-          type: 'Array<any>',
+          type: 'any[]',
           model: ''
         },
         credentials: {
           name: 'credentials',
-          type: 'Array<any>',
+          type: 'any[]',
           model: ''
         },
       }

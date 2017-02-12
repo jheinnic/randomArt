@@ -2,6 +2,14 @@
   "name": "PeerConnection",
   "plural": "PeerConnections",
   "base": "PersistedModel",
+  "isInjection": false,
+  "mixins": {
+    "Timestamp": {
+      "required": false,
+      "validateUpsert": true,
+      "silenceWarnings": false
+    }
+  },
   "properties": {
     "peerId": {
       "type": "String",
@@ -12,32 +20,31 @@
       "type": "Boolean"
     }
   },
-  "mixins": {
-    "Timestamp": {
-      "required" : false,
-      "validateUpsert": true,
-      "silenceWarnings": false
-    }
-  },
-  "acls": [{
-    "principalType": "ROLE",
-    "principalId": "$everyone",
-    "permission": "DENY"
-  }, {
-    "principalType": "ROLE",
-    "principalId": "$authenticated",
-    "requestType": "READ",
-    "permission": "ALLOW"
-  }, {
-    "principalType": "ROLE",
-    "principalId": "$owner",
-    "permission": "ALLOW"
-  }],
+  "validations": [],
   "relations": {
     "user": {
       "type": "belongsTo",
       "model": "User",
       "foreignKey": "userId"
     }
-  }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "requestType": "READ"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW"
+    }
+  ],
+  "methods": {}
 }

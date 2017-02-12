@@ -11,10 +11,10 @@ function computePixelPoints(pointCount, minValue, maxValue) {
   if ((pointCount % 2) == 0) {
     initial = 0.5;
   } else {
-    initial = 0;
+    initial = 0.0;
   }
 
-  const rangeWidth: number = 1.0 * (maxValue - minValue);
+  const rangeWidth: number = (maxValue - minValue);
   const halfWidth: number = rangeWidth / 2.0;
   const midOffset: number = minValue * (-1.0);  // maxValue - rangeWidth;
 
@@ -38,7 +38,7 @@ function computeAffinePixelPoints(pointCount, minValue, maxValue) {
   // console.log(`Calculating map from [0...${pointCount}-1] onto [${minValue}...${maxValue}]`)
   var initial = 0.5;
   var translate = minValue;
-  var scale = (maxValue - minValue) / (pointCount - 0);
+  var scale = (maxValue - minValue) / (pointCount - 0.0);
 
   var pointsArray = [];
   for (var ii = initial; ii < pointCount; ii += 1) {
@@ -137,8 +137,8 @@ export class PointStreamService
   private width: number;
   private height: number;
   private pixelCount: number;
-  private widthPoints: number[];
-  private heightPoints: number[];
+  public widthPoints: number[];
+  public heightPoints: number[];
 
   public constructor() { }
 
@@ -152,11 +152,8 @@ export class PointStreamService
       .flatMap<number, PointMap>((xVal: number, xIdx: number) => {
         return Observable.from<number, number>(this.heightPoints)
           .map<number, PointMap>((yVal: number, yIdx: number) => {
-            return new PointMap(
-              new Point(counter, xIdx, yIdx),
-              new Point(counter++, xVal, yVal)
-            );
-});
+            return new PointMap(new Point(counter, xIdx, yIdx), new Point(counter++, xVal, yVal));
+          });
       });
   }
 
@@ -165,10 +162,20 @@ export class PointStreamService
     const itemSeq: Observable<PointMap> = this.mapSquareRegion(pixelCount);
 
     return intervalSeq.zip<number,PointMap>(itemSeq)
-      .map<[number, PointMap],PointMap>(
-        function (x: [number, PointMap]) { return x[1]; }
-      );
+      .map<[number, PointMap],PointMap>(function (x: [number, PointMap]) { return x[1]; });
   }
+
+  public mapRegionFromDimensions(widthPoints: number[], heightPoints: number[]) {
+    let counter = 0;
+    return Observable.from<number,number>(widthPoints)
+      .flatMap<number, PointMap>((xVal: number, xIdx: number) => {
+        return Observable.from<number, number>(heightPoints)
+          .map<number, PointMap>((yVal: number, yIdx: number) => {
+            return new PointMap(new Point(counter, xIdx, yIdx), new Point(counter++, xVal, yVal));
+          });
+      });
+  }
+
 
   public mapRectangularRegion(
     pixelWidth: number, pixelHeight: number, fitOrFill: 'fit' | 'fill' = 'fit'
@@ -205,16 +212,15 @@ export class PointStreamService
       .flatMap<number, PointMap>((xVal: number, xIdx: number) => {
         return Observable.from<number, number>(this.heightPoints)
           .map<number, PointMap>((yVal: number, yIdx: number) => {
-            return new PointMap(
-              new Point(counter, xIdx, yIdx),
-              new Point(counter++, xVal, yVal));
+            return new PointMap(new Point(counter, xIdx, yIdx), new Point(counter++, xVal, yVal));
           });
       });
   }
 
-  public performColorTransform(
-    region: Observable<PointMap>, seedPhrase: string
-  ): Observable<PaintablePoint> {
+  public
+  performColorTransform(
+    region: Observable < PointMap >, seedPhrase: string
+  ): Observable < PaintablePoint > {
     let phraseModel = randomArtFactory.new_picture(seedPhrase);
     return region.map(function (pointMap: PointMap, index: number) {
       return pointMap.from.withFillStyle(randomArtFactory.compute_pixel(phraseModel, pointMap.to.x, pointMap.to.y, 1, 1))
@@ -235,22 +241,20 @@ export class PointStreamService
    * @returns {Observable<PaintablePoint>} A stream of canvas coordinate to logial color pairs.
    */
   public performGradualColorTransform(
-    region: Observable<PointMap>, pixelCount: number, seedPhrase: string,
+    region: Observable < PointMap >, pixelCount: number, seedPhrase: string,
     livenessLatency: number = 750, maxBufSize: number = 2000,
-  ): Observable<[PaintablePoint[], number]> {
+  ): Observable < [PaintablePoint[], number] > {
     const phraseModel = randomArtFactory.new_picture(seedPhrase);
     const integralBufSize = findOptimalDivisor(pixelCount, maxBufSize);
     const iterCount = pixelCount / integralBufSize;
 
-    const progressSequence =
-      Observable.range(1, iterCount).map(
-        function getPercentDone(index: number) { return index / iterCount; }
-      );
+    const progressSequence = Observable.range(1, iterCount)
+      .map(function getPercentDone(index: number) { return index / iterCount; });
 
-    // For this to work, the the total pixel count MUST be an even multiple of
-    // the overall pixel count.  Otherwise, the final buffer never can flush
-    // and the sequence may repeat from the beginning, attempting to force that to
-    // happen!
+// For this to work, the the total pixel count MUST be an even multiple of
+// the overall pixel count.  Otherwise, the final buffer never can flush
+// and the sequence may repeat from the beginning, attempting to force that to
+// happen!
     return region.bufferCount(integralBufSize)
       .zip(Observable.interval(livenessLatency))
       .map<[PointMap[], number],PaintablePoint[]>(function (pointMapsPair: [PointMap[], number]) {
@@ -259,11 +263,12 @@ export class PointStreamService
           .map(function (pointMap: PointMap) {
             return pointMap.from.withFillStyle(randomArtFactory.compute_pixel(phraseModel, pointMap.to.x, pointMap.to.y, 1, 1));
           });
-      }).zip(progressSequence);
+      })
+      .zip(progressSequence);
   }
 }
 
-function gcf(a:number, b:number) {
+function gcf(a: number, b: number) {
   let retVal = a;
   if (b !== 0) {
     retVal = gcf(b, a % b);
@@ -278,7 +283,7 @@ function listDivisors(n) {
 
   const small = [];
   const large = [];
-  const  end = Math.floor(Math.sqrt(n));
+  const end = Math.floor(Math.sqrt(n));
 
   for (let i = 1; i < end; i++) {
     if ((n % i) === 0) {
@@ -286,11 +291,10 @@ function listDivisors(n) {
     }
   }
 
-  if ((end*end) === n) {
+  if ((end * end) === n) {
     small.push(end);
   }
 
-  return small.concat(
-    large.reverse());
+  return small.concat(large.reverse());
 }
 

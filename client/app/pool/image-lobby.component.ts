@@ -1,27 +1,35 @@
 /**
  * Created by jheinnic on 1/2/17.
  */
-import {Component, ViewChild, AfterViewInit, ElementRef, NgZone} from "@angular/core";
-import {PointStreamService, PointMap, PaintablePoint} from "../stream-play";
-import {Observable} from "rxjs";
+import {
+  Component, ViewChild, AfterViewInit, OnInit, OnDestroy, ElementRef, ViewChildren
+} from "@angular/core";
+import {ActivatedRoute} from "@angular/router";
 import {PhraseGeneratorService} from "../shared/phrase-generator/phrase-generator.service";
+import {PaintableDirective, Dimensions} from "../shared/canvas-util/paintable.directive";
 import {ArtworkApi} from "../shared/sdk/services/custom/Artwork";
-import Tether = require('tether');
-import path = require('path');
+import {PointMappingService, PaintProgress} from "./point-mapping.service";
+import {WordPaintQueueService} from "./word-paint-queue.service";
+import {WordPaintTask} from "./word-paint-task.datamodel";
+import {ImageChainDef} from "./image-chain-def.datamodel";
+import {ImageStoreService} from "./image-store.service";
+import {NavbarDataService, NavbarDataModelBuilder, MenuNavDataModelBuilder } from "../app-root";
+import {ServiceEventType, ServiceStage} from "../shared/service-util/service-lifecycle.datamodel";
+import {QueueChange} from "../shared/service-util/abstract-queue.service";
+import {
+  TaskEventType, ProgressTaskEvent, FinishedTaskEvent, BeganTaskEvent, HardErrorTaskEvent,
+  SoftErrorTaskEvent, CancelledTaskEvent, AcknowledgedTaskEvent
+} from "../shared/service-util/task-lifecycle.datamodel";
+import {PaintablePoint} from "../shared/canvas-util/point.datamodel";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subscription} from "rxjs/Subscription";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import uuid = require('uuid');
 import _ = require('lodash');
 
-interface PaintDone
-{
-  phrasePainted: string,
-  whenDismissed: Date,
-  imageData: Blob /*ImageData*/
-}
 
-interface PaintToDo
-{
-  phraseToPaint: string
-}
-
+const MIN_QUEUE_SIZE: number = 8;
 const MAX_BUFFER_SIZE: number = 2000;
 const LIVE_LATENCY: number = 600;
 
@@ -29,226 +37,295 @@ const LIVE_LATENCY: number = 600;
 @Component({
   moduleId: "./app/pool",
   selector: "image-lobby",
+  inputs: [],
   template: require("./_image-lobby.view.html"),
   styleUrls: ["./_image-lobby.scss"]
 })
-export class ImageLobbyComponent
+export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
 {
-  private phrasePainting: string;
-  private phrasePainted: string;
-  private cancelSignal: boolean = false;
+ private allImageChains: ImageChainDef[];
+  private _selectedImageChain: ImageChainDef;
 
-  private canvasHeight = 480;
-  private canvasWidth = 640;
+  private queueContent: Immutable.List<WordPaintTask>
+  private currentPaintTask: WordPaintTask;
+  private previousPhrase: string;
 
-  private scalePoints: Observable<PointMap>;
-  private context: CanvasRenderingContext2D | null;
+  private serviceSub: Subscription;
+  private queueSub: Subscription;
+  private taskSub: Subscription;
 
-  public paintJobsNext: PaintToDo[];
-  public paintJobsDone: PaintDone[];
+  private progressMode: string = "determinate";
+  private pctBuffer: number = 0;
+  private pctDone: number = 0;
 
-  @ViewChild('wordPaint') wordPaintCanvas: ElementRef;
-  @ViewChild('resizeCanvasBtn') resizeCanvasBtn: ElementRef;
-  @ViewChild('generateNameBtn') generateNameBtn: ElementRef;
-  @ViewChild('startPaintingBtn') startPaintingBtm: ElementRef;
+  @ViewChildren("canvas[paintable]") private canvasRef: PaintableDirective;
+
+  private paintSize: Dimensions = {
+    pixelWidth: 480,
+    pixelHeight: 480
+  };
+  private paintSizeSubject: BehaviorSubject<Dimensions>;
+  private paintProgress: Subject<PaintProgress> = new Subject<PaintProgress>();
+
+  private uploadSubscription: Subscription;
 
   constructor(
-    private readonly ngZone: NgZone, private readonly artworkApi: ArtworkApi,
-    private readonly pointService: PointStreamService,
-    private readonly phraseGenerator: PhraseGeneratorService
+    private readonly activatedRoute: ActivatedRoute, private readonly artworkApi: ArtworkApi,
+    private readonly pointService: PointMappingService,
+    private readonly phraseGenerator: PhraseGeneratorService,
+    private readonly imageStore: ImageStoreService,
+    private readonly paintQueue: WordPaintQueueService,
+    private readonly navbarDataService: NavbarDataService
   ) {
-    this.paintJobsNext = [
-      {phraseToPaint: this.phraseGenerator.createNextPhrase()}
-    ];
-    this.paintJobsDone = [
-      {
-        phrasePainted: 'Placeholder One',
-        whenDismissed: new Date(),
-        imageData: null
-      }
-    ];
+    this.paintSizeSubject =
+      new BehaviorSubject<Dimensions>(this.paintSize);
+  }
+
+  public ngOnInit() {
+    let snapshot = this.activatedRoute.snapshot;
+    this.allImageChains = snapshot.data['imageChainDef'];
+    this._selectedImageChain = this.allImageChains[0];
+
+    // let obsChains = snapshot.data['imageChainDef'];
+    // let subscription = obsChains.subscribe((values: ImageChainDef[]) => {
+    //   this.allImageChains = values;
+    //   console.log(JSON.stringify(values));
+    //   this._selectedImageChain = this.allImageChains[0];
+    // }, (err: any) => { console.error(err); }, () => { console.log("Shutting down"); });
+
+    let numRounds = 0;
+    while ((this.paintQueue.count() < MIN_QUEUE_SIZE) && (numRounds++ < MIN_QUEUE_SIZE)) {
+      this.scheduleNext();
+    }
+
+    this.queueSub = this.paintQueue.onChanged()
+      .subscribe((event: QueueChange<WordPaintTask>) => {
+        switch (event.kind) {
+          case 'offer':
+            this.queueContent = event.newContent;
+            if ((!this.currentPaintTask) && (this.pointService.stage
+              === ServiceStage.available)) {
+              this.beginPainting();
+            }
+            break;
+          case 'take':
+          case 'create':
+          case 'remove':
+          case 'replace':
+          case 'swap':
+          default:
+            this.queueContent = event.newContent;
+            break;
+        }
+
+        while (this.queueContent.size < MIN_QUEUE_SIZE) {
+          this.scheduleNext();
+        }
+      }, (err: any) => { console.error(err); },
+        () => { this.queueSub = undefined; });
+
+    this.serviceSub = this.pointService.events
+      .subscribe((event: ServiceEventType) => {
+        switch (event.kind) {
+          case 'launched': {
+            if (this.paintQueue && this.paintQueue.count() > 0) {
+              this.beginPainting();
+            }
+            break;
+          }
+          default:
+            console.log('Nothing for' + JSON.stringify(event));
+            break;
+        }
+      }, (err: any) => { console.error(err); },
+        () => { this.serviceSub = undefined; });
+
+    console.log("Editting Image Lab menu item");
+    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
+      builder.resetTabs()
+        .editMenuNav('Image Lab', (builder: MenuNavDataModelBuilder) => {
+          builder.disabled(true)
+        });
+    })
+  }
+
+  public ngOnDestroy() {
+    if (this.serviceSub) {
+      this.serviceSub.unsubscribe();
+    }
+
+    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
+      builder.editMenuNav('Image Lab', (builder: MenuNavDataModelBuilder) => {
+        builder.disabled(false)
+      });
+    });
+  }
+
+  public ngAfterViewInit() {
+    // this.wordPaintCanvas.isReady();
   }
 
   get phraseToPaint(): string {
-    let retVal: string = '';
-    if (this.paintJobsNext.length >= 1) {
-      retVal = this.paintJobsNext[0].phraseToPaint;
+    let retVal: string;
+
+    if (this.paintQueue.count() >= 1) {
+      retVal = this.paintQueue.peek().phrase;
     }
+
     return retVal;
   }
 
   get hasPainted(): boolean {
-    return _.isString(this.phrasePainted);
+    return _.isString(this.previousPhrase);
   }
 
   get isPainting(): boolean {
-    return _.isString(this.phrasePainting);
+    return this.currentPaintTask instanceof Object;
   }
 
   get willPaint(): boolean {
-    return !this.isPainting && (this.paintJobsNext.length > 0);
+    return !this.isPainting && (this.paintQueue.count() > 0);
   }
 
-  public sizeCanvas() {
-    this.scalePoints =
-      this.pointService.mapRectangularRegion(this.canvasWidth, this.canvasHeight);
+  private get selectedImageChain(): ImageChainDef {
+    return this._selectedImageChain;
   }
 
-  public newCanvas() {
-    console.log('New Canvas TODO');
+  private set selectedImageChain(data: ImageChainDef) {
+    this._selectedImageChain = data;
   }
 
   public renameNext() {
-    this.paintJobsNext.unshift();
-    this.scheduleNext();
+    if (this.paintQueue.count() > 0) {
+      let rawTask: WordPaintTask = WordPaintTask.build((builder) => {
+        builder.phrase(
+          this.phraseGenerator.createNextPhrase()
+        ).chain(
+          this.paintQueue.peek().chain
+        )
+      });
+
+      const newItem = this.pointService.prepareTask(rawTask);
+      this.paintQueue.replace(0, newItem);
+    } else {
+      console.error("Cannot replace next item--queue is already empty!");
+    }
   }
 
   public scheduleNext() {
-    this.paintJobsNext.push({
-      phraseToPaint: this.phraseGenerator.createNextPhrase()
+    let rawTask: WordPaintTask = WordPaintTask.build((builder) => {
+      builder.phrase(
+        this.phraseGenerator.createNextPhrase()
+      ).chain(this.selectedImageChain)
     });
+
+    const newItem = this.pointService.prepareTask(rawTask);
+    this.paintQueue.offer(newItem);
   }
 
   public beginPainting() {
-    let canvasBefore: HTMLCanvasElement = this.wordPaintCanvas.nativeElement;
-
-    if (this.paintJobsNext.length < 1) {
-      throw new Error("No jobs in queue left to paint!");
+    if (this.paintQueue.count() > 0) {
+      this.currentPaintTask = this.paintQueue.take();
+      this.taskSub = this.currentPaintTask.events.subscribe(
+        (event: TaskEventType<string, PaintProgress, string>) => {
+          switch (event.kind) {
+            case 'began':
+              this.onWordPaintBegin(event);
+              break;
+            case 'progress':
+              this.onWordPaintProgress(event);
+              break;
+            case 'acknowledged':
+              this.onWordPaintAcknowledged(event);
+              break;
+            case 'finished':
+              this.onWordPaintDone(event);
+              break;
+            case 'cancelled':
+              this.onWordPaintCancelled(event);
+              break;
+            case 'hardError':
+              this.onWordPaintHardError(event);
+              break;
+            case 'softError':
+              this.onWordPaintSoftError(event);
+              break;
+            default:
+              console.log(event);
+          }
+        }, (err: any) => { console.error(err); }, () => {this.taskSub = undefined; });
+      this.currentPaintTask.begin();
+    } else {
+      console.error("Cannot paint next item--queuee is already empty!");
     }
-    if (this.isPainting) {
-      throw new Error('A paint job is already in progress!');
-    }
-    this.context = canvasBefore.getContext('2d', {storage: true});
-    if (this.context === null) {
-      throw new Error("Could not get 2D context from canvas element");
-    }
-
-    if (!this.scalePoints) {
-      this.sizeCanvas();
-    }
-
-    this.phrasePainting = this.paintJobsNext.shift().phraseToPaint;
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        this.doPaintWord();
-      }, 1);
-    });
-    this.onWordPaintBegin(this.phrasePainting);
-  }
-
-  private doPaintWord() {
-    const pixelCount = this.canvasWidth * this.canvasHeight;
-    const outputSubject: Observable<[PaintablePoint[], number]> =
-      this.pointService.performGradualColorTransform(
-        this.scalePoints, pixelCount, this.phrasePainting, LIVE_LATENCY, MAX_BUFFER_SIZE);
-
-    // Get calculation result, then...
-    let iterCounter = 0;
-    let pixelCounter = 0;
-    outputSubject.subscribe((paintPoints: [PaintablePoint[],number]) => {
-      // ...paint into context
-      paintPoints[0].forEach(function (paintPoint) {
-        paintPoint.paintTo(this.context);
-      });
-
-      this.ngZone.run(() => {
-        this.onWordPaintProgress(this.phrasePainting, paintPoints[1]);
-
-        if (this.cancelSignal === true) {
-          let temp = this.phrasePainting;
-          this.phrasePainting = null;
-          this.cancelSignal = false;
-          console.log('Cancelled');
-          this.onWordPaintCancel(temp);
-        }
-      });
-    }, (error) => {
-      console.error('Failed to complete paint step!', error);
-      this.ngZone.run(() => {
-        let temp = this.phrasePainting;
-        this.phrasePainting = null;
-        this.cancelSignal = false;
-        this.onWordPaintFail(temp);
-      });
-    }, () => {
-      this.ngZone.run(() => {
-        this.phrasePainted = this.phrasePainting;
-        this.phrasePainting = null;
-        this.cancelSignal = false;
-        this.onWordPaintDone(this.phrasePainted);
-      });
-    });
-
-    console.log('Done');
   }
 
   public cancelPainting() {
-    this.cancelSignal = true;
+    this.currentPaintTask.cancel();
   }
 
-  public dismissIfFinished( imageData: Blob ) {
-    if (this.phrasePainted > '') {
-      /*let imageData = this.context.getImageData();*/
-      let whenDismissed = new Date()
-      this.paintJobsDone.push({
-        phrasePainted: this.phrasePainted,
-        whenDismissed: whenDismissed,
-        imageData: imageData
-      });
-      this.phrasePainted = null;
-      this.onCanvasReady(whenDismissed);
-    }
+  //
+  // Event Handlers for compopnentized wordpaint canvas TODO
+  //
+
+  public onWordPaintBegin(event: BeganTaskEvent<string,PaintProgress,string>) {
+    this.paintSize = {
+      pixelWidth: this.currentPaintTask.chain.pixelWidth,
+      pixelHeight: this.currentPaintTask.chain.pixelHeight
+    };
   }
 
-  public onSelectChip(self, $event) {
-    console.log("Chip self = ", self);
-    console.log("Chip $event = ", $event);
+  public onWordPaintProgress(event: ProgressTaskEvent<string,PaintProgress,string>) {
+    // this.wordPaintCanvas.paint(event.progress.paintPoints);
+    this.paintProgress.next(event.progress);
+    console.log(`Progress update TODO for ${event.task} at ${event.progress.pctDone}!`);
+    this.pctBuffer = (event.progress.pctDone * 2) - this.pctDone;
+    this.pctDone = event.progress.pctDone;
   }
 
-//
-// Event Handlers for compopnentized wordpaint canvas TODO
-//
-
-  public onCanvasReady(eventTime) {
-    console.log("Auto word component was signalled onCanvasReady from wordPaint at "
-      + eventTime);
-    if (this.paintJobsNext.length > 0) {
-      this.context.fillStyle = 'rgb(0,0,0)';
-      this.context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.beginPainting();
-    }
+  public onWordPaintSoftError(event: SoftErrorTaskEvent<string,PaintProgress,string>) {
+    this.currentPaintTask.acknowledge();
+    this.scheduleNext();
   }
 
-  public onWordPaintBegin(currentWord) {
+  public onWordPaintHardError(event: HardErrorTaskEvent<string,PaintProgress,string>) {
+    this.currentPaintTask.acknowledge();
+    this.scheduleNext();
   }
 
-  public onWordPaintProgress(currentWord, pctDone) {
-    console.log("Progress update TODO!");
+  public onWordPaintCancelled(event: CancelledTaskEvent<string,PaintProgress,string>) {
+    this.currentPaintTask.acknowledge();
+    this.scheduleNext();
   }
 
-  public onWordPaintFail(currentWord) {
-  }
-
-  public onWordPaintCancel(currentWord) {
-
-  }
-
-  public onWordPaintDone(completedPhrase) {
-    let canvas = this.context.canvas
+  public onWordPaintDone(event: FinishedTaskEvent<string,PaintProgress,string>) {
+    let completedPhrase = event.task;
+    let fullImageDataUrl = this.canvasRef.dataUrl
+    let imageDataUrl =
+      fullImageDataUrl.replace(/^data:image\/(png|jpeg|jpg|gif);base64,/, '');
 
     // TODO: Try using the toBlob() method instead of this hackish looking snippet
-    let base64Data: string = canvas.toDataURL('image/png')
-      .replace(/^data:image\/(png|jpeg|jpg|gif);base64,/, '');
-    console.log(base64Data);
-    let imageData: Blob = base64toBlob(base64Data, 'image/png');
+    // let base64Data: string = canvas.toDataURL('image/png')
+    let imageData: Blob = base64toBlob(imageDataUrl, 'image/png');
 
-    let result: Observable<any> = this.artworkApi.upload(
-      completedPhrase, this.canvasWidth, this.canvasHeight, base64Data);
+    this.scheduleNext();
 
-    result.subscribe(
-      (data) => { }, (err) => { console.error(err); },
-      () => { this.dismissIfFinished(imageData); }
-    );
+    const result: Observable<any> = this.artworkApi.upload(
+      completedPhrase, this.currentPaintTask.chain.pixelWidth,
+      this.currentPaintTask.chain.pixelHeight, imageDataUrl);
+
+    this.uploadSubscription = result.subscribe((data) => {
+      this.uploadSubscription.unsubscribe();
+      this.currentPaintTask.acknowledge();
+      // TODO: Insert to local image store.
+    }, (err) => { console.error(err); }, () => { this.uploadSubscription = null});
+  }
+
+  public onWordPaintAcknowledged(
+    event: AcknowledgedTaskEvent<string,PaintProgress,string>) {
+    this.taskSub.unsubscribe();
+    this.taskSub = undefined;
+    this.currentPaintTask = undefined;
   }
 }
 

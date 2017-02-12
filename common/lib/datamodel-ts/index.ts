@@ -3,6 +3,19 @@ import builder = require('fluent-interface-builder');
 import {Builder} from "fluent-interface-builder";
 import { makeDecorator, makeParamDecorator, makePropDecorator } from '@angular/core/src/util/decorators';
 
+// From the standard library....
+export type Partial<T> = { [P in keyof T]?: T[P]; }
+export type Readonly<T> = { readonly [P in keyof T]: T[P]; }
+export type Nullable<T> = { [P in keyof T]: T[P] | null; }
+
+export type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
+export type PartialPick<T, K extends keyof T> = Pick<T,K> & Partial<T>
+
+export type Record<K extends string, T> = { [P in K]: T; }
+export type Flags<K extends string> = Record<K, boolean>
+export type KeyPairs<T extends string> = Record<T, T> // { [P in T]: T }
+
+export type KeyToValue<T extends string> = { [P in T]: P }
 //
 // Generic Helper Methods
 //
@@ -13,26 +26,39 @@ export interface NoArgConstructor<T> {
   new (): T;
 }
 
+export interface PartialConstructor<T> {
+  new (previous?: T, template?: Partial<T>): T;
+}
+
 // Marker interface for any collection of methods that provide construction semantics
-// for an immutable data model object.
-export interface ModelBuilder<T, M extends ModelBuilder<T, M>> { };
+// for an immutable data model object.  This library contains utility classes that facilitate
+// using such an interface to drive the cloning and construction of immutable artifacts
+// with a fluent coding style.
+// export interface ModelBuilder<T> { }
+export type FluentBuilder<M> = { [K in keyof M]: (...params: any[]) => M };
+export type FactoryWrapper<T, M> = FluentBuilder<M> & Wrapper<T>;
+export interface Wrapper<T> { unwrap(): T; }
+
 
 // Named signature for a method that takes a ModelBuilder and uses it to define how a
 // desired object is to be constructed.
-export type Director<T, M extends ModelBuilder<T, M>> = (builder:ModelBuilder<T,M>) => void;
+export type Director<M> = (builder:FluentBuilder<M>) => void;
 
 // Named signature for a method that takes a Director, calls it with a ModelBuilder
 // matching its signature requirements, and uses the work the Director does on that
 // ModelBuilder to return an instance of what the Director described to caller.
-export type BuildMethod<T, M extends ModelBuilder<T, M>> = (director:Director<T, M>) => T;
+export type BuildMethod<T, M> = (director:Director<M>) => T;
+
+export type CopyMethod<T, M> = (director:Director<M>) => T;
 
 // Marker interface that augments a collection of methods that provide construction
 // semantics with an additional method to perform the described construction.
-export interface Wrapper<T, M extends ModelBuilder<T,M>> extends ModelBuilder<T,M> {
-  unwrap(): T;
-}
+// export interface Wrapper<T, M extends ModelBuilder<T,M>> extends ModelBuilder<T,M> {
+//   unwrap(): T;
+// }
 
-export function unwrapHelper<T>(): (T)=>T { return (self:T) => { return self; }; }
+
+export function unwrapHelper<T>(): (T:T)=>T { return (self:T) => { return self; }; }
 
 // Helper function that implements the recurring pattern of implementing a builder method
 // that:
@@ -45,25 +71,44 @@ export function unwrapHelper<T>(): (T)=>T { return (self:T) => { return self; };
 // -- A preconfigured Builder from fluent-interface-builder that has been configured to
 //    produce Wrappers that extend the required ModelBuilder API.
 // -- A class the provided Builder is used to construct with a No-Argument constructor.
-export function buildMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapper<T,M>>(
+export function buildMethodFactory<T, M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
   wrapperBuilder:Builder<W,T>, ctor:NoArgConstructor<T>
 ) : BuildMethod<T,M> {
-  return (director:Director<T, M>): T => {
+  return (director:Director<M>): T => {
     let wrapper:W = wrapperBuilder.value(new ctor());
     director(wrapper);
     return wrapper.unwrap();
   };
 }
 
-export function copyMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapper<T,M>>(
-  wrapperBuilder:Builder<W,T>, self: T
+export function oldCopyMethodFactory<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
+  self: T, wrapperBuilder:Builder<W,T>
 ) : BuildMethod<T,M> {
-  return function (director:Director<T, M>): T {
+  return function (director:Director<M>): T {
     let wrapper:W = wrapperBuilder.value(self);
     director(wrapper);
     return wrapper.unwrap();
   };
 }
+
+export function copyMethodFactory<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
+  wrapperBuilder:Builder<W,T>
+) : CopyMethod<T,M> {
+  return function (director:Director<M>): T {
+    let wrapper:W = wrapperBuilder.value(this);
+    director(wrapper);
+    return wrapper.unwrap();
+  };
+}
+
+export function copyMethod<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
+  self: T, wrapperBuilder:Builder<W,T>, director: Director<M>
+) : T {
+  let wrapper:W = wrapperBuilder.value(self);
+  director(wrapper);
+  return wrapper.unwrap();
+}
+
 
 
 //
@@ -74,7 +119,7 @@ export function copyMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapp
  *
  * @Annotation
  */
-export var /** @type {?} */ DataModel = (makeDecorator('DataModel', {
+export const /** @type {?} */ DataModel = (makeDecorator('DataModel', {
   name: undefined,
   builder: "default"
 }));
@@ -84,4 +129,4 @@ export var /** @type {?} */ DataModel = (makeDecorator('DataModel', {
  *
  * @Annotation
  */
-export var /** @type {?} */ Collection = (makePropDecorator('Collection', undefined));
+export const /** @type {?} */ Collection = (makePropDecorator('Collection', []));

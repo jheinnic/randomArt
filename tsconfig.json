@@ -5,14 +5,15 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
-    "noEmitHelpers": true,
+    "importHelpers": true,
     "noUnusedLocals": false,
+    "noImplicitAny": false,
     "strictNullChecks": false,
     "noUnusedParameters": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "dom", "es6", "scripthost" ],
+    "lib": [ "dom", "es5", "scripthost", "es2015.promise", "es2015.core", "es2015.collection" ],
     "rootDirs": [ "client", "common/lib" ],
     "baseUrl": ".",
     "paths": {
@@ -44,6 +45,7 @@
   "exclude": [
     "node_modules/**/*",
     "typings/main/**/*",
+    "attic/*",
     "server/**/*",
     "build/**/*",
     "dist/**/*"

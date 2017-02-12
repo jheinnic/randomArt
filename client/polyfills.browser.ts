@@ -22,6 +22,12 @@ import 'core-js/es6/map';
 import 'core-js/es6/set';
 import 'core-js/es6/reflect';
 
+// This one I'm adding myself...
+// import 'core-js/es6/promise';
+// import 'es6-promise';
+require('es6-promise').polyfill();
+
+
 // These appear to go beyond what Angular requires?
 // import 'core-js/es6/weak-map';
 // import 'core-js/es6/weak-set';

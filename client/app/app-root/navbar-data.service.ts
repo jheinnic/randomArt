@@ -6,8 +6,6 @@ import {NavbarData, NavbarDataDirector, NavbarDataModelBuilder} from "./navbar-d
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
 
-require("rxjs/add/operator/share");
-
 @Injectable()
 export class NavbarDataService {
   private dataModel = new NavbarData();

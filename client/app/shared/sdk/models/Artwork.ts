@@ -1,4 +1,7 @@
 /* tslint:disable */
+import {
+  ImageChain
+} from '../index';
 
 declare var Object: any;
 export interface ArtworkInterface {
@@ -8,8 +11,11 @@ export interface ArtworkInterface {
   url: string;
   type?: string;
   title?: string;
-  width?: number;
-  height?: number;
+  owner?: string;
+  imageChainId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  imageChain?: ImageChain;
 }
 
 export class Artwork implements ArtworkInterface {
@@ -19,8 +25,11 @@ export class Artwork implements ArtworkInterface {
   url: string;
   type: string;
   title: string;
-  width: number;
-  height: number;
+  owner: string;
+  imageChainId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  imageChain: ImageChain;
   constructor(data?: ArtworkInterface) {
     Object.assign(this, data);
   }
@@ -76,16 +85,29 @@ export class Artwork implements ArtworkInterface {
           name: 'title',
           type: 'string'
         },
-        width: {
-          name: 'width',
-          type: 'number'
+        owner: {
+          name: 'owner',
+          type: 'string'
         },
-        height: {
-          name: 'height',
-          type: 'number'
+        imageChainId: {
+          name: 'imageChainId',
+          type: 'string'
+        },
+        createdAt: {
+          name: 'createdAt',
+          type: 'Date'
+        },
+        updatedAt: {
+          name: 'updatedAt',
+          type: 'Date'
         },
       },
       relations: {
+        imageChain: {
+          name: 'imageChain',
+          type: 'ImageChain',
+          model: 'ImageChain'
+        },
       }
     }
   }

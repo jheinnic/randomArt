@@ -5,9 +5,11 @@ import { PeerConnection } from '../../models/PeerConnection';
 import { Email } from '../../models/Email';
 import { StormpathUser } from '../../models/StormpathUser';
 import { Container } from '../../models/Container';
+import { ImageChain } from '../../models/ImageChain';
 import { Artwork } from '../../models/Artwork';
+import { Pool } from '../../models/Pool';
 
-interface Models { [name: string]: any }
+export interface Models { [name: string]: any }
 
 @Injectable()
 export class SDKModels {
@@ -18,7 +20,9 @@ export class SDKModels {
     Email: Email,
     StormpathUser: StormpathUser,
     Container: Container,
+    ImageChain: ImageChain,
     Artwork: Artwork,
+    Pool: Pool,
     
   };
 

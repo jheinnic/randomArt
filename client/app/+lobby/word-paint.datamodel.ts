@@ -3,7 +3,7 @@
  */
 import builder = require('fluent-interface-builder');
 import {
-  ModelBuilder, unwrapHelper, copyMethodFactory, BuildMethod
+  unwrapHelper, copyMethodFactory, BuildMethod, FactoryWrapper, CopyMethod
 } from "../../../common/lib/datamodel-ts";
 //import * as builder from "fluent-interface-builder";
 
@@ -54,22 +54,15 @@ const wrapWordPaintDataModel = builder.build<WordPaintDataModelWrapper,WordPaint
   .unwrap('unwrap', unwrapHelper);
 
 
-export interface WordPaintDataModelBuilder
-extends WordPaintEventVisitor,ModelBuilder<WordPaintEvent, WordPaintDataModelBuilder>
+export interface WordPaintDataModelBuilder extends WordPaintEventVisitor
 {
-  visitReady(event: CanvasReadyEvent) : WordPaintDataModelBuilder;
-  visitUpdate(event: ProgressUpdateEvent): WordPaintDataModelBuilder;
-  visitCancelled(event: TaskCancelledEvent): WordPaintDataModelBuilder;
-  visitCompleted(event: TaskCompletedEvent): WordPaintDataModelBuilder;
+  visitReady(event: CanvasReadyEvent) : this;
+  visitUpdate(event: ProgressUpdateEvent): this;
+  visitCancelled(event: TaskCancelledEvent): this;
+  visitCompleted(event: TaskCompletedEvent): this;
 }
 
-type WordPaintDataModelWrapper = {
-  visitReady(event: CanvasReadyEvent) : WordPaintDataModelWrapper;
-  visitUpdate(event: ProgressUpdateEvent): WordPaintDataModelWrapper;
-  visitCancelled(event: TaskCancelledEvent): WordPaintDataModelWrapper;
-  visitCompleted(event: TaskCompletedEvent): WordPaintDataModelWrapper;
-  unwrap(): WordPaintDataModel;
-}
+type WordPaintDataModelWrapper = FactoryWrapper<WordPaintDataModel, WordPaintDataModelBuilder>;
 
 export interface WordPaintEventVisitor
 {
@@ -159,11 +152,11 @@ export class WordPaintDataModel
   readonly currentWord: string|null;
   readonly pctDone: number;
 
-  readonly copy: BuildMethod<WordPaintDataModel, WordPaintDataModelBuilder>;
+  readonly copy: CopyMethod<WordPaintDataModel, WordPaintDataModelBuilder>;
 
   constructor(content?: WordPaintDataInterface) {
     console.log( 'This: ', JSON.stringify(this), ' & that: ' + JSON.stringify(content));
     Object.assign(this, content);
-    this.copy = copyMethodFactory(wrapWordPaintDataModel, this);
+    this.copy = copyMethodFactory(wrapWordPaintDataModel);
   }
 }

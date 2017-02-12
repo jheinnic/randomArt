@@ -1,0 +1,13 @@
+<md-button-toggle-group-mutiple #group="imageChainsGroup" vertical="true">
+  <md-button-toggle *ngFor="let chain of imageChains" input="imageChains" [name]="chain.uuid" checked="true" [value]="chain.uuid" (change)="console.log($event)">
+    {{chain.displayName}}
+  </md-button-toggle>
+</md-button-toggle-group-mutiple>
+<div id="pool-lobby-panel" class="scroll-container">
+  <md-grid-list rowHeight="96px" gutterSize="4px">
+    <md-grid-tile *ngFor="let pool of poolList">
+      <md-grid-tile-header>{{pool.imageChain.displayName}}</md-grid-tile-header>
+      <md-grid-tile-footer>{{pool.name}}</md-grid-tile-footer>
+    </md-grid-tile>
+  </md-grid-list>
+</div>

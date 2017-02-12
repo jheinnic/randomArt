@@ -1,54 +1,15 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 import builder = require('fluent-interface-builder');
-import {unwrapHelper, buildMethodFactory, ModelBuilder, Wrapper} from "../../../common/lib/datamodel-ts";
+import {
+  unwrapHelper, buildMethodFactory, copyMethodFactory, FactoryWrapper, Partial, BuildMethod,
+  CopyMethod, copyMethod
+} from "../../../common/lib/datamodel-ts";
 import Immutable = require('immutable');
 import _ = require('lodash');
 
 //
 // Generic Helper Methods
 //
-
-// const unwrapHelper = <T>(): (T)=>T => { return _.identity; };
-
-// interface NoArgConstructor<T>
-// { new (): T;
-// }
-//
-// // Marker interface for any collection of methods that provide construction semantics
-// // for an immutable data model object.
-// interface ModelBuilder<T, M extends ModelBuilder<T, M>>
-// {
-// }
-// ;
-//
-// // Marker interface that augments a collection of methods that provide construction
-// // semantics with an additional method to perform the described construction.
-// interface Wrapper<T, M extends ModelBuilder<T,M>> extends ModelBuilder<T,M>
-// {
-//   unwrap(): T;
-// }
-//
-// // Named signature for a method that takes a ModelBuilder and uses it to define how a
-// // desired object is to be constructed.
-// type Director<T, M extends ModelBuilder<T, M>> = (builder: ModelBuilder<T,M>) => void;
-//
-// // Named signature for a method that takes a Director, calls it with a ModelBuilder
-// // matching its signature requirements, and uses the work the Director does on that
-// // ModelBuilder to return an instance of what the Director described to caller.
-// type BuildMethod<T, M extends ModelBuilder<T, M>> = (director: Director<T, M>) => T;
-//
-// function unwrapHelper<T>(): (T) => T { return _.identity; }
-//
-// // Helper function that implements the recurring pattern of creating a builder method
-// function buildMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapper<T,M>>(
-//   wrapperBuilder: Builder<W,T>, ctor: NoArgConstructor<T>
-// ): BuildMethod<T,M> {
-//   return (director: Director<T, M>): T => {
-//     let wrapper: W = wrapperBuilder.value(new ctor());
-//     director(wrapper);
-//     return wrapper.unwrap();
-//   };
-// }
 
 
 //
@@ -73,13 +34,17 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
   ) => (context: NavbarData) => {
     let tabs:Immutable.List<NavbarTabData> = context.tabs;
     if (isDefault) {
-      let oldDefault = tabs.findEntry(function (val) { return val.isDefault;});
+      let oldDefault = tabs.findEntry(
+        function (val:NavbarTabData) { return val.isDefault;});
       if (! _.isUndefined(oldDefault)) {
-        tabs = tabs.set(oldDefault[0], new NavbarTabData(oldDefault[1], {isDefault: false}));
+        tabs = tabs.set(
+          oldDefault[0],
+          new NavbarTabData(oldDefault[1], {isDefault: false}));
       }
     }
 
-    let entry = tabs.findEntry(function (val) { return val.displayName === displayName; });
+    let entry = tabs.findEntry(
+      function (val:NavbarTabData) { return val.displayName === displayName; });
     if (! _.isUndefined(entry)) {
       tabs = tabs.set(entry[0], new NavbarTabData(entry[1], {
         displayName: displayName,
@@ -94,26 +59,33 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
       }));
     }
 
+
     return new NavbarData(context, {tabs: tabs});
   })
   .chain('resetTabs', () => (context: NavbarData) => {
-    return Object.assign(new NavbarTabData(), context, {tabs: []});
+    return new NavbarData(context, {tabs: Immutable.List<NavbarTabData>()});
   })
   .chain('addMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    return Object.assign(new NavbarData(), context, {
-      menuItems: context.menuItems.push(MenuNavData.build(director) as MenuNavData)
-    } as NavbarData);
+    var newItem = new MenuNavData(undefined, {displayName: displayName});
+
+    // TODO: Make sure displayName is unique.
+
+    return new NavbarData(context, {
+      menuItems: context.menuItems.push(
+        newItem.copy(director)
+      )
+    });
   })
   .chain('editMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    let entry = context.menuItems.findEntry((item) => {
+    let entry = context.menuItems.findEntry((item:MenuNavData) => {
       return item.displayName === displayName
     });
 
-    // TODO: Handle error if displayName matches nothing
+    if (!entry) { throw new Error("No such menu item: " + displayName); }
 
     return new NavbarData(context, {
       menuItems: context.menuItems.set(
@@ -122,7 +94,7 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
   })
   .chain('deleteMenuNav', (displayName: string) => (context: NavbarData) => {
     return new NavbarData(context, {
-      menuItems: context.menuItems.filter( function(nextItem) {
+      menuItems: context.menuItems.filter( function(nextItem:MenuNavData) {
         return nextItem.displayName != displayName;
       }).toList()
     });
@@ -144,12 +116,8 @@ const wrapNavbarDataTwo = builder.build<NavbarDataTwoWrapper,NavbarData>()
     return new NavbarData(context, {brandName: brandName}) as NavbarData;
   })
   .chain('addTab', (director: NavbarTabDataDirector) => (context: NavbarData) => {
-    let wrapper: NavbarTabDataWrapper = wrapNavbarTabData.value(new NavbarTabData());
-
-    director(wrapper as NavbarTabDataModelBuilder);
-
     return new NavbarData(context, {
-      tabs: context.tabs.push(wrapper.unwrap())
+      tabs: context.tabs.push(NavbarTabData.build(director))
     });
   })
   .unwrap('unwrap', unwrapHelper);
@@ -175,12 +143,7 @@ let wrapMenuNavData = builder.build<MenuNavDataWrapper, MenuNavData>()
 // Data Models
 //
 
-export type NavbarDataType = {
-  brandName?: string;
-  sidenavOpen?: boolean;
-  tabs?: Immutable.List<NavbarTabData>
-  menuItems?: Immutable.List<MenuNavData>
-}
+export type NavbarDataType = Partial<NavbarData>;
 
 export class NavbarData
 {
@@ -189,7 +152,7 @@ export class NavbarData
   readonly tabs: Immutable.List<NavbarTabData> = Immutable.List<NavbarTabData>();
   readonly menuItems: Immutable.List<MenuNavData> = Immutable.List<MenuNavData>();
 
-  constructor(predecessor?: NavbarData, data?: NavbarDataType) {
+  constructor(predecessor?: NavbarData, data?: Partial<NavbarData>) {
     Object.assign(this, predecessor || {}, data || {});
   }
 
@@ -201,17 +164,17 @@ export class NavbarData
   //   return wrapper.unwrap();
   // }
 
+  acopy: CopyMethod<NavbarData, NavbarDataModelBuilder> = copyMethodFactory(wrapNavbarData);
+
+  bcopy(director: NavbarDataDirector): NavbarData {
+    return copyMethod(this, wrapNavbarData, director);
+  }
+
   copy(director: NavbarDataDirector) {
     let wrapper: NavbarDataWrapper = wrapNavbarData.value(this);
     director(wrapper);
     return wrapper.unwrap();
   }
-}
-
-export type NavbarTabDataType = {
-  displayName?: string;
-  routerLink?: string;
-  isDefault?: boolean;
 }
 
 export class NavbarTabData
@@ -220,7 +183,7 @@ export class NavbarTabData
   readonly routerLink: string;
   readonly isDefault: boolean;
 
-  constructor(predecessor?: NavbarTabData, data?: NavbarTabDataType) {
+  constructor(predecessor?: NavbarTabData, data?: Partial<NavbarTabData>) {
     Object.assign(this, predecessor || {}, data || {});
   }
 
@@ -233,14 +196,6 @@ export class NavbarTabData
   }
 }
 
-export type MenuNavDataType = {
-  displayName?: string;
-  routerLink?: string;
-  disabled?: boolean;
-  orderRank?: number;
-  iconName?: string;
-}
-
 export class MenuNavData
 {
   readonly displayName: string;
@@ -249,7 +204,7 @@ export class MenuNavData
   readonly orderRank: number;
   readonly iconName: string;
 
-  constructor(predecessor?: MenuNavData, data?: MenuNavDataType) {
+  constructor(predecessor?: MenuNavData, data?: Partial<MenuNavData>) {
     Object.assign(this, predecessor || {}, data || {});
   }
 
@@ -277,78 +232,50 @@ type NavbarTabDataDirector = (builder: NavbarTabDataModelBuilder) => void;
 // Wrapper types
 //
 
-type NavbarDataWrapper =
-  {
-    brandName(brandName: string): NavbarDataWrapper;
-    openSidenav(): NavbarDataWrapper;
-    closeSidenav(): NavbarDataWrapper;
-    toggleSidenav(): NavbarDataWrapper;
-    addTab(displayName: string, routerLink: string, isDefault: boolean): NavbarDataWrapper;
-    resetTabs(): NavbarDataWrapper;
-    addMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataWrapper;
-    editMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataWrapper;
-    removeMenuNav(displayName: string): NavbarDataWrapper;
-    unwrap(): NavbarData;
-  }
+type NavbarDataWrapper = FactoryWrapper<NavbarData, NavbarDataModelBuilder>;
 
-type MenuNavDataWrapper = {
-  routerLink(routerLink: string): MenuNavDataWrapper;
-  disabled(disabled: boolean): MenuNavDataWrapper;
-  orderRank(orderRank: number): MenuNavDataWrapper;
-  iconName(iconName: string): MenuNavDataWrapper;
-  unwrap(): MenuNavData;
-}
+type MenuNavDataWrapper = FactoryWrapper<MenuNavData, MenuNavDataModelBuilder>;
 
-type NavbarTabDataWrapper =
-  {
-    displayName(displayName: string): NavbarTabDataWrapper;
-    routerLink(routerLink: string): NavbarTabDataWrapper;
-    unwrap(): NavbarTabData;
-  }
+type NavbarTabDataWrapper = FactoryWrapper<NavbarTabData, NavbarTabDataModelBuilder>;
 
-type NavbarDataTwoWrapper =
-  {
-    brandName(brandName: string): NavbarDataTwoWrapper;
-    addTab(NavbarTabDataDirector): NavbarDataTwoWrapper;
-    unwrap(): NavbarData;
-  }
+type NavbarDataTwoWrapper = FactoryWrapper<NavbarData, NavbarDataModelBuilderTwo>;
 
 
 //
 // Builder Interfaces
 //
 
-export interface NavbarDataModelBuilder extends ModelBuilder<NavbarData, NavbarDataModelBuilder>
+export interface NavbarDataModelBuilder
 {
-  brandName(brandName: string): NavbarDataModelBuilder;
-  openSidenav(): NavbarDataModelBuilder;
-  closeSidenav(): NavbarDataModelBuilder;
-  toggleSidenav(): NavbarDataModelBuilder;
-  addTab(displayName: string, routerLink: string, isDefault: boolean): NavbarDataModelBuilder;
-  resetTabs(): NavbarDataModelBuilder;
-  addMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataModelBuilder;
-  editMenuNav(displayName: string, director: MenuNavDataDirector): NavbarDataModelBuilder;
-  removeMenuNav(displayName): NavbarDataModelBuilder;
+  brandName(brandName: string): this;
+  openSidenav(): this;
+  closeSidenav(): this;
+  toggleSidenav(): this;
+  addTab(displayName: string, routerLink: string, isDefault: boolean): this;
+  resetTabs(): this;
+  addMenuNav(displayName: string, director: MenuNavDataDirector): this;
+  editMenuNav(displayName: string, director: MenuNavDataDirector): this;
+  removeMenuNav(displayName: string): this;
 }
 
-export interface MenuNavDataModelBuilder extends ModelBuilder<MenuNavData, MenuNavDataModelBuilder>
+export interface MenuNavDataModelBuilder
 {
-  routerLink(routerLink: string): MenuNavDataModelBuilder;
-  disabled(disabled: boolean): MenuNavDataModelBuilder;
-  orderRank(orderRank: number): MenuNavDataModelBuilder;
-  iconName(iconName: string): MenuNavDataModelBuilder;
+  routerLink(routerLink: string): this;
+  disabled(disabled: boolean): this;
+  orderRank(orderRank: number): this;
+  iconName(iconName: string): this;
 }
 ;
 
-interface NavbarTabDataModelBuilder extends ModelBuilder<NavbarTabData, NavbarTabDataModelBuilder>
+interface NavbarTabDataModelBuilder
 {
-  displayName(displayName: string): NavbarTabDataModelBuilder;
-  routerLink(routerLink: string): NavbarTabDataModelBuilder;
+  displayName(displayName: string): this;
+  outerLink(routerLink: string): this;
 }
 
-interface NavbarDataModelBuilderTwo extends ModelBuilder<NavbarData, NavbarDataModelBuilderTwo>
+interface NavbarDataModelBuilderTwo
 {
-  brandName(brandName: string): NavbarDataModelBuilderTwo;
-  addTab(NavbarTabDataDirector): NavbarDataModelBuilderTwo;
+  brandName(brandName: string): this;
+  addTab(director: NavbarTabDataDirector): this;
 }
 

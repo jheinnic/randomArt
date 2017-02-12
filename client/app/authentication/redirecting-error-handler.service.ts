@@ -18,7 +18,7 @@ export class RedirectingErrorHandler {
   }
 
   public handleError(error: Response): Observable<String> {
-    console.log("I am handling: ", error);
+    console.error("I am handling: ", error);
     if (error.status == 401) {
       this.loginModalRef = this.dialogService.open(LoginModalComponent, { disableClose: false });
       this.loginModalRef.afterClosed().subscribe(

@@ -1,12 +1,10 @@
 /**
  * Created by jheinnic on 1/17/17.
  */
-import {Component, Input, EventEmitter, Output, OnDestroy} from "@angular/core";
-import {ActivatedRoute, Data} from "@angular/router";
+import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs";
 import {NavbarData} from "../app-root/navbar-data.datamodel";
 import {NavbarDataService} from "../app-root/navbar-data.service";
-import {NavbarDataResolver} from "../app-root/navbar-data.resolver";
 
 @Component({
   moduleId: './app/pool/image-lobby-action.component',

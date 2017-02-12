@@ -34,11 +34,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Find a related item by id for accessTokens.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for accessTokens
+   * @param {any} fk Foreign key for accessTokens
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -64,11 +64,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Delete a related item by id for accessTokens.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for accessTokens
+   * @param {any} fk Foreign key for accessTokens
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -91,15 +91,15 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Update a related item by id for accessTokens.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for accessTokens
+   * @param {any} fk Foreign key for accessTokens
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -127,11 +127,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Find a related item by id for identities.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for identities
+   * @param {any} fk Foreign key for identities
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -157,11 +157,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Delete a related item by id for identities.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for identities
+   * @param {any} fk Foreign key for identities
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -184,15 +184,15 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Update a related item by id for identities.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for identities
+   * @param {any} fk Foreign key for identities
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -220,11 +220,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Find a related item by id for credentials.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for credentials
+   * @param {any} fk Foreign key for credentials
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -250,11 +250,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Delete a related item by id for credentials.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for credentials
+   * @param {any} fk Foreign key for credentials
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -277,15 +277,15 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Update a related item by id for credentials.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param any fk Foreign key for credentials
+   * @param {any} fk Foreign key for credentials
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -313,11 +313,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Queries accessTokens of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object filter 
+   * @param {object} filter 
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -343,13 +343,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in accessTokens of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -376,9 +376,9 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Deletes all accessTokens of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -400,11 +400,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Counts accessTokens of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object where Criteria to match model instances
+   * @param {object} where Criteria to match model instances
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -429,11 +429,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Queries identities of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object filter 
+   * @param {object} filter 
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -459,13 +459,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in identities of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -492,9 +492,9 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Deletes all identities of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -516,11 +516,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Counts identities of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object where Criteria to match model instances
+   * @param {object} where Criteria to match model instances
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -545,11 +545,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Queries credentials of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object filter 
+   * @param {object} filter 
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -575,13 +575,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in credentials of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -608,9 +608,9 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Deletes all credentials of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -632,11 +632,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Counts credentials of User.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object where Criteria to match model instances
+   * @param {object} where Criteria to match model instances
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -661,18 +661,18 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Login a user with username/email and password.
    *
-   * @param string include Related objects to include in the response. See the description of return value for more details.
+   * @param {string} include Related objects to include in the response. See the description of return value for more details.
    *   Default value: `user`.
    *
    *  - `rememberMe` - `boolean` - Whether the authentication credentials
    *     should be remembered in localStorage across app/browser restarts.
    *     Default: `true`.
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -698,8 +698,7 @@ export class UserApi extends BaseLoopBackApi {
         (response: any) => {
           response.ttl = parseInt(response.ttl);
           response.rememberMe = rememberMe;
-          this.auth.setUser(response);
-          this.auth.save();
+          this.auth.setToken(response);
           return response;
         }
       );
@@ -710,11 +709,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Logout a user with access token.
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    *  - `access_token` – `{string}` - Do not supply this argument, it is automatically extracted from request headers.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -736,13 +735,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Confirm a user registration with email verification token.
    *
-   * @param string uid 
+   * @param {string} uid 
    *
-   * @param string token 
+   * @param {string} token 
    *
-   * @param string redirect 
+   * @param {string} redirect 
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -765,11 +764,11 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Reset password for a user with email.
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -791,13 +790,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in accessTokens of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -824,13 +823,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in identities of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -857,13 +856,13 @@ export class UserApi extends BaseLoopBackApi {
   /**
    * Creates a new instance in credentials of this model.
    *
-   * @param any id User id
+   * @param {any} id User id
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    * This method expects a subset of model properties as request parameters.
    *
-   * @returns object[] An empty reference that will be
+   * @returns {object[]} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *

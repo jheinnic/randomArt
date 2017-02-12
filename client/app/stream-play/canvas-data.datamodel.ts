@@ -3,9 +3,7 @@
  */
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 import {unwrapHelper} from "../../../common/lib/datamodel-ts";
-import {
-  buildMethodFactory, ModelBuilder, Director, NoArgConstructor
-} from "../../../common/lib/datamodel-ts/index";
+import {Director} from "../../../common/lib/datamodel-ts/index";
 import {EventEmitter} from "@angular/core";
 import Immutable = require('immutable');
 import _ = require('lodash');
@@ -45,10 +43,10 @@ export interface StreamCanvasDataModelBuilder {
 
 
 export type PlotCanvasDataModelDirector =
-  Director<CanvasDataModel, PlotCanvasDataModelBuilder>;
+  Director<PlotCanvasDataModelBuilder>;
 
 export type StreamCanvasDataModelDirector =
-  Director<CanvasDataModel, StreamCanvasDataModelBuilder>;
+  Director<StreamCanvasDataModelBuilder>;
 
 export type CanvasDataModelMemento = string;
 

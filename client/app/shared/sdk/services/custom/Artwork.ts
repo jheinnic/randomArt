@@ -12,6 +12,7 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Rx';
 import { Artwork } from '../../models/Artwork';
 import { SocketConnection } from '../../sockets/socket.connections';
+import { ImageChain } from '../../models/ImageChain';
 
 
 /**
@@ -32,15 +33,45 @@ export class ArtworkApi extends BaseLoopBackApi {
   }
 
   /**
+   * Fetches belongsTo relation imageChain.
+   *
+   * @param {any} id PersistedModel id
+   *
+   * @param {boolean} refresh 
+   *
+   * @returns {object} An empty reference that will be
+   *   populated with the actual data once the response is returned
+   *   from the server.
+   *
+   * <em>
+   * (The remote method definition does not provide any description.
+   * This usually means the response is a `Artwork` object.)
+   * </em>
+   */
+  public getImageChain(id: any, refresh: any = {}): Observable<any> {
+    let _method: string = "GET";
+    let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
+    "/Artworks/:id/imageChain";
+    let _routeParams: any = {
+      id: id
+    };
+    let _postBody: any = {};
+    let _urlParams: any = {};
+    if (refresh) _urlParams.refresh = refresh;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    return result;
+  }
+
+  /**
    * Uploads a file
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
    *
    *  - `req` – `{object}` - 
    *
    *  - `data` – `{string}` - 
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -66,17 +97,17 @@ export class ArtworkApi extends BaseLoopBackApi {
   /**
    * Uploads a file
    *
-   * @param object data Request data.
+   * @param {object} data Request data.
+   *
+   *  - `req` – `{object}` - 
    *
    *  - `title` – `{string}` - 
    *
-   *  - `width` – `{string}` - 
-   *
-   *  - `height` – `{string}` - 
+   *  - `imageChainId` – `{string}` - 
    *
    *  - `data` – `{string}` - 
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
@@ -85,16 +116,16 @@ export class ArtworkApi extends BaseLoopBackApi {
    * This usually means the response is a `Artwork` object.)
    * </em>
    */
-  public upload(title: any = {}, width: any = {}, height: any = {}, data: any = {}): Observable<any> {
+  public upload(req: any = {}, title: any = {}, imageChainId: any = {}, data: any = {}): Observable<any> {
     let _method: string = "POST";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Artworks/upload";
     let _routeParams: any = {};
     let _postBody: any = {};
     let _urlParams: any = {};
+    if (req) _urlParams.req = req;
     if (title) _urlParams.title = title;
-    if (width) _urlParams.width = width;
-    if (height) _urlParams.height = height;
+    if (imageChainId) _urlParams.imageChainId = imageChainId;
     if (data) _urlParams.data = data;
     let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
     return result;

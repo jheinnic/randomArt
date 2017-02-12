@@ -1,14 +1,22 @@
 {
   "name": "Artwork",
+  "plural": "Artworks",
   "base": "PersistedModel",
   "idInjection": false,
+  "mixins": {
+    "TimeStamp": {
+      "required": true,
+      "validateUpsert": true,
+      "silenceWarnings": false
+    }
+  },
   "options": {
     "validateUpsert": true
   },
   "properties": {
     "uuid": {
-      "id": true,
       "type": "string",
+      "id": true,
       "required": true
     },
     "filename": {
@@ -31,17 +39,71 @@
       "type": "string",
       "required": false
     },
-    "width": {
-      "type": "number",
-      "required": false
-    },
-    "height": {
-      "type": "number",
+    "owner": {
+      "type": "string",
       "required": false
     }
   },
   "validations": [],
-  "relations": {},
-  "acls": [],
-  "methods": []
+  "relations": {
+    "imageChain": {
+      "type": "belongsTo",
+      "model": "ImageChain",
+      "foreignKey": "imageChainId"
+    }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "Admin",
+      "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "requestType": "READ"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "create",
+      "requestType": "EXECUTE"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "Moderator",
+      "permission": "ALLOW",
+      "property": "updateAttributes",
+      "requestType": "EXECUTE"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "findById",
+      "requestType": "EXECUTE"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "Admin",
+      "permission": "ALLOW",
+      "property": "replaceById",
+      "requestType": "EXECUTE"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "Admin",
+      "permission": "ALLOW",
+      "property": "deleteById",
+      "requestType": "EXECUTE"
+    }
+  ],
+  "methods": {}
 }

@@ -1,8 +1,6 @@
-<div class="absolute-top">
-  <nav md-tab-nav-bar class="md-primary">
-    <a *ngFor="let tabData of navbarData.tabs" md-tab-link
-       routerLink="{{tabData.routerLink}}" routerLinkActive #rla="routerLinkActive"
-       [active]="(!rlaSafe && tabData.isDefault) || (rlaSafe && rla.isActive)"
-       replaceUrl="true" mdTooltip="{{rlaSafe && rla.isActive}}!" mdTooltipPosition="below">{{tabData.displayName}}</a>
-  </nav>
-</div>
+<nav md-tab-nav-bar class="md-primary">
+  <a *ngFor="let tabData of navbarData.tabs" md-tab-link
+     routerLink="{{tabData.routerLink}}" routerLinkActive
+     #rla="routerLinkActive" [active]="rlaSafe && rla.isActive"
+     mdTooltip="{{rlaSafe && rla.isActive}}!" mdTooltipPosition="below">{{tabData.displayName}}</a>
+</nav>

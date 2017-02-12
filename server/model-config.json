@@ -62,12 +62,20 @@
   },
   "StormpathUser": {
     "dataSource": "stormpath"
-  }, 
+  },
   "Container": {
     "dataSource": "artStore",
     "public": true
   },
+  "ImageChain": {
+    "dataSource": "db",
+    "public": true
+  },
   "Artwork": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Pool": {
     "dataSource": "db",
     "public": true
   }

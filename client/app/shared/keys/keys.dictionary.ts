@@ -1,8 +1,11 @@
 import {OpaqueToken} from "@angular/core";
 
 export interface DIKeys {
+  apiUriHost: OpaqueToken,
   authHomeRoute: OpaqueToken,
-  authFailRoute: OpaqueToken
+  authFailRoute: OpaqueToken,
+  chance: OpaqueToken,
+  googleLoginUrl: OpaqueToken
 };
 
 export const DIKeys = {

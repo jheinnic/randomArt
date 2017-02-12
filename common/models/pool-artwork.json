@@ -1,0 +1,47 @@
+{
+  "name": "PoolArtwork",
+  "plural": "PoolArtworks",
+  "base": "PersistedModel",
+  "isInjection": true,
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "generated": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "pool": {
+      "type": "belongsTo",
+      "model": "Pool",
+      "foreignKey": "poolGuId"
+    },
+    "artwork": {
+      "type": "belongsTo",
+      "model": "Artwork",
+      "foreignKey": "artworkUuid"
+    }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "requestType": "READ"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "create",
+      "requestType": "EXECUTE"
+    }
+  ],
+  "methods": {}
+}

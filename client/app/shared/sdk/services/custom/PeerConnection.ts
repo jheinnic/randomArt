@@ -35,11 +35,11 @@ export class PeerConnectionApi extends BaseLoopBackApi {
   /**
    * Fetches belongsTo relation user.
    *
-   * @param any id PersistedModel id
+   * @param {any} id PersistedModel id
    *
-   * @param boolean refresh 
+   * @param {boolean} refresh 
    *
-   * @returns object An empty reference that will be
+   * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
    *   from the server.
    *
