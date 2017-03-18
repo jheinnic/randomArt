@@ -2,10 +2,10 @@
   "name": "Pool",
   "plural": "Pools",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
   "mixins": {
     "TimeStamp": {
-      "required": true,
+      "required": false,
       "validateUpsert": true,
       "silenceWarnings": false
     },
@@ -28,7 +28,8 @@
   "properties": {
     "guid": {
       "type": "string",
-      "defaultFn": "guid"
+      "defaultFn": "guid",
+      "id": true
     },
     "name": {
       "type": "string",
@@ -37,10 +38,23 @@
   },
   "validations": [ ],
   "relations": {
+    "owner": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": "ownerId",
+      "options": {
+        "validate": true,
+        "forceId": true
+      }
+    },
     "imageChain": {
       "type": "belongsTo",
       "model": "ImageChain",
-      "foreignKey": "imageChainId"
+      "foreignKey": "imageChainId",
+      "options": {
+        "validate": true,
+        "forceId": true
+      }
     },
     "images": {
       "type": "referencesMany",
