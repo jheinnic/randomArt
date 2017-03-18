@@ -6,16 +6,12 @@ import {Resolve, ActivatedRouteSnapshot, RouterStateSnapshot} from "@angular/rou
 import {RealTime} from "../shared/sdk/services/core/real.time";
 import {BASE_URL, API_VERSION} from "../shared/base-url.values";
 import {LoopBackConfig} from "../shared/sdk/lb.config";
-import {ImageChain} from "../shared/sdk/models/ImageChain";
-import {FireLoopRef} from "../shared/sdk/models/FireLoopRef";
 import {Observable} from "rxjs/Observable";
+import {Pool} from "../shared/sdk/models/Pool";
 
 @Injectable()
-export class ImageChainDefResolver implements Resolve<Observable<Pool>>
+export class ResourcePathPoolResolver implements Resolve<Observable<Pool>>
 {
-  private reference: FireLoopRef<ImageChain>;
-  private chains: Observable<ImageChain>;
-
   constructor(private readonly rt: RealTime) {
     LoopBackConfig.setBaseURL(BASE_URL);
     LoopBackConfig.setApiVersion(API_VERSION);
@@ -23,14 +19,11 @@ export class ImageChainDefResolver implements Resolve<Observable<Pool>>
 
   resolve(
     route: ActivatedRouteSnapshot, state: RouterStateSnapshot
-  ): Observable<ImageChain> {
-    this.reference = this.rt.FireLoop.ref<ImageChain>(ImageChain);
+  ): Observable<Pool> {
+    const poolId = route.data['poolId'];
 
-    this.chains = this.reference.on("changes", {
-      offset: 0,
-      order: "pixelCount ASC, pixelHeight ASC, pixelWidth ASC"
-    });
-
-    return this.chains;
+    return this.rt.FireLoop
+      .ref<Pool>(Pool)
+      .on("changes", {where: {id: poolId}});
   }
 }

@@ -4,13 +4,14 @@
       <div class="d-flex flex-row">
         <md-input-container>
           <md-placeholder>Width</md-placeholder>
-          <input md-input type="number" [(ngModel)]="canvasWidth"/>
+          <input mdInput type="number" [(ngModel)]="canvasWidth"/>
         </md-input-container>
         <md-input-container floatingPlaceholder="Height">
           <md-placeholder>Height:</md-placeholder>
-          <input md-input type="number" [(ngModel)]="canvasHeight"/>
+          <input mdInput type="number" [(ngModel)]="canvasHeight"/>
         </md-input-container>
       </div>
+      <p>Stuff</p>>
     </md-card-content>
     <md-card-actions>
       <button md-raised-button #newCanvasBtn class="md-primary" (click)="sizeCanvas()">RESIZE CANVAS</button>
@@ -21,7 +22,7 @@
   <md-card>
     <md-card-content>
       <md-input-container>
-        <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
+        <input mdInput type="text" disabled="true" [(ngModel)]="phraseToPaint"/>
       </md-input-container>
     </md-card-content>
     <md-card-actions>
@@ -43,7 +44,7 @@
   <md-card>
     <md-card-content>
       <md-input-container>
-        <input md-input type="text" disabled="true" value="{{phraseToPaint}}"/>
+        <input mdInput type="text" disabled="false" [(ngModel)]="phraseToPaint"/>
       </md-input-container>
     </md-card-content>
     <md-card-actions>

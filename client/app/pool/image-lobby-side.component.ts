@@ -4,6 +4,7 @@
 import {Component} from "@angular/core";
 
 @Component({
+  moduleId: 'client/app/pool/image-lobby-side.component',
   templateUrl: './_image-lobby-side.view.html'
 })
 export class ImageLobbySideComponent {

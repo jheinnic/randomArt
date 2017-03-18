@@ -1,96 +1,37 @@
-import {
-  Director, FactoryWrapper, Partial, PartialPick, ReflectiveFluentBuilder
-} from "../../../common/lib/datamodel-ts";
-import {AbstractTask, TaskEventType} from "../shared/service-util/task-lifecycle.datamodel";
-import {Subject} from "rxjs/Subject";
-import {PointMap} from "../shared/canvas-util/point.datamodel";
 import {NgZone} from "@angular/core";
+import {PointMap} from "../shared/canvas-util/point.datamodel";
+import {ImageChain} from "../shared/sdk/models/ImageChain";
+import {AbstractTask, TaskEvent} from "../shared/service-util/task-lifecycle.datamodel";
+import {WordPaintInput} from "./word-paint-input.datamodel";
+import {WordPaintProgress} from "./word-paint-progress.datamodel";
+import {WordPaintResult} from "./word-paint-result.datamodel";
+import {ReflectiveFluentBuilder, FluentBuilder} from "../../../common/lib/datamodel-ts";
 import {Subscription} from "rxjs/Subscription";
 import {Observable} from "rxjs/Observable";
-import {Builder} from "fluent-interface-builder";
-import * as randomArtFactory from "./genjs";
-import {ImageChain} from "../shared/sdk/models/ImageChain";
-import {
-  PaintProgress, IncrementalPaintProgress, InitialPaintProgress
-} from "./paint-progress.datamodel";
+import {Subject} from "rxjs/Subject";
 import builder = require("fluent-interface-builder");
+import * as randomArtFactory from "./genjs";
+import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
 
 
-//
-// Wrapper Implementations
-//
-
-type WordPaintTaskFactory = FactoryWrapper<WordPaintTask,WordPaintTaskBuilder>;
-
-const wrapWordPaintTask: Builder<WordPaintTaskFactory,Partial<WordPaintTask>> = builder.build<WordPaintTaskFactory,Partial<WordPaintTask>>()
-  .chain("chain", (chain: ImageChain) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {chain: chain});
-  })
-  .chain("phrase", (phrase: string) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {phrase: phrase});
-  })
-  .chain("delayInterval", (delayInterval: number) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {delayInterval: delayInterval});
-  })
-  .chain("maxBufferSize", (maxBufferSize: number) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {maxBufferSize: maxBufferSize});
-  })
-  .chain("ngZone", (ngZone: NgZone) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {ngZone: ngZone});
-  })
-  .chain("subscription", (subscription: Subscription) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {subscription: subscription});
-  })
-  .chain("launchSubject", (launchSubject: Subject<any>) => (context: Partial<WordPaintTask>) => {
-    return Object.assign(context, {launchSubject: launchSubject});
-  })
-  .unwrap("unwrap", () => (context: Partial<WordPaintTask>) => {
-    return new WordPaintTask({
-      task: context.phrase,
-      chain: context.chain,
-      model: context.model ? context.model : randomArtFactory.new_picture(context.phrase),
-      delayInterval: context.delayInterval,
-      maxBufferSize: context.maxBufferSize,
-      ngZone: context.ngZone,
-      subscription: context.subscription,
-      launchSubject: context.launchSubject
-    });
-  });
-
-
-//
-// Models
-//
-
-type Required = "task" | "chain" | "model" | "ngZone" | "launchSubject" | "subscription";
-
-export class WordPaintTask extends AbstractTask<string,PaintProgress,string>
+export class WordPaintTask extends AbstractTask<WordPaintInput,WordPaintProgress,WordPaintResult>
 {
-  readonly model: any;
-  readonly chain: ImageChain;
-  readonly ngZone: NgZone;
-  readonly delayInterval: number;
-  readonly maxBufferSize: number;
-  readonly subscription: Subscription;
-  readonly launchSubject: Subject<any>;
   private isCancelled: boolean = false;
+  private model: any;
 
-  constructor(base: PartialPick<WordPaintTask,Required>) {
-    super(base);
-    Object.assign(this, base);
-  }
-
-  static build(director: Director<WordPaintTaskBuilder>) {
-    let wrapper = wrapWordPaintTask.value({});
-    director(wrapper);
-    return wrapper.unwrap();
+  constructor(
+    readonly input: WordPaintInput, readonly ngZone: NgZone, readonly subscription: Subscription,
+    readonly launchSubject: Subject<any>, readonly paintableCanvas: PaintableDirective
+  ) {
+    super(input);
+    this.model = randomArtFactory.new_picture(input.phrase);
   }
 
   public get phrase(): string {
-    return this.task;
+    return this.task.phrase;
   }
 
-  public get events(): Observable<TaskEventType<string,PaintProgress,string>> {
+  public get events(): Observable<TaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>> {
     return super.getEvents();
   }
 
@@ -125,15 +66,29 @@ export class WordPaintTask extends AbstractTask<string,PaintProgress,string>
     console.log("Pre-ngZone, ", this);
     this.ngZone.run(() => {
       console.log('Back in angular zone');
-      super.report(
-        IncrementalPaintProgress.build((builder: ReflectiveFluentBuilder<IncrementalPaintProgress>) => {
-          builder.pctDone(pctDone)
-            .paintPoints(paintablePoints)
-        })
-      );
+      super.report(WordPaintProgress.build((builder: ReflectiveFluentBuilder<WordPaintProgress>) => {
+        builder.pctDone(pctDone)
+          .paintPoints(paintablePoints)
+      }));
 
-      if (pctDone === 1) {
-        super.finish(this.phrase);
+      if ((pctDone === 1) && (! this.isCancelled)) {
+        let subscription = this.paintableCanvas.blob.subscribe(
+          (blob:Blob) => {
+            if (! this.isCancelled) {
+              super.finish(WordPaintResult.build((builder: FluentBuilder<WordPaintResult>) => {
+                builder.imageData(blob)
+              }));
+            }
+
+            subscription.unsubscribe();
+          },
+          (err:any) =>
+          {
+            console.error(err);
+            subscription.unsubscribe();
+          },
+          () => { subscription.unsubscribe() }
+        );
       }
     });
   }
@@ -151,26 +106,3 @@ export class WordPaintTask extends AbstractTask<string,PaintProgress,string>
   }
 }
 
-
-//
-// Builder Interfaces
-//
-
-export interface WordPaintTaskBuilder
-{
-  phrase(phrase: string): this;
-
-  model(model: any): this;
-
-  chain(chain: ImageChain): this;
-
-  delayInterval(delayInterval: number): this;
-
-  maxBufferSize(maxBufferSize: number): this;
-
-  ngZone(ngZone: NgZone): this;
-
-  launchSubject(launchSubject: Subject<any>): this;
-
-  subscription(subscription: Subscription): this;
-}

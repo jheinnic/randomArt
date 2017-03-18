@@ -3,10 +3,10 @@
  */
 import {Injectable} from "@angular/core";
 import {AbstractQueueService} from "../shared/service-util/abstract-queue.service";
-import {WordPaintTask} from "./word-paint-task.datamodel";
+import {WordPaintInput} from "./word-paint-input.datamodel";
 
 @Injectable()
-export class WordPaintQueueService extends AbstractQueueService<WordPaintTask>
+export class WordPaintQueueService extends AbstractQueueService<WordPaintInput>
 {
   constructor() {
     super();

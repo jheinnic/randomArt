@@ -2,15 +2,18 @@
  * Created by jheinnic on 1/11/17.
  */
 import {
-  Directive, ElementRef, Attribute, EventEmitter, Output, Input, OnDestroy, HostBinding,
-  ContentChild, AfterViewInit
+  Directive, ElementRef, Attribute, EventEmitter, Output, OnDestroy, HostBinding, ContentChild,
+  AfterViewInit
 } from "@angular/core";
-import {PaintProgress} from "../../pool/point-mapping.service";
 import {Subscription} from "rxjs/Subscription";
 import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Observable} from "rxjs/Observable";
 import {PaintablePoint} from "./point.datamodel";
-import {Partial} from "../../../../common/lib/datamodel-ts/index";
+import {TaskEvent} from "../service-util/task-lifecycle.datamodel";
+import {WordPaintProgress} from "../../pool/word-paint-progress.datamodel";
+import {WordPaintTask} from "../../pool/word-paint-task.class";
+import {WordPaintResult} from "../../pool/word-paint-result.datamodel";
+import {WordPaintInput} from "../../pool/word-paint-input.datamodel";
 
 export interface Dimensions
 {
@@ -19,12 +22,11 @@ export interface Dimensions
 }
 
 @Directive({
-  selector: "canvas[paintable]",
+  selector: "canvas[paintable]"
 })
-export class PaintableDirective implements AfterViewInit, OnDestroy
+export class PaintableDirective implements OnDestroy
 {
-  @ContentChild("canvas[paintable]") domRef: ElementRef;
-  private canvasRef: HTMLCanvasElement;
+  private readonly canvasRef: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
 
   private mySize: Dimensions;
@@ -35,15 +37,14 @@ export class PaintableDirective implements AfterViewInit, OnDestroy
   @Output() public resized = new EventEmitter<Dimensions>();
 
   private progressSubscript: Subscription;
-  private progressSource: Observable<PaintProgress>;
+  // private progressSource: Observable<WordPaintProgress>;
+  private paintableTask: WordPaintTask;
 
 
   constructor(
-    // private readonly canvasRef: ElementRef,
     @Attribute("width") width: number,
     @Attribute("height") height: number,
-    // @Attribute("maxBufferSize") maxBufferSize: number,
-    // @Attribute("liveLatencyDuration") liveLatencuDuration: number
+    private readonly domRef: ElementRef
   ) {
     this.originalSize = {
       pixelWidth: width,
@@ -54,12 +55,11 @@ export class PaintableDirective implements AfterViewInit, OnDestroy
     //   pixelWidth: 480,
     //   pixelHeight: 480
     // };
+
+    console.log("Paintable self: ", this.domRef);
+    this.canvasRef = this.domRef.nativeElement;
     // this.canvas = canvasRef.nativeElement;
     // console.log("Constructor: ", this.canvasRef);
-  }
-
-  public ngAfterViewInit() {
-    this.canvasRef = this.domRef.nativeElement;
   }
 
   public ngOnDestroy() {
@@ -71,51 +71,110 @@ export class PaintableDirective implements AfterViewInit, OnDestroy
     return this.mySize.pixelWidth;
   }
 
-  public set width(value: number) {
-    this.mySize = Object.assign({}, this.mySize, {pixelWidth: value});
-  }
+  // public set width(value: number) {
+  //   this.mySize = Object.assign({}, this.mySize, {pixelWidth: value});
+  // }
 
   @HostBinding("height")
   public get height() {
     return this.mySize.pixelHeight;
   }
 
-  public set height(value: number) {
-    this.mySize = Object.assign({}, this.mySize, {pixelHeight: value});
-  }
+  // public set height(value: number) {
+  //   this.mySize = Object.assign({}, this.mySize, {pixelHeight: value});
+  // }
 
-  @Input("sizeable")
-  public set sizable(value: Partial<Dimensions>) {
-    const nextSize = Object.assign({}, this.mySize || {}, value || {});
+  /*
+   @Input("sizable")
+   public set sizable(value: string) {
+   const nextSize;
+   if (value) {
+   let tokens = value.split('x');
+   if (tokens.length === 2) {
+   nextSize = Object.assign(), this.mySize || {}. value || {
+   pixelWidth: pixelWidth,
+   pixelHeight, pixelHeight
+   }
+   }
+   if ((nextSize.pixelWidth !== this.width) || (nextSize.pixelHeight !== this.height)) {
+   this.mySize = nextSize;
 
-    if ((nextSize.pixelWidth !== this.width) || (nextSize.pixelHeight !== this.height)) {
-      this.mySize = nextSize;
+   if (this.domRef && this.canvasRef) {
+   this.context = this.canvasRef.getContext("2d");
+   this.resized.emit(this.mySize);
+   }
 
-      if (this.domRef && this.canvasRef) {
-        this.context = this.canvasRef.getContext("2d");
-        this.resized.emit(this.mySize);
-      }
+   this.myBlob = undefined;
+   }
+   }
+   }
 
-      this.myBlob = undefined;
+   public get sizable(): Partial<Dimensions> {
+   return this.mySize;
+   }
+   */
+
+  // @Input("sizable")
+  // public set sizable(value: Partial<Dimensions>) {
+  //   const nextSize = Object.assign({}, this.mySize || {}, value || {});
+  //
+  //   if ((nextSize.pixelWidth !== this.width) || (nextSize.pixelHeight !== this.height)) {
+  //     this.mySize = nextSize;
+  //
+  //     if (this.domRef && this.canvasRef) {
+  //       this.context = this.canvasRef.getContext("2d");
+  //       this.resized.emit(this.mySize);
+  //     }
+  //
+  //     this.myBlob = undefined;
+  //   }
+  // }
+  //
+  // public get sizable(): Partial<Dimensions> {
+  //   return this.mySize;
+  // }
+
+  // @Input("paintable")
+  // public set paintable(paintableTask: WordPaintTask) {
+  public subscribeTo(
+    paintTaskEvents: Observable<TaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>>
+  ) {
+    if (this.progressSubscript) {
+      this.progressSubscript.unsubscribe();
     }
-  }
 
-  @Input("paintable")
-  public set paintable(progressSource: Observable<PaintProgress>) {
-    if (progressSource) {
-      const self: PaintableDirective = this;
-
-      this.progressSource = progressSource;
-      this.progressSubscript = progressSource.subscribe(function (progress: PaintProgress) {
-        if ((!progress) || (!progress.paintPoints) || (progress.paintPoints.length > 0)) {
-          console.log(`Canvas asked to paint ${progress.paintPoints.length}, starting with "${progress.paintPoints[0]}"`);
-          self.paint(progress.paintPoints);
+    if (paintTaskEvents) {
+      this.progressSubscript = paintTaskEvents.subscribe(function (event: TaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
+        if (event.kind === 'began') {
+          this.mySize = {
+            pixelWidth: event.task.chain.pixelWidth,
+            pixelHeight: event.task.chain.pixelHeight,
+          };
+          this.clearView();
+        } else if (event.kind === 'progress') {
+          this.paint(event.progress.paintPoints);
+        } else if (event.kind === 'acknowledged') {
+          this.clearView();
+          if (this.progressSubscript) {
+            this.progressSubscript.unsubscribe();
+          } else {
+            console.log('Event subscription had lapsed before previous shutdown.  Oh well..');
+          }
+        } else {
+          console.log('Unexpected paintable task event, ' + JSON.stringify(this.event)
+            + ', while in state.');
         }
       }, function (error: any) { console.error(error); }, function () { this.progressSubscript = undefined; });
     }
   }
 
-  public paint(points: PaintablePoint[]): void {
+// public get paintable(): Observable<PaintProgress> {
+//   return this.progressSource;
+// }
+
+  public paint(
+    points: PaintablePoint[]
+  ): void {
     if (points) {
       points.forEach((point: PaintablePoint) => {
         if ((point.x < 0) || (point.x >= this.width)) {
@@ -137,8 +196,8 @@ export class PaintableDirective implements AfterViewInit, OnDestroy
     return retVal;
   }
 
-  public get blob(): Observable<Blob> {
-    let retVal: AsyncSubject<Blob>;
+  public get blob(): Observable < Blob > {
+    let retVal: AsyncSubject < Blob >;
     if (this.myBlob) {
       retVal = this.myBlob;
     } else {
@@ -156,5 +215,10 @@ export class PaintableDirective implements AfterViewInit, OnDestroy
 
   public flushBlob() {
     this.myBlob = undefined;
+  }
+
+  private clearView() {
+    this.flushBlob();
+    // TODO: More to cleanup still!!!
   }
 }

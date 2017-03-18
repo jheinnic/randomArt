@@ -1,11 +1,12 @@
 /**
  * Created by jheinnic on 1/6/17.
  */
-import {Component, Inject} from "@angular/core"
+import {Component} from "@angular/core"
 import {MdDialogRef} from "@angular/material";
-import path = require('path');
 import {PhraseGeneratorService} from "./phrase-generator.service";
-import {WordPaintTask, WordPaintTaskBuilder} from "../../pool/word-paint-task.datamodel";
+import {WordPaintInput} from "../../pool/word-paint-input.datamodel";
+import {ReflectiveFluentBuilder} from "../../../../common/lib/datamodel-ts/index";
+import path = require('path');
 
 @Component({
   moduleId: path.resolve(__dirname, __filename),
@@ -13,57 +14,59 @@ import {WordPaintTask, WordPaintTaskBuilder} from "../../pool/word-paint-task.da
   template: require('./_new-named-canvas-modal.view.html')
 })
 export class NewNamedCanvasModalComponent {
-  private wordPaintTask: WordPaintTask
+  private wordPaintInput: WordPaintInput
 
   constructor(
     private readonly modalRef: MdDialogRef<NewNamedCanvasModalComponent>,
     private readonly phraseGenerator: PhraseGeneratorService
   ) {
-    this.wordPaintTask = WordPaintTask.build((builder:WordPaintTaskBuilder) => {
-      builder.phrase(
-        this.phraseGenerator.createNextPhrase()
-      )
-        // .width(640)
-        // .height(480);
-    });
+    this.wordPaintInput = WordPaintInput.build(
+      (builder:ReflectiveFluentBuilder<WordPaintInput>) => {
+        builder.phrase(
+          this.phraseGenerator.createNextPhrase()
+        )
+          // .width(640)
+          // .height(480);
+      }
+    );
   }
 
   private generateNewPhrase() {
-    // this.wordPaintTask = this.wordPaintTask.copy(
-    //   (builder: WordPaintTaskBuilder) => {
+    // this.wordPaintInput = this.wordPaintInput.copy(
+    //   (builder: WordPaintInputBuilder) => {
     //     builder.phrase(this.phraseGenerator.createNextPhrase());
     //   });
   }
 
   get phraseToPaint():string {
-    return this.wordPaintTask.phrase;
+    return this.wordPaintInput.phrase;
   }
 
   set phraseToPaint(value: string) {
-    // this.wordPaintTask = this.wordPaintTask.copy(
-    //   (builder: WordPaintTaskBuilder) => { builder.phrase(value); }
+    // this.wordPaintInput = this.wordPaintInput.copy(
+    //   (builder: WordPaintInputBuilder) => { builder.phrase(value); }
     // );
   }
 
   // get width(): number {
-  //   return this.wordPaintTask.width;
+  //   return this.wordPaintInput.width;
   // }
   //
   // set width(value:number) {
-  //   this.wordPaintTask = this.wordPaintTask.copy(
-  //     (builder: WordPaintTaskBuilder) => {
+  //   this.wordPaintInput = this.wordPaintInput.copy(
+  //     (builder: WordPaintInputBuilder) => {
   //       builder.width(value);
   //     }
   //   );
   // }
   //
   // get height(): number {
-  //   return this.wordPaintTask.height;
+  //   return this.wordPaintInput.height;
   // }
   //
   // set height(value:number) {
-  //   this.wordPaintTask = this.wordPaintTask.copy(
-  //     (builder: WordPaintTaskBuilder) => {
+  //   this.wordPaintInput = this.wordPaintInput.copy(
+  //     (builder: WordPaintInputBuilder) => {
   //       builder.height(value);
   //     }
   //   );
@@ -72,6 +75,6 @@ export class NewNamedCanvasModalComponent {
   // This close function doesn't need to use jQuery or bootstrap, because
   // the button has the 'data-dismiss' attribute.
   ok() {
-    this.modalRef.close(this.wordPaintTask);
+    this.modalRef.close(this.wordPaintInput);
   }
 }

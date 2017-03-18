@@ -6,33 +6,54 @@ import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {Routes, RouterModule} from "@angular/router";
 import {
-  MdChipsModule, MdCardModule, MdButtonModule, MdIconModule, MdProgressBarModule,
-  MdTooltipModule, MdSidenavModule, MdInputModule, MdToolbarModule, MdCheckboxModule,
-  MdTabsModule
+  MdChipsModule, MdCardModule, MdButtonModule, MdButtonToggleModule, MdIconModule,
+  MdProgressBarModule, MdTooltipModule, MdSidenavModule, MdInputModule, MdToolbarModule,
+  MdCheckboxModule, MdTabsModule, MdListModule, MdDialogModule, MdGridListModule, MdMenuModule,
+  MdSelectModule
 } from "@angular/material";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {pointMappingConfig, PointMappingConfig} from "./point-mapping-config.service";
-import {ImageSequenceCacheService} from "./image-sequence-cache.service";
 import {ImageStoreService} from "./image-store.service";
 import {WordPaintQueueService} from "./word-paint-queue.service";
 import {PointMappingService} from "./point-mapping.service";
 import {ImageLobbyComponent} from "./image-lobby.component";
 import {ImageLobbySideComponent} from "./image-lobby-side.component";
 import {ImageLobbyActionComponent} from "./image-lobby-action.component";
+import {PoolListComponent} from "./pool-list.component";
 import {ImageChainDefResolver} from "./image-chain-def.resolver";
+import {NewPoolModalComponent} from "./new-pool-modal.component";
 import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
+import {ImageChainCacheService} from "./image-chain-cache.service";
+import {PoolStoreService} from "./pool-store.service";
+import {AppModule} from "../app.module";
+
+const DEFAULT_LIVE_DELAY_DURATION = 360;
+const DEFAULT_MAX_BUFFER_SIZE = 250;
 
 @NgModule({
-  declarations: [PoolLobbyComponent, ImageLobbyComponent, ImageLobbySideComponent, ImageLobbyActionComponent, PaintableDirective],
+  declarations: [
+    ImageLobbyComponent,
+    ImageLobbySideComponent,
+    ImageLobbyActionComponent,
+    NewPoolModalComponent,
+    PoolListComponent,
+    PaintableDirective
+  ],
   imports: [
     CommonModule,
     FormsModule,
     MdButtonModule,
-    MdChipsModule,
+    MdButtonToggleModule,
     MdCardModule,
+    MdChipsModule,
     MdCheckboxModule,
+    MdDialogModule,
+    MdGridListModule,
     MdIconModule,
     MdInputModule,
+    MdListModule,
+    MdMenuModule,
+    MdSelectModule,
     MdSidenavModule,
     MdProgressBarModule,
     MdTabsModule,
@@ -42,34 +63,59 @@ import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
     RouterModule.forChild(PoolModule.routes)
   ],
   providers: [
-    {provide: pointMappingConfig, useValue: { liveDelayDuration: 360, maxBufferSize: 256 }},
-    PointMappingConfig, PointMappingService, WordPaintQueueService, ImageStoreService,
-    ImageSequenceCacheService, ImageChainDefResolver
+    {
+      provide: pointMappingConfig,
+      useValue: {
+        liveDelayDuration: DEFAULT_LIVE_DELAY_DURATION,
+        maxBufferSize: DEFAULT_MAX_BUFFER_SIZE
+      }
+    },
+    PointMappingConfig,
+    PointMappingService,
+    WordPaintQueueService,
+    ImageStoreService,
+    ImageChainCacheService,
+    PoolStoreService
   ],
-  exports: []
+  exports: [],
+  entryComponents: []
 })
 export class PoolModule
 {
   static routes: Routes = [
     {
-      path: 'images',
-      resolve: {
-        'imageChainDef': ImageChainDefResolver
-        // 'labSession': 'labSession',
-        // 'labSettings': 'labSettings'
-      },
+      path: 'pools',
+      // resolve: {
+      //   imageChainDef: ImageChainDefResolver
+      //   labSession: 'labSession',
+      //   labSettings: 'labSettings'
+      // },
       children: [
         {
-          path: 'pools/:poolId/images',
+          path: ':poolId/images',
           pathMatch: 'full',
           component: ImageLobbyComponent
         }, {
-          path: 'pools/:poolId/images',
+          path: ':poolId/images',
           pathMatch: 'full',
           component: ImageLobbyActionComponent,
           outlet: 'action'
         }, {
-          path: 'pools/:poolId/images',
+          path: ':poolId/images',
+          pathMatch: 'full',
+          component: ImageLobbySideComponent,
+          outlet: 'side'
+        }, {
+          path: '',
+          pathMatch: 'full',
+          component: PoolListComponent,
+        }, {
+          path: '',
+          pathMatch: 'full',
+          component: ImageLobbyActionComponent,
+          outlet: 'action'
+        }, {
+          path: '',
           pathMatch: 'full',
           component: ImageLobbySideComponent,
           outlet: 'side'

@@ -1,16 +1,59 @@
-<div class="scroll-container row">
-  <div class="col-6 col-md-4 d-flex flex-column justify-content-around">
-        <md-card>
-<md-button-toggle-group-mutiple #group="imageChainsGroup" vertical="true">
-  <md-button-toggle *ngFor="let chain of imageChains" input="imageChains" [name]="chain.uuid" checked="true" [value]="chain.uuid" (change)="console.log($event)">
-    {{chain.displayName}}
-  </md-button-toggle>
-</md-button-toggle-group-mutiple>
-<div id="pool-lobby-panel" class="scroll-container">
-  <md-grid-list rowHeight="96px" gutterSize="4px">
-    <md-grid-tile *ngFor="let pool of poolList">
-      <md-grid-tile-header>{{pool.imageChain.displayName}}</md-grid-tile-header>
-      <md-grid-tile-footer>{{pool.name}}</md-grid-tile-footer>
-    </md-grid-tile>
-  </md-grid-list>
+<md-toolbar>
+  <h6>Image Pools</h6>
+  <div class="ml-auto"></div>
+  <button md-icon-button (click)="add($event)">
+    <md-icon>add</md-icon>
+  </button>
+  <div ngbDropdown class="d-inline-block">
+    <button md-icon-button id="filterDropDown" ngbDropdownToggle>
+      <md-icon>filter_list</md-icon>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="filterDropDown">
+      <md-button-toggle-group multiple="true" #group="mdButtonToggleGroup" vertical="true"></md-button-toggle-group>
+      <div class="d-flex flex-row flex-wrap" style="width:40vw;">
+        <md-button-toggle *ngFor="let chain of allImageChains" [checked]="false" [value]="chain.uuid"
+                          buttonToggleGroupMultiple="group" (change)="toggleChainFilter($event)"
+                          style="flex: 0 0 auto;">
+          {{chain.displayName}}
+        </md-button-toggle>
+      </div>
+    </div>
+  </div>
+  <button md-icon-button (click)="sort($event)">
+    <md-icon>sort</md-icon>
+  </button>
+</md-toolbar>
+<div class="pool-list-panel row scroll-container">
+  <div class="col-7 col-md-5 col-lg-4 col-xl-3 scrollable">
+    <md-list>
+      <md-list-item md-list-icon="collections">Stuff</md-list-item>
+      <md-list-item *ngFor="let pool of poolList">{{pool.name}}</md-list-item>
+      <md-list-item md-list-icon="collections">Stuff</md-list-item>
+    </md-list>
+  </div>
+</div>
+<div class="scroll-container col-5 col-md-7 col-lg-8 col-xl-9">
+  <md-toolbar>
+    <h6>Selection Content</h6>
+  </md-toolbar>
+  <div class="pool-content-panel scrollable">
+    <div class="d-inline-flex flex-row flex-wrap align-items-start">
+      <md-chip-list>
+        <!--
+        <md-chip *ngFor="let image of poolContent">{{pool.title}}
+        -->
+        <md-chip>Apple</md-chip>
+        <md-chip>Baby</md-chip>
+        <md-chip>ipsum lorem</md-chip>
+      </md-chip-list>
+      <!--
+        <md-grid-list rowHeight="96px" gutterSize="4px">
+          <md-grid-tile *ngFor="let pool of poolList">
+            <md-grid-tile-header>{{pool.imageChain.displayName}}</md-grid-tile-header>
+            <md-grid-tile-footer>{{pool.name}}</md-grid-tile-footer>
+          </md-grid-tile>
+        </md-grid-list>
+      -->
+    </div>
+  </div>
 </div>

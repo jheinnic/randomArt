@@ -5,50 +5,60 @@ import {
   Component, ViewChild, AfterViewInit, OnInit, OnDestroy, ElementRef, ViewChildren
 } from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
-import {PhraseGeneratorService} from "../shared/phrase-generator/phrase-generator.service";
-import {PaintableDirective, Dimensions} from "../shared/canvas-util/paintable.directive";
-import {ArtworkApi} from "../shared/sdk/services/custom/Artwork";
-import {PointMappingService, PaintProgress} from "./point-mapping.service";
-import {WordPaintQueueService} from "./word-paint-queue.service";
-import {WordPaintTask} from "./word-paint-task.datamodel";
-import {ImageChainDef} from "./image-chain-def.datamodel";
-import {ImageStoreService} from "./image-store.service";
 import {NavbarDataService, NavbarDataModelBuilder, MenuNavDataModelBuilder } from "../app-root";
-import {ServiceEventType, ServiceStage} from "../shared/service-util/service-lifecycle.datamodel";
+import {ReflectiveFluentBuilder} from "../../../common/lib/datamodel-ts/index";
+import {PhraseGeneratorService} from "../shared/phrase-generator/phrase-generator.service";
+import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
+import {ArtworkApi} from "../shared/sdk/services/custom/Artwork";
+import {RealTime} from "../shared/sdk/services/core/real.time";
+import {FireLoopRef} from "../shared/sdk/models/FireLoopRef";
+import {Pool} from "../shared/sdk/models/Pool";
+import {ImageChain} from "../shared/sdk/models/ImageChain";
 import {QueueChange} from "../shared/service-util/abstract-queue.service";
+import {ServiceEventType} from "../shared/service-util/service-lifecycle.datamodel";
 import {
-  TaskEventType, ProgressTaskEvent, FinishedTaskEvent, BeganTaskEvent, HardErrorTaskEvent,
+  TaskEvent, ProgressTaskEvent, FinishedTaskEvent, HardErrorTaskEvent,
   SoftErrorTaskEvent, CancelledTaskEvent, AcknowledgedTaskEvent
 } from "../shared/service-util/task-lifecycle.datamodel";
-import {PaintablePoint} from "../shared/canvas-util/point.datamodel";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {PointMappingService} from "./point-mapping.service";
+import {WordPaintQueueService} from "./word-paint-queue.service";
+import {WordPaintTask} from "./word-paint-task.class";
+import {WordPaintInput} from "./word-paint-input.datamodel";
+import {WordPaintResult} from "./word-paint-result.datamodel";
+import {WordPaintProgress} from "./word-paint-progress.datamodel";
 import {Subscription} from "rxjs/Subscription";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
+import Immutable = require('immutable');
 import uuid = require('uuid');
 import _ = require('lodash');
 
 
 const MIN_QUEUE_SIZE: number = 8;
-const MAX_BUFFER_SIZE: number = 2000;
-const LIVE_LATENCY: number = 600;
+// const MAX_BUFFER_SIZE: number = 2000;
+// const LIVE_LATENCY: number = 600;
 
 
 @Component({
-  moduleId: "./app/pool",
+  moduleId: "client/app/pool/image-lobby.component",
   selector: "image-lobby",
-  inputs: [],
   template: require("./_image-lobby.view.html"),
-  styleUrls: ["./_image-lobby.scss"]
+  styleUrls: ["./_image-lobby.scss"],
+
 })
 export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
 {
- private allImageChains: ImageChainDef[];
-  private _selectedImageChain: ImageChainDef;
+  private fireLoopRef: FireLoopRef<ImageChain>;
+  private allImageChains: ImageChain[] = [];
+  private selectedImageChain: ImageChain;
+  private imageChainSubsn: Subscription;
+  private rtSubscription: Subscription;
 
-  private queueContent: Immutable.List<WordPaintTask>
+  private activePoolInst: Pool;
+  private activePoolSubsn: Subscription;
+
+  private queueContent: Immutable.List<WordPaintInput>;
   private currentPaintTask: WordPaintTask;
-  private previousPhrase: string;
+  private previousPaintTask: WordPaintTask;
 
   private serviceSub: Subscription;
   private queueSub: Subscription;
@@ -58,53 +68,84 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
   private pctBuffer: number = 0;
   private pctDone: number = 0;
 
-  @ViewChildren("canvas[paintable]") private canvasRef: PaintableDirective;
-
-  private paintSize: Dimensions = {
-    pixelWidth: 480,
-    pixelHeight: 480
-  };
-  private paintSizeSubject: BehaviorSubject<Dimensions>;
-  private paintProgress: Subject<PaintProgress> = new Subject<PaintProgress>();
-
+  @ViewChild(PaintableDirective) private baseCanvasRef: ElementRef; //PaintableDirective;
+  private canvasRef: PaintableDirective;
   private uploadSubscription: Subscription;
 
   constructor(
-    private readonly activatedRoute: ActivatedRoute, private readonly artworkApi: ArtworkApi,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly artworkApi: ArtworkApi,
+    private readonly realTime: RealTime,
     private readonly pointService: PointMappingService,
     private readonly phraseGenerator: PhraseGeneratorService,
-    private readonly imageStore: ImageStoreService,
     private readonly paintQueue: WordPaintQueueService,
     private readonly navbarDataService: NavbarDataService
   ) {
-    this.paintSizeSubject =
-      new BehaviorSubject<Dimensions>(this.paintSize);
+    console.log('ImageLobby Constructor');
+
+    this.rtSubscription = this.realTime.onReady().subscribe(
+      () => {
+        this.fireLoopRef = this.realTime.FireLoop
+          .ref<ImageChain>(ImageChain);
+        this.imageChainSubsn =
+          this.fireLoopRef.on("change", {
+            offset: 0,
+            order: "pixelCount ASC, pixelHeight ASC, pixelWidth ASC"
+          }).subscribe(
+            (newData:ImageChain[]) => {
+              this.allImageChains = newData;
+              this.selectedImageChain = newData[0];
+            },
+            (err:any) => {
+              console.error(err);
+              this.imageChainSubsn.unsubscribe();
+            },
+            () => {
+              this.imageChainSubsn = undefined;
+            }
+          );
+      },
+      (err:any) => {
+        console.error(err);
+        this.rtSubscription.unsubscribe();
+      },
+      () => { this.rtSubscription = undefined; }
+    );
   }
 
   public ngOnInit() {
     let snapshot = this.activatedRoute.snapshot;
-    this.allImageChains = snapshot.data['imageChainDef'];
-    this._selectedImageChain = this.allImageChains[0];
+    // TODO!!
+    // this.activePoolSubsn = snapshot.data['activePoolInst']
+    //   .subscribe(
+    //     (data) => {this.activePoolInst = data;},
+    //     (err) => {console.error(err); this.activePoolSubsn.unsubscribe()},
+    //     () => {this.activePoolSubsn = undefined;}
+    //   );
 
-    // let obsChains = snapshot.data['imageChainDef'];
-    // let subscription = obsChains.subscribe((values: ImageChainDef[]) => {
-    //   this.allImageChains = values;
-    //   console.log(JSON.stringify(values));
-    //   this._selectedImageChain = this.allImageChains[0];
-    // }, (err: any) => { console.error(err); }, () => { console.log("Shutting down"); });
+    console.log("Editting Image Lab menu item");
+    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
+      builder.resetTabs()
+        .editMenuNav('Image Pools', (builder: MenuNavDataModelBuilder) => {
+          builder.disabled(true)
+        });
+    });
+  }
 
-    let numRounds = 0;
-    while ((this.paintQueue.count() < MIN_QUEUE_SIZE) && (numRounds++ < MIN_QUEUE_SIZE)) {
-      this.scheduleNext();
+  public ngAfterViewInit() {
+    console.log(this.baseCanvasRef);
+    if (this.baseCanvasRef) {
+      this.canvasRef = this.baseCanvasRef.nativeElement;
+    } else {
+      throw new Error("Failed to find paintableCanvas directive in image lobby template!?");
     }
 
     this.queueSub = this.paintQueue.onChanged()
-      .subscribe((event: QueueChange<WordPaintTask>) => {
+      .subscribe((event: QueueChange<WordPaintInput>) => {
         switch (event.kind) {
           case 'offer':
             this.queueContent = event.newContent;
-            if ((!this.currentPaintTask) && (this.pointService.stage
-              === ServiceStage.available)) {
+            if ((!this.currentPaintTask) && this.pointService.isAvailable()) {
               this.beginPainting();
             }
             break;
@@ -124,11 +165,15 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
       }, (err: any) => { console.error(err); },
         () => { this.queueSub = undefined; });
 
+    while (this.paintQueue.count() < MIN_QUEUE_SIZE) {
+      this.scheduleNext();
+    }
+
     this.serviceSub = this.pointService.events
       .subscribe((event: ServiceEventType) => {
         switch (event.kind) {
           case 'launched': {
-            if (this.paintQueue && this.paintQueue.count() > 0) {
+            if (this.paintQueue && (this.paintQueue.count() > 0)) {
               this.beginPainting();
             }
             break;
@@ -137,16 +182,8 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
             console.log('Nothing for' + JSON.stringify(event));
             break;
         }
-      }, (err: any) => { console.error(err); },
+      }, (err: any) => { console.error(err); this.serviceSub.unsubscribe(); },
         () => { this.serviceSub = undefined; });
-
-    console.log("Editting Image Lab menu item");
-    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
-      builder.resetTabs()
-        .editMenuNav('Image Lab', (builder: MenuNavDataModelBuilder) => {
-          builder.disabled(true)
-        });
-    })
   }
 
   public ngOnDestroy() {
@@ -154,15 +191,27 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
       this.serviceSub.unsubscribe();
     }
 
+    if (this.queueSub) {
+      this.queueSub.unsubscribe();
+    }
+
+    if (this.activePoolSubsn) {
+      this.activePoolSubsn.unsubscribe();
+    }
+
+    if (this.imageChainSubsn) {
+      this.imageChainSubsn.unsubscribe();
+    }
+
+    if (this.fireLoopRef) {
+      this.fireLoopRef.dispose();
+    }
+
     this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
-      builder.editMenuNav('Image Lab', (builder: MenuNavDataModelBuilder) => {
+      builder.editMenuNav('Image Pools', (builder: MenuNavDataModelBuilder) => {
         builder.disabled(false)
       });
     });
-  }
-
-  public ngAfterViewInit() {
-    // this.wordPaintCanvas.isReady();
   }
 
   get phraseToPaint(): string {
@@ -176,7 +225,7 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   get hasPainted(): boolean {
-    return _.isString(this.previousPhrase);
+    return !!this.previousPaintTask;
   }
 
   get isPainting(): boolean {
@@ -187,51 +236,46 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
     return !this.isPainting && (this.paintQueue.count() > 0);
   }
 
-  private get selectedImageChain(): ImageChainDef {
-    return this._selectedImageChain;
-  }
-
-  private set selectedImageChain(data: ImageChainDef) {
-    this._selectedImageChain = data;
-  }
-
   public renameNext() {
     if (this.paintQueue.count() > 0) {
-      let rawTask: WordPaintTask = WordPaintTask.build((builder) => {
-        builder.phrase(
-          this.phraseGenerator.createNextPhrase()
-        ).chain(
-          this.paintQueue.peek().chain
-        )
-      });
+      let rawTask: WordPaintInput = this.paintQueue.peek();
 
-      const newItem = this.pointService.prepareTask(rawTask);
-      this.paintQueue.replace(0, newItem);
+      let newTask: WordPaintInput = rawTask.copy(
+        (builder: ReflectiveFluentBuilder<WordPaintInput>) => {
+          builder.phrase(
+            this.phraseGenerator.createNextPhrase()
+          ).chain(this.selectedImageChain)
+        }
+      );
+
+      this.paintQueue.replace(0, newTask);
     } else {
       console.error("Cannot replace next item--queue is already empty!");
     }
   }
 
   public scheduleNext() {
-    let rawTask: WordPaintTask = WordPaintTask.build((builder) => {
-      builder.phrase(
-        this.phraseGenerator.createNextPhrase()
-      ).chain(this.selectedImageChain)
-    });
-
-    const newItem = this.pointService.prepareTask(rawTask);
-    this.paintQueue.offer(newItem);
+    this.paintQueue.offer(
+    WordPaintInput.build(
+      (builder: ReflectiveFluentBuilder<WordPaintInput>) => {
+        builder.phrase(
+          this.phraseGenerator.createNextPhrase()
+        ).chain(this.selectedImageChain)
+      })
+    );
   }
 
   public beginPainting() {
     if (this.paintQueue.count() > 0) {
-      this.currentPaintTask = this.paintQueue.take();
+      const rawTask = this.paintQueue.take();
+      this.currentPaintTask = this.pointService.prepareTask(rawTask, this.canvasRef);
+      this.canvasRef.subscribeTo(this.currentPaintTask.events);
       this.taskSub = this.currentPaintTask.events.subscribe(
-        (event: TaskEventType<string, PaintProgress, string>) => {
+        (event: TaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) => {
           switch (event.kind) {
-            case 'began':
-              this.onWordPaintBegin(event);
-              break;
+            // case 'began':
+            //   this.onWordPaintBegin(event);
+            //   break;
             case 'progress':
               this.onWordPaintProgress(event);
               break;
@@ -256,7 +300,7 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
         }, (err: any) => { console.error(err); }, () => {this.taskSub = undefined; });
       this.currentPaintTask.begin();
     } else {
-      console.error("Cannot paint next item--queuee is already empty!");
+      console.error("Cannot paint next item--queue is empty?!");
     }
   }
 
@@ -268,39 +312,35 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
   // Event Handlers for compopnentized wordpaint canvas TODO
   //
 
-  public onWordPaintBegin(event: BeganTaskEvent<string,PaintProgress,string>) {
-    this.paintSize = {
-      pixelWidth: this.currentPaintTask.chain.pixelWidth,
-      pixelHeight: this.currentPaintTask.chain.pixelHeight
-    };
-  }
+  // public onWordPaintBegin(event: BeganTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
+  // }
 
-  public onWordPaintProgress(event: ProgressTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintProgress(event: ProgressTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
     // this.wordPaintCanvas.paint(event.progress.paintPoints);
-    this.paintProgress.next(event.progress);
+    // this.paintProgress.next(event.progress);
     console.log(`Progress update TODO for ${event.task} at ${event.progress.pctDone}!`);
     this.pctBuffer = (event.progress.pctDone * 2) - this.pctDone;
     this.pctDone = event.progress.pctDone;
   }
 
-  public onWordPaintSoftError(event: SoftErrorTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintSoftError(event: SoftErrorTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
     this.currentPaintTask.acknowledge();
     this.scheduleNext();
   }
 
-  public onWordPaintHardError(event: HardErrorTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintHardError(event: HardErrorTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
     this.currentPaintTask.acknowledge();
     this.scheduleNext();
   }
 
-  public onWordPaintCancelled(event: CancelledTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintCancelled(event: CancelledTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
     this.currentPaintTask.acknowledge();
     this.scheduleNext();
   }
 
-  public onWordPaintDone(event: FinishedTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintDone(event: FinishedTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>) {
     let completedPhrase = event.task;
-    let fullImageDataUrl = this.canvasRef.dataUrl
+    let fullImageDataUrl = this.canvasRef.dataUrl;
     let imageDataUrl =
       fullImageDataUrl.replace(/^data:image\/(png|jpeg|jpg|gif);base64,/, '');
 
@@ -311,8 +351,8 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
     this.scheduleNext();
 
     const result: Observable<any> = this.artworkApi.upload(
-      completedPhrase, this.currentPaintTask.chain.pixelWidth,
-      this.currentPaintTask.chain.pixelHeight, imageDataUrl);
+      completedPhrase, this.currentPaintTask.input.chain.pixelWidth,
+      this.currentPaintTask.input.chain.pixelHeight, imageDataUrl);
 
     this.uploadSubscription = result.subscribe((data) => {
       this.uploadSubscription.unsubscribe();
@@ -321,10 +361,12 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
     }, (err) => { console.error(err); }, () => { this.uploadSubscription = null});
   }
 
-  public onWordPaintAcknowledged(
-    event: AcknowledgedTaskEvent<string,PaintProgress,string>) {
+  private onWordPaintAcknowledged(
+    event: AcknowledgedTaskEvent<WordPaintInput,WordPaintProgress,WordPaintResult>
+  ) {
     this.taskSub.unsubscribe();
     this.taskSub = undefined;
+    this.previousPaintTask = this.currentPaintTask;
     this.currentPaintTask = undefined;
   }
 }

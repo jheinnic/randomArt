@@ -7,7 +7,7 @@ import {NavbarData} from "../app-root/navbar-data.datamodel";
 import {NavbarDataService} from "../app-root/navbar-data.service";
 
 @Component({
-  moduleId: './app/pool/image-lobby-action.component',
+  moduleId: 'client/app/pool/image-lobby-action.component',
   templateUrl: './_image-lobby-action.view.html'
 })
 export class ImageLobbyActionComponent implements OnDestroy {

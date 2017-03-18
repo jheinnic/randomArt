@@ -7,63 +7,76 @@ import {BASE_URL, API_VERSION} from "../shared/base-url.values";
 import {LoopBackConfig} from "../shared/sdk/lb.config";
 import {FireLoop} from "../shared/sdk/models/FireLoop";
 import {FireLoopRef} from "../shared/sdk/models/FireLoopRef";
-import {ImageChain} from "../shared/sdk/models/ImageChain";
-import {RealTimeManager} from "../shared/service-util/real-time-manager.service";
+import {
+  RealTimeManagerService
+} from "../shared/service-util/real-time-manager.service";
 import {Observable} from "rxjs/Observable";
+import {Pool} from "../shared/sdk/models/Pool";
+import {UserApi} from "../shared/sdk/services/custom/User";
 import {Subscription} from "rxjs/Subscription";
-import {Subject} from "rxjs/Subject";
+import {BehaviorSubject} from "rxjs";
+import {LoopBackFilter} from "../shared/sdk/models/BaseModels";
 
 @Injectable()
-export class ImageChainCacheService implements OnDestroy
+export class PoolStoreService
 {
-  private readonly returnSubject = new Subject<Immutable.List<ImageChain>>();
+  private userId: string;
+  private poolSub: Subscription;
+  private poolRef: FireLoopRef<Pool>;
+  private onReady: BehaviorSubject<boolean>;
 
-  private rtSubscription: Subscription;
-  private imageChainSubsn: Subscription;
-  private fireLoopRef: FireLoopRef<ImageChain>;
-
-
-  constructor(private readonly realTime: RealTimeManager) {
+  constructor(
+    private readonly realTime: RealTimeManagerService, private readonly authSvc: UserApi
+  ) {
     LoopBackConfig.setBaseURL(BASE_URL);
     LoopBackConfig.setApiVersion(API_VERSION);
-
-    this.rtSubscription = this.realTime.connection.subscribe(
-      (fireLoop:FireLoop) => {
-        if (this.imageChainSubsn) {
-          this.imageChainSubsn.unsubscribe();
-        }
-
-        this.fireLoopRef = fireLoop.ref<ImageChain>(ImageChain);
-        this.imageChainSubsn =
-          this.fireLoopRef.on("change", {
-            offset: 0,
-            order: "pixelCount ASC, pixelHeight ASC, pixelWidth ASC"
-          }).map((data:ImageChain[]) => Immutable.List(data))
-            .subscribe(this.returnSubject);
-      },
-      (err:any) => {
-        console.error(err);
-        this.rtSubscription.unsubscribe();
-      },
-      () => { this.rtSubscription = undefined; }
-    );
+    this.onReady = new BehaviorSubject<boolean>(false);
   }
 
-  public getImageChainCache(): Observable<Immutable.List<ImageChain>> {
-    return this.returnSubject.asObservable();
+  public initForUser(): Observable<boolean> {
+    if (! this.authSvc.getCurrentId()) {
+      return Observable.empty<boolean>();
+    }
+
+    this.poolSub = this.realTime.connection.subscribe(
+      (fireLoop: FireLoop) => {
+        this.poolRef = fireLoop.ref<Pool>(Pool);
+        this.onReady.next(true);
+      },
+      (err: any) => {
+        console.error('Could not acquire fireloop Pool reference', err);
+      },
+      () => {
+        console.log('End of socket subscription?');
+      });
+
+    return this.onReady.asObservable();
   }
 
-  public ngOnDestroy(): void {
-    if (this.imageChainSubsn) {
-      this.imageChainSubsn.unsubscribe();
-      this.imageChainSubsn = undefined;
+  public isReady() {
+    return !! this.poolRef;
+  }
+
+  public subscribeWithFilter(filter: LoopBackFilter): Observable<Pool[]> {
+    let retVal: Observable<Pool[]>;
+
+    if (!! this.poolRef) {
+      retVal = this.poolRef.on('change', filter);
+    } else {
+      retVal = undefined;
     }
 
-    if (this.rtSubscription) {
-      this.rtSubscription.unsubscribe();
-      this.rtSubscription = undefined;
+    return retVal;
+  }
+
+  public create(newItem: Pool): Observable<Pool> {
+    let retVal: Observable<Pool>;
+    if (this.isReady) {
+      retVal = this.poolRef.create(newItem);
+    } else {
+      retVal = undefined;
     }
 
-    this.returnSubject.complete();
+    return retVal;
   }
 }

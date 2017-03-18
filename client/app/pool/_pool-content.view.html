@@ -17,6 +17,11 @@
                 </template>
               </md-chip-list>
             </section>
+            <section>
+              <p>Stuff</p>
+              <p *ngFor="let chain of allImageChains">{{chain.displayName}}</p>
+              <p>Stuff</p>
+            </section>
           </md-card-content>
         </md-card>
       </div></div>
@@ -70,7 +75,7 @@
         </md-card-subtitle>
         <md-card-content>
           <div class="d-flex flex-column align-items-center justify-content-around">
-            <canvas #wordPaint class="align-self-center border-2"
+            <canvas #wordPaint class="align-self-center border-2" paintable
                     [sizeable]="paintSize" [paintable]="paintProgress"></canvas>
             <md-progress-bar *ngIf="isPainting" color="md-warn" class="mt-1 mb-auto" [mode]="progressMode"
                              [value]="pctDone" [bufferValue]="nextPctDone"></md-progress-bar>
