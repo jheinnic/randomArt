@@ -1,10 +1,10 @@
 import {Component, Directive} from '@angular/core';
 
 @Directive({
-  selector: 'span[blank-area]',
+  selector: '[blank-area]',
   host:{
     '[class.flex-fill]': 'true'
   }
 })
-export class BlankAreaComponent {
+export class BlankAreaDirective {
 }

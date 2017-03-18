@@ -1,3 +1,6 @@
+<div class="scroll-container row">
+  <div class="col-6 col-md-4 d-flex flex-column justify-content-around">
+        <md-card>
 <md-button-toggle-group-mutiple #group="imageChainsGroup" vertical="true">
   <md-button-toggle *ngFor="let chain of imageChains" input="imageChains" [name]="chain.uuid" checked="true" [value]="chain.uuid" (change)="console.log($event)">
     {{chain.displayName}}
