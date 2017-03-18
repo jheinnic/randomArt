@@ -14,7 +14,7 @@ module.exports = function(app) {
 
   console.log(obj.toObject());
 
-  XwGen.create(xwInst, function (err, u1) {
+  XwGen.create(obj, function (err, u1) {
     if (err) {
       console.error(err);
     } else {

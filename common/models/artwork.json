@@ -5,7 +5,7 @@
   "idInjection": false,
   "mixins": {
     "TimeStamp": {
-      "required": true,
+      "required": false,
       "validateUpsert": true,
       "silenceWarnings": false
     }

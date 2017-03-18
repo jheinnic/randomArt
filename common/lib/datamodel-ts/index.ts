@@ -1,7 +1,7 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 import builder = require('fluent-interface-builder');
 import {Builder} from "fluent-interface-builder";
-import { makeDecorator, makeParamDecorator, makePropDecorator } from '@angular/core/src/util/decorators';
+import {makeDecorator, makePropDecorator} from "@angular/core/src/util/decorators";
 
 // From the standard library....
 export type Partial<T> = { [P in keyof T]?: T[P]; }
@@ -72,7 +72,7 @@ export function unwrapHelper<T>(): (T:T)=>T { return (self:T) => { return self; 
 //    produce Wrappers that extend the required ModelBuilder API.
 // -- A class the provided Builder is used to construct with a No-Argument constructor.
 export function buildMethodFactory<T, M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
-  wrapperBuilder:Builder<W,T>, ctor:NoArgConstructor<T>
+  wrapperBuilder:Builder<W,Partial<T>>, ctor:NoArgConstructor<T>
 ) : BuildMethod<T,M> {
   return (director:Director<M>): T => {
     let wrapper:W = wrapperBuilder.value(new ctor());
@@ -82,7 +82,7 @@ export function buildMethodFactory<T, M extends FluentBuilder<M>, W extends Fact
 }
 
 export function oldCopyMethodFactory<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
-  self: T, wrapperBuilder:Builder<W,T>
+  self: T, wrapperBuilder:Builder<W,Partial<T>>
 ) : BuildMethod<T,M> {
   return function (director:Director<M>): T {
     let wrapper:W = wrapperBuilder.value(self);
@@ -92,7 +92,7 @@ export function oldCopyMethodFactory<T,M extends FluentBuilder<M>, W extends Fac
 }
 
 export function copyMethodFactory<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
-  wrapperBuilder:Builder<W,T>
+  wrapperBuilder:Builder<W,Partial<T>>
 ) : CopyMethod<T,M> {
   return function (director:Director<M>): T {
     let wrapper:W = wrapperBuilder.value(this);
@@ -102,13 +102,66 @@ export function copyMethodFactory<T,M extends FluentBuilder<M>, W extends Factor
 }
 
 export function copyMethod<T,M extends FluentBuilder<M>, W extends FactoryWrapper<T,M>>(
-  self: T, wrapperBuilder:Builder<W,T>, director: Director<M>
+  self: T, wrapperBuilder:Builder<W,Partial<T>>, director: Director<M>
 ) : T {
   let wrapper:W = wrapperBuilder.value(self);
   director(wrapper);
   return wrapper.unwrap();
 }
 
+type Value = string | number | boolean;
+
+export type Buildable<T> =
+  { [K in keyof T]: Value | Buildable<any> | Immutable.List<Value> | Immutable.List<Buildable<any>>; };
+
+/*
+export type Editable<T> =
+  { [K in keyof T]: Value| Buildable<any> | Immutable.List<Value> |
+    // Immutable.List[Buildable<any>]; }
+  & { id: Value; };
+ */
+
+export type Functionized<T> = {
+  [K in keyof T]: (param: any) => any // T[K]) => any
+};
+
+export type ReflectiveFluentBuilder<T extends Buildable<T>> = FluentBuilder<Functionized<T>> & {
+  [K in keyof T]: (param: any) => any // T[K]) => FluentBuilder<Functionized<T>>;
+}
+
+export type ReflectiveBuilder<T extends Buildable<T>> = Builder<FactoryWrapper<T, ReflectiveFluentBuilder<T>>,Partial<T>>;
+
+type Keys<T> = keyof T;
+
+// export function aderiveFactoryWrapper(sample: Buildable<T>): FactoryWrapper<ReflectiveFluentBuilder<T>> {
+//   return Object.keys(sample)
+//     .reduce();
+// }
+
+export function deriveFactoryWrapper<T extends Buildable<T>>(sample: Keys<T>[] = []): ReflectiveBuilder<T> {
+  let retVal = builder.build<FactoryWrapper<T,ReflectiveFluentBuilder<T>>,Partial<T>>();
+
+  // let targetKeys: Keys<T>[];
+  // if (sample.length === 0) {
+  //   targetKeys = Object.keys(T);
+  // } else {
+  //   targetKeys = sample;
+  // }
+
+  sample.forEach(
+    (key:keyof T) => {
+      if (key !== 'unwrap') {
+        retVal = retVal.cascade(key, (value) => (context: Partial<T>) => {
+          let tempVal = {} as Partial<T>;
+          tempVal[key] = value;
+          Object.assign(context, tempVal);
+        })
+      }
+    }
+  );
+
+  return retVal.unwrap('unwrap', unwrapHelper);
+}
 
 
 //
