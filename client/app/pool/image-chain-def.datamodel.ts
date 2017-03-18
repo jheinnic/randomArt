@@ -41,7 +41,8 @@ function derivePointMaps(widthPoints: number[], heightPoints: number[]): Observa
             new Point(undefined, {
               x: xIdx,
               y: yIdx
-            }), new Point(undefined, {
+            }),
+            new Point(undefined, {
               x: xVal,
               y: yVal
             })
@@ -54,9 +55,10 @@ function derivePointMaps(widthPoints: number[], heightPoints: number[]): Observa
 }
 
 type ImageChainDefWrapper = FactoryWrapper<ImageChainDef,ImageChainDefBuilder>;
+
 const wrapImageChainDef: Builder<ImageChainDefWrapper,Partial<ImageChainDef>> =
   builder.build<ImageChainDefWrapper,Partial<ImageChainDef>>()
-    .chain(
+    .cascade(
       'dimensions',
       (pixelWidth: number, pixelHeight: number, fitOrFill: FitOrFillType) =>
         (context: Partial<ImageChainDef>) =>
@@ -66,13 +68,13 @@ const wrapImageChainDef: Builder<ImageChainDefWrapper,Partial<ImageChainDef>> =
             fitOrFill: fitOrFill
           })
     )
-    .chain('displayName', (displayName:string) => (context: Partial<ImageChainDef>) =>
+    .cascade('displayName', (displayName:string) => (context: Partial<ImageChainDef>) =>
       Object.assign(context, {displayName: displayName})
     )
-    .chain('localId', (localId:number) => (context: Partial<ImageChainDef>) =>
+    .cascade('localId', (localId:number) => (context: Partial<ImageChainDef>) =>
       Object.assign(context, {localId: localId})
     )
-    .chain('uuid', (uuid:string) => (context: Partial<ImageChainDef>) =>
+    .cascade('uuid', (uuid:string) => (context: Partial<ImageChainDef>) =>
       Object.assign(context, {uuid: uuid})
     )
     .unwrap('unwrap', () => (context:Partial<ImageChainDef>) =>

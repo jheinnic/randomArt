@@ -42,21 +42,27 @@ export class PassportComponent implements OnDestroy
         ttl: 1209600,
         user: {}
       };
-      auth.setUser(tokenData);
+      auth.setToken(tokenData);
+      auth.save();
 
       this.lookupSubscription = userApi.findById(tokenKeys.userId, {include: "identities"})
         .subscribe((userData: User) => {
           console.log('Lookup from params yields: ' + JSON.stringify(userData));
           if (userData) {
             tokenData.user = userData;
-            this.auth.setUser(tokenData);
+            this.auth.setUser(userData);
             this.auth.save();
             this.router.navigate([authHomeUrl]);
           } else {
+            console.error(`Failed to retrieve user data for ${tokenData}`);
             this.router.navigate(['/login']);
           }
-        }, (err: any) => { console.error(err); }, () => { this.lookupSubscription = null; });
-    }, (err: any) => { console.error(err); }, () => { this.routeSubscription = null; });
+        },
+          (err: any) => { console.error(err); },
+          () => { this.lookupSubscription = null; });
+    },
+      (err: any) => { console.error(err); },
+      () => { this.routeSubscription = null; });
   }
 
   public ngOnDestroy(): void {

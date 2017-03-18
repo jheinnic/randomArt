@@ -13,8 +13,8 @@ export interface ArtworkInterface {
   title?: string;
   owner?: string;
   imageChainId?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   imageChain?: ImageChain;
 }
 

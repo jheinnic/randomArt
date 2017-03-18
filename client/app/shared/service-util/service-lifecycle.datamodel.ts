@@ -76,6 +76,10 @@ export class AbstractService
     this.myEvents = new BehaviorSubject<ServiceEventType>({kind: 'new'});
   }
 
+  public isAvailable(): boolean {
+    return this.svcStage === ServiceStage.available;
+  }
+
   protected getStage(): ServiceLifecycleStage {
     return this.svcStage;
   }

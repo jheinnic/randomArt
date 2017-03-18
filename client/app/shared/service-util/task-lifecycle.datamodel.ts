@@ -1,8 +1,9 @@
 /**
  * Created by jheinnic on 2/2/17.
  */
-import {BehaviorSubject, Observable} from "rxjs";
 import {KeyToValue} from "../../../../common/lib/datamodel-ts/index";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs/Observable";
 
 export type TaskLifecycleStage = 'pending' | 'active' | 'suspended' | 'abandoned' | 'done' | 'retryable' | 'failed' | 'closed';
 export type TaskEventKind = 'new' | 'began' | 'progress' | 'paused' | 'resumed' | 'finished' | 'cancelled' | 'softError' | 'hardError' | 'acknowledged' | 'retried';
@@ -87,34 +88,30 @@ export interface RetriedTaskEvent<Task,Progress,Result> {
   task: Task;
 }
 
-export type TaskEventType<Task,Progress,Result> = NewTaskEvent<Task,Progress,Result> | BeganTaskEvent<Task,Progress,Result> | ProgressTaskEvent<Task,Progress,Result> | PausedTaskEvent<Task,Progress,Result> | ResumedTaskEvent<Task,Progress,Result> | CancelledTaskEvent<Task,Progress,Result> | FinishedTaskEvent<Task,Progress,Result> | SoftErrorTaskEvent<Task,Progress,Result> | HardErrorTaskEvent<Task,Progress,Result> | RetriedTaskEvent<Task,Progress,Result> | AcknowledgedTaskEvent<Task,Progress,Result>;
+export type TaskEvent<Task,Progress,Result> = NewTaskEvent<Task,Progress,Result> | BeganTaskEvent<Task,Progress,Result> | ProgressTaskEvent<Task,Progress,Result> | PausedTaskEvent<Task,Progress,Result> | ResumedTaskEvent<Task,Progress,Result> | CancelledTaskEvent<Task,Progress,Result> | FinishedTaskEvent<Task,Progress,Result> | SoftErrorTaskEvent<Task,Progress,Result> | HardErrorTaskEvent<Task,Progress,Result> | RetriedTaskEvent<Task,Progress,Result> | AcknowledgedTaskEvent<Task,Progress,Result>;
 
 /**
  * Abstract base class for a worker with a lifecycle, with a set of base properties that
- * is the union of all event interface types.  This facilitates a pattern where changes in
- * lifecycle's state machine are coincident to immutable reconstruction.  This in turn
- * promotes use of the service worker's lifecycle state engine object itself as the lifecycle
- * event payload.
  */
-export class AbstractTask<Task,Progress,Result>
-{
-  private _stage: TaskLifecycleStage = 'pending';
-  protected readonly onTaskEvent: BehaviorSubject<TaskEventType<Task,Progress,Result>>;
+export class AbstractTask<Input,Progress,Result>
+  {
+    private myStage: TaskLifecycleStage = 'pending';
+    protected readonly onTaskEvent: BehaviorSubject<TaskEvent<Input,Progress,Result>>;
 
   protected progress: Progress;
   protected result: Result;
   protected error: any;
 
-  constructor(public readonly task: Task) {
-    this.onTaskEvent = new BehaviorSubject<TaskEventType<Task,Progress,Result>>({
+  constructor(public readonly task: Input) {
+    this.onTaskEvent = new BehaviorSubject<TaskEvent<Input,Progress,Result>>({
       kind: 'new',
-      task: task
+      task: this.task
     });
   }
 
   private assertTransition(from: TaskLifecycleStage, to: TaskLifecycleStage) {
-    if (this._stage !== from) {
-      throw new Error(`Cannot transition from ${from} while current state is ${this._stage}`);
+    if (this.myStage !== from) {
+      throw new Error(`Cannot transition from ${from} while current state is ${this.myStage}`);
     }
 
     let nextEvent;
@@ -138,7 +135,7 @@ export class AbstractTask<Task,Progress,Result>
         nextEvent = { kind: 'softError', task: this.task, error: this.error };
         break;
       case 'active->failed':
-        nextEvent = { kind: 'hardError', task: this.task, result: this.error };
+        nextEvent = { kind: 'hardError', task: this.task, error: this.error };
         break;
       case 'done->closed':
       case 'abandoned->closed':
@@ -154,11 +151,11 @@ export class AbstractTask<Task,Progress,Result>
         // throw new Error(`Internal error task state changes from ${from} to ${to} are
         // undefined`);
         throw new Error(
-          `Cannot transition to ${to} while current state is ${this._stage}`);
+          `Cannot transition to ${to} while current state is ${this.myStage}`);
     }
 
     setTimeout(() => {
-      this._stage = to;
+      this.myStage = to;
       this.onTaskEvent.next(nextEvent);
     });
   }
@@ -197,21 +194,21 @@ export class AbstractTask<Task,Progress,Result>
   }
 
   protected acknowledge() {
-    switch(this._stage) {
+    switch(this.myStage) {
       case 'done':
       case 'retryable':
       case 'failed':
       case 'abandoned':
-        this.assertTransition(this._stage, 'closed');
+        this.assertTransition(this.myStage, 'closed');
         break;
       default:
-        throw new Error(`Cannot transition to closed while current state is ${this._stage}`);
+        throw new Error(`Cannot transition to closed while current state is ${this.myStage}`);
     }
   }
 
   protected report(progress: Progress) {
-    if (this._stage !== 'active') {
-      throw new Error(`Progress reports can only be emitted when a task is active, but task is ${this._stage}`);
+    if (this.myStage !== 'active') {
+      throw new Error(`Progress reports can only be emitted when a task is active, but task is ${this.myStage}`);
     }
 
     setTimeout(() => {
@@ -221,10 +218,10 @@ export class AbstractTask<Task,Progress,Result>
   }
 
   protected get stage(): TaskLifecycleStage {
-    return this._stage;
+    return this.myStage;
   }
 
-  protected getEvents(): Observable<TaskEventType<Task,Progress,Result>> {
-    return this.onTaskEvent.asObservable().do((e) => { console.log('Task Event: ', e);});
+  protected getEvents(): Observable<TaskEvent<Input,Progress,Result>> {
+    return this.onTaskEvent.asObservable().do((e) => { console.log('Input Event: ', e);});
   }
 }

@@ -1,5 +1,6 @@
 /* tslint:disable */
 import {
+  User,
   ImageChain,
   Artwork
 } from '../index';
@@ -8,11 +9,12 @@ declare var Object: any;
 export interface PoolInterface {
   guid?: string;
   name: string;
-  id?: any;
+  ownerId?: any;
   imageChainId?: string;
   artworkIds?: Array<string>;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  owner?: User;
   imageChain?: ImageChain;
   images?: Artwork[];
 }
@@ -20,11 +22,12 @@ export interface PoolInterface {
 export class Pool implements PoolInterface {
   guid: string;
   name: string;
-  id: any;
+  ownerId: any;
   imageChainId: string;
   artworkIds: Array<string>;
   createdAt: Date;
   updatedAt: Date;
+  owner: User;
   imageChain: ImageChain;
   images: Artwork[];
   constructor(data?: PoolInterface) {
@@ -66,8 +69,8 @@ export class Pool implements PoolInterface {
           name: 'name',
           type: 'string'
         },
-        id: {
-          name: 'id',
+        ownerId: {
+          name: 'ownerId',
           type: 'any'
         },
         imageChainId: {
@@ -89,6 +92,11 @@ export class Pool implements PoolInterface {
         },
       },
       relations: {
+        owner: {
+          name: 'owner',
+          type: 'User',
+          model: 'User'
+        },
         imageChain: {
           name: 'imageChain',
           type: 'ImageChain',

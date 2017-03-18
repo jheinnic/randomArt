@@ -1,4 +1,4 @@
-import {Component, Inject, Optional, OpaqueToken} from "@angular/core";
+import {Component} from "@angular/core";
 import {Location} from "@angular/common";
 import {MdDialogRef} from "@angular/material";
 import {Observable} from "rxjs/Observable";
@@ -13,16 +13,12 @@ interface Credentials
   password: string | null;
 }
 
-@Component(
-  {
-    selector: 'login-modal',
-    templateUrl: './_login-modal.view.html'
-    // host: {
-    //   '[class.d-flex]': 'true',
-    //   '[class.flex-column]': 'true'
-    // }
-  }
-)
+@Component({
+  moduleId: 'client/app/authentication/login-modal.component',
+  selector: 'login-modal',
+  template: require('./_login-modal.view.html'),
+  styles: [require('./_social.scss')]
+})
 export class LoginModalComponent
 {
   private cred: Credentials = {

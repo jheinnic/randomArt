@@ -8,7 +8,8 @@ export interface ImageChainInterface {
   pixelHeight: number;
   fitOrFill: string;
   pixelCount?: number;
-  pointMaps?: any;
+  widthPoints?: any;
+  heightPoints?: any;
   owner?: string;
 }
 
@@ -19,7 +20,8 @@ export class ImageChain implements ImageChainInterface {
   pixelHeight: number;
   fitOrFill: string;
   pixelCount: number;
-  pointMaps: any;
+  widthPoints: any;
+  heightPoints: any;
   owner: string;
   constructor(data?: ImageChainInterface) {
     Object.assign(this, data);
@@ -76,8 +78,12 @@ export class ImageChain implements ImageChainInterface {
           name: 'pixelCount',
           type: 'number'
         },
-        pointMaps: {
-          name: 'pointMaps',
+        widthPoints: {
+          name: 'widthPoints',
+          type: 'any'
+        },
+        heightPoints: {
+          name: 'heightPoints',
           type: 'any'
         },
         owner: {

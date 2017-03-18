@@ -15,14 +15,15 @@
       "./mixins",
       "../node_modules/loopback-ds-timestamp-mixin",
       "../node_modules/loopback-component-realtime/dist/mixins",
-      "../node_modules/loopback-connextor-stormpath/dist/mixins"
+      "../node_modules/loopback-connector-stormpath/dist/mixins"
     ]
   },
   "User": {
     "dataSource": "db",
     "public": true,
     "options": {
-      "emailVerificationRequired": true
+      "emailVerificationRequired": true,
+      "injectOptionsFromRemoteContext": true
     }
   },
   "AccessToken": {

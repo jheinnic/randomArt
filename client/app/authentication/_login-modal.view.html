@@ -1,36 +1,52 @@
-<h5 md-dialog-title class="md-primary">Login</h5>
+<md-toolbar color="primary" class="control-theme">
+  <span md-dialog-title>Login</span>
+  <div flex-spacer></div>
+  <button md-icon-button md-dialog-close color="warn" class="mr-auto">
+    <md-icon>close</md-icon>
+  </button>
+</md-toolbar>
 <md-dialog-content>
-  <div class="d-flex flex-md-row flex-column">
+  <div class="d-flex flex-md-row flex-column align-items-start justify-content-between">
     <md-card>
+      <md-card-title>
+        <h5>Social Network</h5>
+      </md-card-title>
       <md-card-actions>
-        <button md-raised-button class="p-1 p-md-3 md-primary" routerLink="/login/google">Login with Google
-        </button>
+        <!--button mdRaisedButton class="p-1 p-md-3 mat-primary" routerLink="/login/google">Login Google</button-->
+        <button md-raised-button class="loginBtn loginBtnGoogle" routerLink="/login/google">Login With Google</button>
       </md-card-actions>
     </md-card>
-    <h5 class="p-3 align-self-center">- or -</h5>
+    <!--span class="p-3 align-self-center">- or -</span-->
     <md-card>
-      <md-card-content>
-        <div class="d-flex flex-column">
-          <span>Login with local account</span>
-            <md-input-container md-floatingPlaceholder="Username">
-              <input md-input type="text" required [(ngModel)]="cred.username">
+      <form>
+        <md-card-title>
+          <h5>Registered User</h5>
+        </md-card-title>
+        <md-card-content>
+          <div class="d-flex flex-column flex-nowrap">
+            <md-input-container>
+              <md-hint>Username</md-hint>
+              <input name="username" mdInput type="text" required [(ngModel)]="cred.username">
             </md-input-container>
             <!--Forgot your username?  a ui-sref="public.forgot.username">Click Here</a-->
             <md-input-container>
-              <md-placeholder>Password</md-placeholder>
-              <input md-input type="password" required [(ngModel)]="cred.password">
+              <md-hint>Password</md-hint>
+              <input mdInput name="password" type="password" required [(ngModel)]="cred.password">
+              <!--md-icon md-suffix>done</md-icon-->
             </md-input-container>
             <!--Forgot your password?  a ui-sref="public.forgot.password">Click Here</a-->
-          <span *ngIf="error != null">{{error}}</span>
-        </div>
-      </md-card-content>
-      <md-card-actions>
-        <div class="d-flex flex-row-reverse">
-          <button md-raised-button (click)="login()" class="md-primary">Login</button>
-          <button md-raised-button (click)="register()" class="md-primary">Sign Up</button>
-          <button md-raised-button md-dialog-close class="mr-auto md-warn">Cancel</button>
-        </div>
-      </md-card-actions>
+            <span *ngIf="!!error">{{error}}</span>
+          </div>
+        </md-card-content>
+        <md-card-actions>
+          <div class="d-flex flex-row-reverse flex-nowrap">
+            <button md-raised-button (click)="login()" color="primary">Login</button>
+            <button md-raised-button (click)="register()" color="primary">Sign Up</button>
+            <button md-raised-button md-dialog-close color="warn" class="mr-auto">Cancel</button>
+          </div>
+        </md-card-actions>
+      </form>
     </md-card>
   </div>
 </md-dialog-content>
+
