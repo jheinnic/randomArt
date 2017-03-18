@@ -6,6 +6,9 @@ import {Component} from "@angular/core";
 @Component({
   moduleId: "./app/scroll/scroll-main.component",
   selector: "scroll-main",
+  host: {
+    "[class.scrollable]": "true"
+  },
   template: require("./_scroll.view.html"),
   styleUrls: ["./_scroll.scss"]
 })
