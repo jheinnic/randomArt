@@ -1,5 +1,5 @@
 {
-  "webAppUrl": "http://portfolio.dev.jchein.name:4000",
+  "webAppUrl": "http://portfolio-api.dev.jchein.name:4000",
   "restApiUrl": "http://portfolio-api.dev.jchein.name:3000/api",
   "restApiRoot": "/api",
   "host": "0.0.0.0",
