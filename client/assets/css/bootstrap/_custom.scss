@@ -98,27 +98,27 @@
 // $red:    #d9534f !default;
 // $orange: #f0ad4e !default;
 // $yellow: #ffd500 !default;
-$yellow: map_get($md-yellow, A700);
-$green:  map_get($md-light-green, 700);
+$yellow: map_get($mat-yellow, A700);
+$green:  map_get($mat-light-green, 700);
 // $blue:   #0275d8 !default;
 // $teal:   #5bc0de !default;
 // $pink:   #ff5b77 !default;
 // $purple: #613d7c !default;
 
 // Create grayscale
-$gray-dark:                 map_get($md-grey, 900);
-$gray:                      map_get($md-grey, 700);
-$gray-light:                map_get($md-grey, 500);
-$gray-lighter:              map_eet($md-grey, 200);
-$gray-lightest:             map_get($md-grey, 100);
+$gray-dark:                 map_get($mat-grey, 900);
+$gray:                      map_get($mat-grey, 700);
+$gray-light:                map_get($mat-grey, 500);
+$gray-lighter:              map_eet($mat-grey, 200);
+$gray-lightest:             map_get($mat-grey, 100);
 
 // Reassign color vars to semantic color scheme
-$brand-primary:             md-color($light-primary, 'default', 1);
+$brand-primary:             mat-color($light-primary, 'default', 1);
 $brand-success:             $green;
-$brand-info:                md-color($light-accent, 'default', 1);
+$brand-info:                mat-color($light-accent, 'default', 1);
 $brand-warning:             $yellow;
-$brand-danger:              md-color($warn, 'default', 1);
-$brand-inverse:             map_get($md-light-theme-background, 'disabled-button');
+$brand-danger:              mat-color($warn, 'default', 1);
+$brand-inverse:             map_get($mat-light-theme-background, 'disabled-button');
 
 
 // Options
@@ -183,10 +183,10 @@ $enable-print-styles:       false;
 //
 // Settings for the `<body>` element.
 
-$body-bg:       map_get($md-light-theme-background, 'background');
-$body-color:    map_get($md-light-theme-foreground, 'text');
-$inverse-bg:    map_get($md-light-theme-background, 'disabled-button');
-$inverse-color: map_get($md-light-theme-foreground, 'disabled-button');
+$body-bg:       map_get($mat-light-theme-background, 'background');
+$body-color:    map_get($mat-light-theme-foreground, 'text');
+$inverse-bg:    map_get($mat-light-theme-background, 'disabled-button');
+$inverse-color: map_get($mat-light-theme-foreground, 'disabled-button');
 
 // Links
 //
@@ -210,6 +210,13 @@ $inverse-color: map_get($md-light-theme-foreground, 'disabled-button');
 //   lg: 992px,
 //   xl: 1200px
 // ) !default;
+$grid-breakpoints: (
+  xs: 0,
+  sm: 600px,
+  md: 768px,
+  lg: 960px,
+  xl: 1200px
+) !default;
 // @include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
 // @include _assert-starts-at-zero($grid-breakpoints);
 
@@ -224,6 +231,12 @@ $inverse-color: map_get($md-light-theme-foreground, 'disabled-button');
 //   lg: 960px,
 //   xl: 1140px
 // ) !default;
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 900px,
+  xl: 1140px
+) !default;
 // @include _assert-ascending($container-max-widths, "$container-max-widths");
 
 
@@ -290,13 +303,13 @@ $headings-font-family:   inherit;
 
 // $small-font-size: 80% !default;
 
-$text-muted: map_get($md-light-theme-foreground, 'secondary-text');
+$text-muted: map_get($mat-light-theme-foreground, 'secondary-text');
 
 // $abbr-border-color: $gray-light !default;
 
-$blockquote-small-color:  map_get($md-light-theme-foreground, 'secondary-text');
+$blockquote-small-color:  map_get($mat-light-theme-foreground, 'secondary-text');
 // $blockquote-font-size:    ($font-size-base * 1.25) !default;
-$blockquote-border-color: map_get($md-light-theme-foreground, 'dividers');
+$blockquote-border-color: map_get($mat-light-theme-foreground, 'dividers');
 // $blockquote-border-width: .25rem !default;
 
 // $hr-border-color: rgba($black,.1) !default;
@@ -323,8 +336,8 @@ $blockquote-border-color: map_get($md-light-theme-foreground, 'dividers');
 // $border-radius-lg:       .3rem !default;
 // $border-radius-sm:       .2rem !default;
 
-$component-active-color: md-color($light-primary, 'default-contrast', 1);
-$component-active-bg:    md-color($light-primary, 'default', 1);
+$component-active-color: mat-color($light-primary, 'default-contrast', 1);
+$component-active-bg:    mat-color($light-primary, 'default', 1);
 
 // $caret-width:            .3em !default;
 
@@ -350,10 +363,10 @@ $component-active-bg:    md-color($light-primary, 'default', 1);
 // $table-bg-active:               $table-bg-hover !default;
 
 // $table-head-bg:                 $gray-lighter !default;
-$table-head-color:              map_get($md-light-theme-foreground, 'secondary-text');
+$table-head-color:              map_get($mat-light-theme-foreground, 'secondary-text');
 
 // $table-border-width:            $border-width !default;
-$table-border-color:            map_get($md-light-theme-foreground, 'dividers');
+$table-border-color:            map_get($mat-light-theme-foreground, 'dividers');
 
 
 // Buttons
@@ -368,17 +381,17 @@ $table-border-color:            map_get($md-light-theme-foreground, 'dividers');
 // $btn-focus-box-shadow:           0 0 0 2px rgba($brand-primary, .25) !default;
 // $btn-active-box-shadow:          inset 0 3px 5px rgba($black,.125) !default;
 
-$btn-primary-color:              md_color($light-primary, 'default-contrast', 1);
+$btn-primary-color:              mat-color($light-primary, 'default-contrast', 1);
 // $btn-primary-bg:                 $brand-primary !default;
-$btn-primary-border:             md_color($light-primary, 'darker', 1);
+$btn-primary-border:             mat-color($light-primary, 'darker', 1);
 
-$btn-secondary-color:            map_get($md-light-theme-foreground, 'text');
+$btn-secondary-color:            map_get($mat-light-theme-foreground, 'text');
 // $btn-secondary-bg:               $white !default;
-$btn-secondary-border:           map_get($md-light-theme-foreground, 'dividers');
+$btn-secondary-border:           map_get($mat-light-theme-foreground, 'dividers');
 
-$btn-info-color:                 md_color($light-accent, 'default-contrast', 1);
+$btn-info-color:                 mat-color($light-accent, 'default-contrast', 1);
 // $btn-info-bg:                    $brand-info !default;
-$btn-info-border:                md_color($light-accent, 'darker', 1);
+$btn-info-border:                mat-color($light-accent, 'darker', 1);
 
 // $btn-success-color:              $white !default;
 // $btn-success-bg:                 $brand-success !default;
@@ -388,11 +401,11 @@ $btn-info-border:                md_color($light-accent, 'darker', 1);
 // $btn-warning-bg:                 $brand-warning !default;
 // $btn-warning-border:             $btn-warning-bg !default;
 
-$btn-danger-color:               md_color($warn, 'default-contrast', 1);
-$btn-danger-bg:                  md_color($warn, 'default', 1);
-$btn-danger-border:              md_color($warn, 'darker', 1);
+$btn-danger-color:               mat-color($warn, 'default-contrast', 1);
+$btn-danger-bg:                  mat-color($warn, 'default', 1);
+$btn-danger-border:              mat-color($warn, 'darker', 1);
 
-$btn-link-disabled-color:        map_get($md-light-theme-foreground, 'disabled button');
+$btn-link-disabled-color:        map_get($mat-light-theme-foreground, 'disabled button');
 
 // $btn-padding-x-sm:               .5rem !default;
 // $btn-padding-y-sm:               .25rem !default;
@@ -417,11 +430,11 @@ $btn-link-disabled-color:        map_get($md-light-theme-foreground, 'disabled b
 // $input-padding-y:                .5rem !default;
 // $input-line-height:              1.25 !default;
 
-$input-bg:                       map_get($md-light-theme-background, 'background');
-$input-bg-disabled:              map_get($md-light-theme-background, 'disabled');
+$input-bg:                       map_get($mat-light-theme-background, 'background');
+$input-bg-disabled:              map_get($mat-light-theme-background, 'disabled');
 
-$input-color:                    map_get($md-light-theme-foreground, 'secondary-text');
-$input-border-color:             map_get($md-light-theme-foreground, 'dividers');
+$input-color:                    map_get($mat-light-theme-foreground, 'secondary-text');
+$input-border-color:             map_get($mat-light-theme-foreground, 'dividers');
 // $input-btn-border-width:         $border-width !default; // For form controls and buttons
 // $input-box-shadow:               inset 0 1px 1px rgba($black,.075) !default;
 
@@ -434,7 +447,7 @@ $input-border-color:             map_get($md-light-theme-foreground, 'dividers')
 // $input-box-shadow-focus:         $input-box-shadow, rgba($input-border-focus, .6) !default;
 // $input-color-focus:              $input-color !default;
 
-$input-color-placeholder:        map_get($md-light-theme-foreground, 'hint-text');
+$input-color-placeholder:        map_get($mat-light-theme-foreground, 'hint-text');
 
 // $input-padding-x-sm:             .5rem !default;
 // $input-padding-y-sm:             .25rem !default;
@@ -688,21 +701,21 @@ $input-color-placeholder:        map_get($md-light-theme-foreground, 'hint-text'
 //
 // Define colors for form feedback states and, by default, alerts.
 
-$state-success-text:             map_get($md-light-green, 900);
-$state-success-bg:               md-contrast($md-light-green, 900);
+$state-success-text:             map_get($mat-light-green, 900);
+$state-success-bg:               mat-contrast($mat-light-green, 900);
 //$state-success-border:           darken($state-success-bg, 5%) !default;
 
-$state-info-text:                map_get($md-blue, 800);
-$state-info-bg:                  md-contrast($md-blue, 800);
+$state-info-text:                map_get($mat-blue, 800);
+$state-info-bg:                  mat-contrast($mat-blue, 800);
 //$state-info-border:              darken($state-info-bg, 7%) !default;
 
-$state-warning-text:             map_get($md-lime, 900);
-$state-warning-bg:               md-contrast($md-lime, 900);
+$state-warning-text:             map_get($mat-lime, 900);
+$state-warning-bg:               mat-contrast($mat-lime, 900);
 $mark-bg:                        $state-warning-bg !default;
 //$state-warning-border:           darken($state-warning-bg, 5%) !default;
 
-$state-danger-text:              map_get($md-deep-orange, 900);
-$state-danger-bg:                md-contrast($md-deep-orange, 900);
+$state-danger-text:              map_get($mat-deep-orange, 900);
+$state-danger-bg:                mat-contrast($mat-deep-orange, 900);
 //$state-danger-border:            darken($state-danger-bg, 5%) !default;
 
 
@@ -712,10 +725,10 @@ $state-danger-bg:                md-contrast($md-deep-orange, 900);
 // $card-spacer-y:            .75rem !default;
 // $card-border-width:        1px !default;
 // $card-border-radius:       $border-radius !default;
-$card-border-color:        map_get($md-light-theme-foreground, 'dividers');
+$card-border-color:        map_get($mat-light-theme-foreground, 'dividers');
 // $card-border-radius-inner: calc(#{$card-border-radius} - #{$card-border-width}) !default;
 // $card-cap-bg:              $gray-lightest !default;
-$card-bg:                  map_get($md-light-theme-background, 'card');
+$card-bg:                  map_get($mat-light-theme-background, 'card');
 
 // $card-link-hover-color:    $white !default;
 
@@ -731,8 +744,8 @@ $card-bg:                  map_get($md-light-theme-background, 'card');
 // Tooltips
 
 // $tooltip-max-width:           200px !default;
-$tooltip-color:               md-color($light-accent, 'darker-contrast', 1);
-$tooltip-bg:                  md-color($light-accent, 'darker', 1);
+$tooltip-color:               mat-color($light-accent, 'darker-contrast', 1);
+$tooltip-bg:                  mat-color($light-accent, 'darker', 1);
 // $tooltip-opacity:             .9 !default;
 // $tooltip-padding-y:           3px !default;
 // $tooltip-padding-x:           8px !default;
@@ -745,10 +758,10 @@ $tooltip-bg:                  md-color($light-accent, 'darker', 1);
 // Popovers
 
 // $popover-inner-padding:               1px !default;
-$popover-bg:                          map_get($md-light-theme-background, 'dialog');
+$popover-bg:                          map_get($mat-light-theme-background, 'dialog');
 // $popover-max-width:                   276px !default;
 // $popover-border-width:                $border-width !default;
-$popover-border-color:                map_get($md-light-theme-foreground, 'dividers');
+$popover-border-color:                map_get($mat-light-theme-foreground, 'dividers');
 // $popover-box-shadow:                  0 5px 10px rgba($black,.2) !default;
 
 // $popover-title-bg:                    darken($popover-bg, 3%) !default;
@@ -860,8 +873,8 @@ $popover-border-color:                map_get($md-light-theme-foreground, 'divid
 // List group
 
 // $list-group-color:               $body-color !default;
-$list-group-bg:                  map_get($md-light-theme-background, 'background');
-$list-group-border-color:        map_get($md-light-theme-foreground, 'dividers');
+$list-group-bg:                  map_get($mat-light-theme-background, 'background');
+$list-group-border-color:        map_get($mat-light-theme-foreground, 'dividers');
 // $list-group-border-width:        $border-width !default;
 // $list-group-border-radius:       $border-radius !default;
 
@@ -891,7 +904,7 @@ $list-group-border-color:        map_get($md-light-theme-foreground, 'dividers')
 // $thumbnail-padding:           .25rem !default;
 // $thumbnail-bg:                $body-bg !default;
 // $thumbnail-border-width:      $border-width !default;
-$thumbnail-border-color:      map_get($md-light-theme-foreground, 'dividers');
+$thumbnail-border-color:      map_get($mat-light-theme-foreground, 'dividers');
 // $thumbnail-border-radius:     $border-radius !default;
 // $thumbnail-box-shadow:        0 1px 2px rgba($black,.075) !default;
 // $thumbnail-transition:        all .2s ease-in-out !default;
@@ -900,7 +913,7 @@ $thumbnail-border-color:      map_get($md-light-theme-foreground, 'dividers');
 // Figures
 
 // $figure-caption-font-size: 90% !default;
-$figure-caption-color:     map_get($md-light-theme-foreground, 'secondary-text');
+$figure-caption-color:     map_get($mat-light-theme-foreground, 'secondary-text');
 
 
 // Breadcrumbs

@@ -1,66 +1,58 @@
 //@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700i');
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500&amp;subset=latin-ext');
-@import 'ng-material/app.toolbar';
+@import "ng-material/app.toolbar";
 
-html, body{
-  height: 100%;
-  overflow: hidden;
+html, body {
+  height: 100vh;
+  overflow-y: hidden;
+  width: 100vw;
+  overflow-x: hidden;
   // font-family: Arial, Helvetica, sans-serif
   // font-family: 'Anonymous Pro', monospace;
 }
 
-.screen-container {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-start;
-  justify-content: flex-start;
+div {
+  overflow-x: inherit;
+  overflow-y: inherit;
 }
 
-.scroll-container {
-  display: inline-flex;
-  flex-flow: column nowrap;
-  height: 100vh;
-  // width: 49vw;
-  overflow-y: hidden
+div.flex-spacer, span.flex-spacer {
+  flex: 1 1 auto;
 }
 
-.scrollable {
-  display: block;
-  height: 100vh;
-  flex: 1 1 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+.mat-toolbar span.brand-name {
+  font-size: 1.5rem !important;
+  padding-left: 10px !important;
+  margin-bottom: 0px !important;
 }
 
-.side-panel-container {
-  width: 300px;
+.mat-toolbar + .mat-dialog-content {
+  margin: 0px -2px 0px -2px !important;
+  padding: 2px 2px 24px 2px !important;
+  border: 2px !important;
 }
 
-.main-panel-container {
-  width: 100%;
+.mat-dialog-container {
+  padding: 0px 0px 24px 0px !important;
 }
 
-footer {
-  background-color: #f0f0f0;
+md-toolbar-row > span.mat-dialog-title {
+  font-size: 1.25rem;
+  margin-bottom: 0px !important;
 }
 
-span.brand-name {
-  font-size: 24px;
-  padding-left: 10px;
+.mat-dialog-content > input {
+  display:block !important;
 }
 
-md-dialog-content > input {
-  display:block;
-}
-
-md-dialog-actions {
+.mat-dialog-actions {
   & > button, & > a {
-    margin-left: 10px;
+    margin-left: 10px !important;
   }
 }
 
-html, body {
-  height: 100%;
+.mat-toolbar-row > button.mat-mini-fab, .mat-toolbar-row > button.mat-raised-button {
+  margin: 0px 4px !important;
 }
 
 .overlay{
@@ -69,6 +61,7 @@ html, body {
   left: 0px;
   right: 0px;
   bottom: 0px;
+  overflow: hidden;
   background-color: rgba(0, 0, 0, 0.8);
 
   .overlay-content {

@@ -24,8 +24,8 @@ import {DurableCanvasService} from "./app/shared/canvas-cache/durable-canvas.ser
 
 // import "@angular/material/core/theming/prebuilt/purple-green";
 require("./assets/css/app.scss");
-require("./assets/css/ng-material/app.theme.scss");
 require("./assets/css/bootstrap/bootstrap.scss");
+require("./assets/css/ng-material/app.theme.scss");
 
 /*
 function onConnectToNet(index, id) {

@@ -3,11 +3,11 @@
 @import '~@angular/material/core/theming/all-theme';
 @import 'app.palette';
 
-@include md-core();
+@include mat-core();
 
-$light-theme: md-light-theme($light-primary, $light-accent, $warn);
-$control-theme: md-dark-theme($control-primary, $control-accent, $warn);
-$dark-theme: md-dark-theme($dark-primary, $dark-accent, $warn);
+$light-theme: mat-light-theme($light-primary, $light-accent, $warn);
+$control-theme: mat-dark-theme($control-primary, $control-accent, $warn);
+$dark-theme: mat-dark-theme($dark-primary, $dark-accent, $warn);
 
 @include angular-material-theme($light-theme);
 
@@ -19,4 +19,4 @@ $dark-theme: md-dark-theme($dark-primary, $dark-accent, $warn);
   @include angular-material-theme($control-theme);
 }
 
-@include md-toolbar-theme($control-theme)
+//@include mat-toolbar-theme($control-theme)

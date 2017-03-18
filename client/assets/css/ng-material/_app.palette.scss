@@ -1,17 +1,17 @@
 @import '~@angular/material/core/theming/palette';
 @import '~@angular/material/core/theming/theming';
 
-$warn:          md-palette($md-red);
+$warn:          mat-palette($mat-red);
 
-$light-primary: md-palette($md-teal, 500, 300, 700);
-$light-accent:  md-palette($md-amber, A700, 400, 800);
-$light-warn:    $warn;
+$control-primary: mat-palette($mat-light-blue, 700, 500, 900);
+$control-accent:  mat-palette($mat-amber, A700, 400, 800);
+$control-warn:    $warn;
 
-$dark-primary:  md-palette($md-pink);
-$dark-accent:   md-palette($md-yellow, A200, 300, 700);
+$dark-primary:  mat-palette($mat-pink);
+$dark-accent:   mat-palette($mat-yellow, A200, 300, 700);
 $dark-warn:     $warn;
 
-$control-primary: md-palette($md-light-blue, 700, 500, 900);
-$control-accent:  md-palette($md-pink, 400, 300, 600);
-$control-warn:    $warn;
+$light-primary: mat-palette($mat-cyan, A700, 400, 800);
+$light-accent:  mat-palette($mat-pink, 400, 300, 600);
+$light-warn:    $warn;
 
