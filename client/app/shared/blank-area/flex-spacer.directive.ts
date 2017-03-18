@@ -1,10 +1,11 @@
-import {Component, Directive} from '@angular/core';
+import {Directive} from "@angular/core";
 
 @Directive({
-  selector: '[blank-area]',
+  // moduleId: "client/app/shared/blank-area/flex-spacer.directive",
+  selector: "[flex-spacer]",
   host:{
-    '[class.flex-fill]': 'true'
+    "[class.flex-spacer]": "true"
   }
 })
-export class BlankAreaDirective {
+export class FlexSpacerDirective {
 }

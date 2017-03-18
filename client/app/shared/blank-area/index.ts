@@ -1,1 +1,1 @@
-export * from './blank-area.component';
+export * from './flex-spacer.directive';
