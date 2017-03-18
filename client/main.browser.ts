@@ -18,8 +18,7 @@ import * as _ from "lodash";
  * our top level module that holds all of our components
  */
 import {AppModule} from "./app";
-import {HttpModule} from "@angular/http"
-import {NgModule, NgModuleRef} from "@angular/core";
+import {NgModuleRef} from "@angular/core";
 import {DurableCanvasService} from "./app/shared/canvas-cache/durable-canvas.service";
 
 // import "@angular/material/core/theming/prebuilt/purple-green";
@@ -110,9 +109,9 @@ export function main(): Promise<any> {
     .then(decorateModuleRef)
     .then((rootModule: NgModuleRef<AppModule>) => {
       let injector = rootModule.injector;
-      let canvasCache = injector.get(DurableCanvasService);
-      let canvasCacheDOM = document.getElementById('canvas-store');
-      canvasCache._bootstrapPortalHost(canvasCacheDOM);
+      // let canvasCache = injector.get(DurableCanvasService);
+      // let canvasCacheDOM = document.getElementById('canvas-store');
+      // canvasCache._bootstrapPortalHost(canvasCacheDOM);
     })
     .catch(err => console.error(err));
 }
