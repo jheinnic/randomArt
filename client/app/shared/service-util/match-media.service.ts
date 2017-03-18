@@ -36,32 +36,32 @@ export class MatchMediaService
   /**********************************************
    METHODS FOR CHECKING TYPE
    **********************************************/
-  IsPhone()
+  isPhone()
   {
     return window.matchMedia(this.rules.phone).matches;
   };
 
-  IsTablet = function ()
+  isTablet()
   {
     return window.matchMedia(this.rules.tablet).matches;
   };
 
-  IsDesktop = function ()
+  isDesktop()
   {
     return window.matchMedia(this.rules.desktop).matches;
   };
 
-  IsPortrait = function ()
+  isPortrait()
   {
     return window.matchMedia(this.rules.portrait).matches;
   };
 
-  IsLandscape = function ()
+  isLandscape()
   {
     return window.matchMedia(this.rules.landscape).matches;
   };
 
-  IsRetina = function ()
+  isRetina()
   {
     return window.matchMedia(this.rules.retina).matches;
   };
@@ -70,7 +70,7 @@ export class MatchMediaService
   /**********************************************
    EVENT LISTENERS BY TYPE
    **********************************************/
-  OnPhone(callBack)
+  onPhone(callBack)
   {
     if (typeof callBack === 'function')
     {
@@ -86,7 +86,7 @@ export class MatchMediaService
     }
   };
 
-  OnTablet(callBack)
+  onTablet(callBack)
   {
     if (typeof callBack === 'function')
     {
@@ -102,7 +102,7 @@ export class MatchMediaService
     }
   };
 
-  OnDesktop(callBack)
+  onDesktop(callBack)
   {
     if (typeof callBack === 'function')
     {
@@ -118,7 +118,7 @@ export class MatchMediaService
     }
   };
 
-  OnPortrait(callBack)
+  onPortrait(callBack)
   {
     if (typeof callBack === 'function')
     {
@@ -134,7 +134,7 @@ export class MatchMediaService
     }
   };
 
-  OnLandscape(callBack)
+  onLandscape(callBack)
   {
     if (typeof callBack === 'function')
     {
