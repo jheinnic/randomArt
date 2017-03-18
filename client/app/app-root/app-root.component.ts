@@ -1,4 +1,6 @@
-import {Component, OnInit, AfterViewInit, QueryList} from "@angular/core";
+import {
+  Component, OnInit, AfterViewInit, QueryList, OnDestroy, ViewChildren, ViewChild
+} from "@angular/core";
 import {NavbarDataService} from "./navbar-data.service";
 import {NavbarDataModelBuilder, NavbarData} from "./navbar-data.datamodel";
 import {Subscription, Observable} from "rxjs";
@@ -8,27 +10,44 @@ import {MdSidenav} from "@angular/material";
 import {GlobalSelection} from "../shared/component-util/global-selection.service";
 
 @Component({
+  moduleId: "client/app/app-root/app-root.component",
   selector: "app-root",
   template: require("./_app-root.view.html"),
   providers: [GlobalSelection]
   // providers: [NavbarDataResolver, NavbarDataService]
 })
-export class AppRootComponent implements OnInit, AfterViewInit
+export class AppRootComponent implements OnInit, OnDestroy, AfterViewInit
 {
   // @ViewChild("#sidenav") sideNav: MdSidenav|any = {
   // open: false,
   // closed: true,
   // isSideNavOpen: () => { return false; }
   // }
-  private sideNav: QueryList<MdSidenav>;
-  private sideNavElem: MdSidenav;
 
-  private subscription: Subscription;
+  @ViewChild(MdSidenav) private sideNavElem: MdSidenav;
   private navbarData: NavbarData;
+  private subscription: Subscription;
 
-  constructor(private navbarDataService: NavbarDataService) {
+  constructor(private readonly navbarDataService: NavbarDataService) {
     LoopBackConfig.setBaseURL(BASE_URL);
     LoopBackConfig.setApiVersion(API_VERSION);
+
+    this.subscription = this.navbarDataService.navbarData.subscribe(
+      (data: NavbarData) => {
+        if (data) {
+          this.navbarData = data;
+          if (this.sideNavElem) {
+            if (data.sidenavOpen === true) {
+              this.sideNavElem.open();
+            } else {
+              this.sideNavElem.close();
+            }
+          } else {
+            console.warn('no visible sidenav controlers due to no internet')
+          }
+        }
+      }
+    );
   }
 
   ngOnInit() {
@@ -51,39 +70,23 @@ export class AppRootComponent implements OnInit, AfterViewInit
             .iconName('event')
             .orderRank(3)
         })
-        .addTab('Create', '/images', false)
+        .addTab('Create', '/pools', false)
         .addTab('Explore', '/scroll', false)
         .addTab('Inspect', '/pointMaps', false)
         .addTab('Manage', '/home', false)
-        .addTab('Assess', '/lobby', false)
+        .addTab('Assess', '/pools/1/images', false)
     });
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   ngAfterViewInit() {
-    let sideNavElem
-    if (this.sideNav) {
-      const sideNavArray: MdSidenav[] = this.sideNav.toArray();
-      if (sideNavArray.length > 0) {
-        let navbarData:Observable<NavbarData> =
-          this.navbarDataService.navbarData;
-        this.sideNavElem = sideNavArray[0];
-        this.subscription = navbarData.subscribe(
-          (data: NavbarData) => {
-            if (data) {
-              this.navbarData = data;
-              if (sideNavElem) {
-                if (data.sidenavOpen === true) {
-                  sideNavElem.open();
-                } else {
-                  sideNavElem.close();
-                }
-              } else {
-                console.warn('no visible sidenav controlers due to no internet')
-              }
-            }
-          }
-        );
-      }
+    // TODO
+    if (this.sideNavElem) {
+      let navbarData:Observable<NavbarData> =
+        this.navbarDataService.navbarData;
     }
   }
 
@@ -104,6 +107,6 @@ export class AppRootComponent implements OnInit, AfterViewInit
   }
 
   public isSideNavOpen() {
-    return this.sideNav && this.sideNavElem && this.sideNavElem.opened;
+    return (!!this.sideNavElem && this.sideNavElem.opened);
   }
 }

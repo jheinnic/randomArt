@@ -1,41 +1,41 @@
 <div class="fixed-top" style="opacity:75%;" (mouseover)="showNav = true" (mouseout)="showNav = false">
-  <md-toolbar class="md-primary justify-content-start flex-align-center">
-    <button md-mini-fab [mdMenuTriggerFor]="appMenu" class="md-accent" mdTooltip="Tooltip!" mdTooltipPosition="below">
+  <md-toolbar class="control-theme mat-primary justify-content-start flex-align-center">
+    <button mdMiniFab [mdMenuTriggerFor]="appMenu" class="mat-accent" mdTooltip="Tooltip!" mdTooltipPosition="below">
       <md-icon>menu</md-icon>
     </button>
     <span class="brand-name">{{navbarData.brandName}}</span>
-    <button *ngIf="isLoggedIn()" md-mini-fab class="md-accent ml-auto" (click)="onClickSettings()">
+    <button *ngIf="isLoggedIn()" mdMiniFab class="mat-accent ml-auto" (click)="onClickSettings()">
       <md-icon>settings</md-icon>
     </button>
     <span *ngIf="isLoggedIn()" class="ml-1">Hello, {{userInfo?.username}}</span>
-    <button *ngIf="!isLoggedIn()" md-raised-button class="md-accent ml-auto" (click)="onClickRegister()">
+    <button *ngIf="!isLoggedIn()" mdRaisedButton class="mat-accent ml-auto" (click)="onClickRegister()">
       <span mdTooltip="Tooltip!" mdTooltipPosition="below">REGISTER</span>
     </button>
-    <button *ngIf="!isLoggedIn()" md-mini-fab class="md-accent ml-1" (click)="onClickLogin()" mdTooltip="Tooltip!" mdTooltipPosition="left">
+    <button *ngIf="!isLoggedIn()" mdMiniFab class="mat-accent ml-1" (click)="onClickLogin()" mdTooltip="Tooltip!"
+            mdTooltipPosition="left">
       <md-icon>cloud_off</md-icon>
     </button>
   </md-toolbar>
   <div [ngbCollapse]="showNav" [ngClass]="{show: showNav}">
-    <nav md-tab-nav-bar class="md-primary">
-      <a *ngFor="let tabData of navbarData.tabs" md-tab-link
+    <nav mdTabNavBar class="mat-primary">
+      <a *ngFor="let tabData of navbarData.tabs" mdTabLink
          [routerLink]="[tabData.routerLink]" routerLinkActive #rla="routerLinkActive"
-         [active]="(!rlaSafe && tabData.isDefault) || (rlaSafe && rla.isActive)"
+         [active]="(rlaSafe && tabData.isDefault) || (rlaSafe && rla.isActive)"
          mdTooltip="Tooltip!" mdTooltipPosition="below">{{tabData.displayName}}</a>
+      <!-- [active]="(!rlaSafe && tabData.isDefault) || (rlaSafe && rla.isActive)"
+         mdTooltip="Tooltip!" mdTooltipPosition="below">{{tabData.displayName}}</a-->
     </nav>
   </div>
   <md-menu #appMenu="mdMenu">
-    <button *ngFor="let menuData of navbarData.menuItems" md-menu-item [disabled]="menuData.disabled"
-            [routerLink]="menuData.routerLink">
-      <md-icon *ngIf="menuData.iconName > ''">{{menuData.iconName}}</md-icon>
-      <span mdTooltip="Tooltip!" mdTooltipPosition="after">{{menuData.displayName}}</span>
+    <button *ngFor="let menuData of navbarData.menuItems" mdMenuItem="mdMenu" [disabled]="menuData.disabled"
+            [routerLink]="menuData.routerLink" mdTooltip="Tooltip!" mdTooltipPosition="after">
+      <span><md-icon *ngIf="menuData.iconName > ''">{{menuData.iconName}}</md-icon>{{menuData.displayName}}</span>
     </button>
-    <button md-menu-item disabled mdTooltip="Tooltip!" mdTooltipPosition="after">
-      <md-icon>settings</md-icon>
-      <span>>Settings</span>
+    <button mdMenuItem="mdMenu" disabled="true" mdTooltip="Tooltip!" mdTooltipPosition="after">
+      <span><md-icon>settings</md-icon>Settings</span>
     </button>
-    <button md-menu-item disabled>
-      <md-icon mdTooltip="Tooltip!" mdTooltipPosition="below">help</md-icon>
-      <span>Help</span>
+    <button mdMenuItem="mdMenu" disabled="true" mdTooltip="Tooltip!" mdTooltipPosition="below">
+      <span><md-icon>help</md-icon>Help</span>
     </button>
   </md-menu>
 </div>

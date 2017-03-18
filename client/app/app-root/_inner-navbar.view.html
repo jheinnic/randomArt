@@ -1,6 +1,5 @@
 <nav md-tab-nav-bar class="md-primary">
   <a *ngFor="let tabData of navbarData.tabs" md-tab-link
-     routerLink="{{tabData.routerLink}}" routerLinkActive
-     #rla="routerLinkActive" [active]="rlaSafe && rla.isActive"
+     routerLink="{{tabData.routerLink}}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive"
      mdTooltip="{{rlaSafe && rla.isActive}}!" mdTooltipPosition="below">{{tabData.displayName}}</a>
 </nav>

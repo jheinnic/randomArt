@@ -17,6 +17,9 @@ const NO_USER_INFO: UserInterface = {
 @Component({
   moduleId   : path.relative(__dirname, __filename),
   selector   : 'top-toolbar',
+  host: {
+    '[class.control-theme]': 'true'
+  },
   templateUrl: './_top-toolbar.view.html',
 })
 export class TopToolbarComponent implements OnDestroy

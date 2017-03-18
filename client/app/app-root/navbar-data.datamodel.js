@@ -1,98 +1,130 @@
 "use strict";
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 var builder = require("fluent-interface-builder");
-var Immutable = require("immutable");
 var datamodel_ts_1 = require("../../../common/lib/datamodel-ts");
-var index_1 = require("../../../common/lib/datamodel-ts/index");
+var Immutable = require("immutable");
+var _ = require("lodash");
 //
 // Generic Helper Methods
 //
-// const unwrapHelper = <T>(): (T)=>T => { return _.identity; };
-// interface NoArgConstructor<T>
-// { new (): T;
-// }
-//
-// // Marker interface for any collection of methods that provide construction semantics
-// // for an immutable data model object.
-// interface ModelBuilder<T, M extends ModelBuilder<T, M>>
-// {
-// }
-// ;
-//
-// // Marker interface that augments a collection of methods that provide construction
-// // semantics with an additional method to perform the described construction.
-// interface Wrapper<T, M extends ModelBuilder<T,M>> extends ModelBuilder<T,M>
-// {
-//   unwrap(): T;
-// }
-//
-// // Named signature for a method that takes a ModelBuilder and uses it to define how a
-// // desired object is to be constructed.
-// type Director<T, M extends ModelBuilder<T, M>> = (builder: ModelBuilder<T,M>) => void;
-//
-// // Named signature for a method that takes a Director, calls it with a ModelBuilder
-// // matching its signature requirements, and uses the work the Director does on that
-// // ModelBuilder to return an instance of what the Director described to caller.
-// type BuildMethod<T, M extends ModelBuilder<T, M>> = (director: Director<T, M>) => T;
-//
-// function unwrapHelper<T>(): (T) => T { return _.identity; }
-//
-// // Helper function that implements the recurring pattern of creating a builder method
-// function buildMethodFactory<T,M extends ModelBuilder<T,M>, W extends Wrapper<T,M>>(
-//   wrapperBuilder: Builder<W,T>, ctor: NoArgConstructor<T>
-// ): BuildMethod<T,M> {
-//   return (director: Director<T, M>): T => {
-//     let wrapper: W = wrapperBuilder.value(new ctor());
-//     director(wrapper);
-//     return wrapper.unwrap();
-//   };
-// }
 //
 // Wrapper Implementations
 //
 var wrapNavbarData = builder.build()
     .chain('brandName', function (brandName) { return function (context) {
-    return Object.assign(new NavbarData(), context, { brandName: brandName });
+    return new NavbarData(context, { brandName: brandName });
 }; })
-    .chain('addTab', function (displayName, routerLink) { return function (context) {
-    return Object.assign(new NavbarData(), context, {
-        tabs: context.tabs.push(Object.assign(new NavbarTabData(), {
-            displayName: displayName, routerLink: routerLink
-        }))
+    .chain('openSidenav', function () { return function (context) {
+    return new NavbarData(context, { sidenavOpen: true });
+}; })
+    .chain('closeSidenav', function () { return function (context) {
+    return new NavbarData(context, { sidenavOpen: false });
+}; })
+    .chain('toggleSidenav', function () { return function (context) {
+    return new NavbarData(context, { sidenavOpen: !context.sidenavOpen });
+}; })
+    .chain('addTab', function (displayName, routerLink, isDefault) {
+    if (isDefault === void 0) { isDefault = false; }
+    return function (context) {
+        var tabs = context.tabs;
+        if (isDefault) {
+            var oldDefault = tabs.findEntry(function (val) { return val.isDefault; });
+            if (!_.isUndefined(oldDefault)) {
+                tabs = tabs.set(oldDefault[0], new NavbarTabData(oldDefault[1], { isDefault: false }));
+            }
+        }
+        var entry = tabs.findEntry(function (val) { return val.displayName === displayName; });
+        if (!_.isUndefined(entry)) {
+            tabs = tabs.set(entry[0], new NavbarTabData(entry[1], {
+                displayName: displayName,
+                routerLink: routerLink,
+                isDefault: isDefault
+            }));
+        }
+        else {
+            tabs = tabs.push(new NavbarTabData(undefined, {
+                displayName: displayName,
+                routerLink: routerLink,
+                isDefault: isDefault
+            }));
+        }
+        return new NavbarData(context, { tabs: tabs });
+    };
+})
+    .chain('resetTabs', function () { return function (context) {
+    return new NavbarData(context, { tabs: Immutable.List() });
+}; })
+    .chain('addMenuNav', function (displayName, director) { return function (context) {
+    var newItem = new MenuNavData(undefined, { displayName: displayName });
+    // TODO: Make sure displayName is unique.
+    return new NavbarData(context, {
+        menuItems: context.menuItems.push(newItem.copy(director))
     });
 }; })
-    .unwrap('unwrap', datamodel_ts_1.unwrapHelper);
+    .chain('editMenuNav', function (displayName, director) { return function (context) {
+    var entry = context.menuItems.findEntry(function (item) {
+        return item.displayName === displayName;
+    });
+    if (!entry) {
+        throw new Error("No such menu item: " + displayName);
+    }
+    return new NavbarData(context, {
+        menuItems: context.menuItems.set(entry[0], entry[1].copy(director))
+    });
+}; })
+    .chain('deleteMenuNav', function (displayName) { return function (context) {
+    return new NavbarData(context, {
+        menuItems: context.menuItems.filter(function (nextItem) {
+            return nextItem.displayName != displayName;
+        }).toList()
+    });
+}; }).unwrap('unwrap', datamodel_ts_1.unwrapHelper);
 var wrapNavbarTabData = builder.build()
     .chain('displayName', function (displayName) { return function (context) {
-    return Object.assign(new NavbarTabData(), { displayName: displayName });
+    return new NavbarTabData(context, { displayName: displayName });
 }; })
     .chain('routerLink', function (routerLink) { return function (context) {
-    return Object.assign(new NavbarTabData(), { routerLink: routerLink });
+    return new NavbarTabData(context, { routerLink: routerLink });
 }; })
     .unwrap('unwrap', datamodel_ts_1.unwrapHelper);
 var wrapNavbarDataTwo = builder.build()
     .chain('brandName', function (brandName) { return function (context) {
-    return Object.assign(new NavbarData(), context, { brandName: brandName });
+    return new NavbarData(context, { brandName: brandName });
 }; })
     .chain('addTab', function (director) { return function (context) {
-    var wrapper = wrapNavbarTabData.value(new NavbarTabData());
-    director(wrapper);
-    return Object.assign(new NavbarData(), context, {
-        tabs: context.tabs.push(wrapper.unwrap())
+    return new NavbarData(context, {
+        tabs: context.tabs.push(NavbarTabData.build(director))
     });
 }; })
     .unwrap('unwrap', datamodel_ts_1.unwrapHelper);
-//
-// Data Models
-//
+var wrapMenuNavData = builder.build()
+    .chain('routerLink', function (routerLink) { return function (context) {
+    return new MenuNavData(context, { routerLink: routerLink });
+}; })
+    .chain('disabled', function (disabled) { return function (context) {
+    return new MenuNavData(context, { disabled: disabled });
+}; })
+    .chain('orderRank', function (orderRank) { return function (context) {
+    return new MenuNavData(context, { orderRank: orderRank });
+}; })
+    .chain('iconName', function (iconName) { return function (context) {
+    return new MenuNavData(context, { iconName: iconName });
+}; })
+    .unwrap('unwrap', datamodel_ts_1.unwrapHelper);
 var NavbarData = (function () {
-    function NavbarData() {
+    function NavbarData(predecessor, data) {
         this.tabs = Immutable.List();
+        this.menuItems = Immutable.List();
+        // static build(director: NavbarDataDirector) {
+        //   let wrapper: NavbarDataWrapper = wrapNavbarData.value(new NavbarData());
+        //   director(wrapper);
+        //   return wrapper.unwrap();
+        // }
+        this.acopy = datamodel_ts_1.copyMethodFactory(wrapNavbarData);
+        Object.assign(this, predecessor || {}, data || {});
     }
-    NavbarData.build = function (director) {
-        var wrapper = wrapNavbarData.value(new NavbarData());
-        director(wrapper);
-        return wrapper.unwrap();
+    NavbarData.prototype.bcopy = function (director) {
+        return datamodel_ts_1.copyMethod(this, wrapNavbarData, director);
     };
     NavbarData.prototype.copy = function (director) {
         var wrapper = wrapNavbarData.value(this);
@@ -101,10 +133,11 @@ var NavbarData = (function () {
     };
     return NavbarData;
 }());
+NavbarData.build = datamodel_ts_1.buildMethodFactory(wrapNavbarData, NavbarData);
 exports.NavbarData = NavbarData;
-NavbarData.build2 = index_1.buildMethodFactory(wrapNavbarData, NavbarData);
 var NavbarTabData = (function () {
-    function NavbarTabData() {
+    function NavbarTabData(predecessor, data) {
+        Object.assign(this, predecessor || {}, data || {});
     }
     NavbarTabData.prototype.copy = function (director) {
         var wrapper = wrapNavbarTabData.value(this);
@@ -113,5 +146,19 @@ var NavbarTabData = (function () {
     };
     return NavbarTabData;
 }());
+NavbarTabData.build = datamodel_ts_1.buildMethodFactory(wrapNavbarTabData, NavbarTabData);
 exports.NavbarTabData = NavbarTabData;
-NavbarTabData.build = index_1.buildMethodFactory(wrapNavbarTabData, NavbarTabData);
+var MenuNavData = (function () {
+    function MenuNavData(predecessor, data) {
+        Object.assign(this, predecessor || {}, data || {});
+    }
+    MenuNavData.prototype.copy = function (director) {
+        var wrapper = wrapMenuNavData.value(this);
+        director(wrapper);
+        return wrapper.unwrap();
+    };
+    return MenuNavData;
+}());
+MenuNavData.build = datamodel_ts_1.buildMethodFactory(wrapMenuNavData, MenuNavData);
+exports.MenuNavData = MenuNavData;
+;

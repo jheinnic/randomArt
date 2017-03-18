@@ -1,37 +1,16 @@
 <top-toolbar></top-toolbar>
-<button md-mini-fab (click)="sidenav.toggle()" style="position: fixed; z-index:3000;">
-  <md-icon>done</md-icon>
-</button>
-<router-outlet name="action" (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
 <md-sidenav-container #sidenav>
-  <inner-navbar></inner-navbar>
   <md-sidenav #sidenav class="control-theme" mode="side" [opened]="isSideNavOpen()">
-    <div class="side-panel-container scroll-container">
-      <!--
-      <div class="toolbar-spacer"></div>
-      -->
-      <div class="scrollable">
-        <router-outlet name="side" (deactivate)="onDeactivate($event)"
-                       (activate)="onActivate($event)"></router-outlet>
-      </div>
-      <div class="footer-spacer"></div>
+    <div class="side-panel-container">
+      <router-outlet name="side" (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
     </div>
   </md-sidenav>
-  <div class="main-panel-container scroll-container">
-    <!--
-    <div class="navbar-scrollable">
-      <router-outlet (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
-    </div>
-    -->
-    <div class="navbar-spacer"></div>
-    <div class="scrollable">
-      <router-outlet (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
-    </div>
-    <div class="footer-spacer"></div>
+  <inner-navbar></inner-navbar>
+  <div class="main-panel-container">
+    <router-outlet (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
+    <router-outlet name="action" (deactivate)="onDeactivate($event)" (activate)="onActivate($event)"></router-outlet>
   </div>
 </md-sidenav-container>
-<div class="fixed-bottom">
-  <footer class="d-flex flex-column align-items-center">
-    <span class="footer-text">&copy; John C. Heinnickel, 2017</span>
-  </footer>
-</div>
+<footer class="absolute-bottom d-flex flex-column align-items-center">
+  <span class="footer-text">&copy; John C. Heinnickel, 2017</span>
+</footer>

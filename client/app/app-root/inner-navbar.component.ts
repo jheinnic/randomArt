@@ -6,7 +6,10 @@ import {Subscription} from "rxjs/Subscription";
 @Component({
   moduleId   : './app/app-root/app-root.component',
   selector   : 'inner-navbar',
-  templateUrl: './_inner-navbar.view.html',
+  host: {
+    '[class.navbar-top]': 'true'
+  },
+  templateUrl: './_inner-navbar.view.html'
 })
 export class InnerNavbarComponent implements AfterViewInit, OnDestroy
 {

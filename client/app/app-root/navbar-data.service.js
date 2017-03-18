@@ -11,16 +11,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var core_1 = require("@angular/core");
 var navbar_data_datamodel_1 = require("./navbar-data.datamodel");
 var ReplaySubject_1 = require("rxjs/ReplaySubject");
-require("rxjs/add/operator/share");
 var NavbarDataService = (function () {
     function NavbarDataService() {
         this.dataModel = new navbar_data_datamodel_1.NavbarData();
         this.dataSubject = new ReplaySubject_1.ReplaySubject(1);
-        this.observableData = this.dataSubject.asObservable();
     }
     Object.defineProperty(NavbarDataService.prototype, "navbarData", {
         get: function () {
-            return this.observableData;
+            return this.dataSubject.asObservable();
         },
         enumerable: true,
         configurable: true

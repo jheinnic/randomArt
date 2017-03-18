@@ -6,6 +6,7 @@ import {
 } from "../../../common/lib/datamodel-ts";
 import Immutable = require('immutable');
 import _ = require('lodash');
+import {Builder} from "fluent-interface-builder";
 
 //
 // Generic Helper Methods
@@ -16,7 +17,7 @@ import _ = require('lodash');
 // Wrapper Implementations
 //
 
-const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
+const wrapNavbarData: Builder<NavbarDataWrapper, NavbarData> = builder.build<NavbarDataWrapper,NavbarData>()
   .chain('brandName', (brandName: string) => (context: NavbarData) => {
     return new NavbarData(context, {brandName: brandName});
   })
@@ -32,20 +33,18 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
   .chain('addTab', (
     displayName: string, routerLink: string, isDefault: boolean = false
   ) => (context: NavbarData) => {
-    let tabs:Immutable.List<NavbarTabData> = context.tabs;
+    let tabs: Immutable.List<NavbarTabData> = context.tabs;
     if (isDefault) {
-      let oldDefault = tabs.findEntry(
-        function (val:NavbarTabData) { return val.isDefault;});
-      if (! _.isUndefined(oldDefault)) {
-        tabs = tabs.set(
-          oldDefault[0],
-          new NavbarTabData(oldDefault[1], {isDefault: false}));
+      let oldDefault = tabs.findEntry(function (val: NavbarTabData) { return val.isDefault;});
+      if (!_.isUndefined(oldDefault)) {
+        tabs = tabs.set(oldDefault[0], new NavbarTabData(oldDefault[1], {isDefault: false}));
       }
     }
 
-    let entry = tabs.findEntry(
-      function (val:NavbarTabData) { return val.displayName === displayName; });
-    if (! _.isUndefined(entry)) {
+    let entry = tabs.findEntry(function (val: NavbarTabData) {
+      return val.displayName === displayName;
+    });
+    if (!_.isUndefined(entry)) {
       tabs = tabs.set(entry[0], new NavbarTabData(entry[1], {
         displayName: displayName,
         routerLink: routerLink,
@@ -73,32 +72,33 @@ const wrapNavbarData = builder.build<NavbarDataWrapper,NavbarData>()
     // TODO: Make sure displayName is unique.
 
     return new NavbarData(context, {
-      menuItems: context.menuItems.push(
-        newItem.copy(director)
-      )
+      menuItems: context.menuItems.push(newItem.copy(director))
     });
   })
   .chain('editMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    let entry = context.menuItems.findEntry((item:MenuNavData) => {
+    let entry = context.menuItems.findEntry((item: MenuNavData) => {
       return item.displayName === displayName
     });
 
-    if (!entry) { throw new Error("No such menu item: " + displayName); }
+    if (!entry) {
+      throw new Error("No such menu item: " + displayName);
+    }
 
     return new NavbarData(context, {
-      menuItems: context.menuItems.set(
-        entry[0], entry[1].copy(director))
+      menuItems: context.menuItems.set(entry[0], entry[1].copy(director))
     });
   })
   .chain('deleteMenuNav', (displayName: string) => (context: NavbarData) => {
     return new NavbarData(context, {
-      menuItems: context.menuItems.filter( function(nextItem:MenuNavData) {
+      menuItems: context.menuItems.filter(function (nextItem: MenuNavData) {
         return nextItem.displayName != displayName;
-      }).toList()
+      })
+        .toList()
     });
-  }).unwrap('unwrap', unwrapHelper);
+  })
+  .unwrap('unwrap', unwrapHelper);
 
 
 const wrapNavbarTabData = builder.build<NavbarTabDataWrapper,NavbarTabData>()
@@ -166,9 +166,9 @@ export class NavbarData
 
   acopy: CopyMethod<NavbarData, NavbarDataModelBuilder> = copyMethodFactory(wrapNavbarData);
 
-  bcopy(director: NavbarDataDirector): NavbarData {
-    return copyMethod(this, wrapNavbarData, director);
-  }
+  // bcopy(director: NavbarDataDirector): NavbarData {
+  //   return copyMethod(this, wrapNavbarData, director);
+  // }
 
   copy(director: NavbarDataDirector) {
     let wrapper: NavbarDataWrapper = wrapNavbarData.value(this);

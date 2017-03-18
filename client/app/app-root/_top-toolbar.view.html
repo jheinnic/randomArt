@@ -1,35 +1,39 @@
-<div class="fixed-top">
-  <md-toolbar class="md-primary justify-content-start flex-align-center">
-    <button md-mini-fab [mdMenuTriggerFor]="appMenu" class="md-accent" mdTooltip="Tooltip!" mdTooltipPosition="below">
-      <md-icon>menu</md-icon>
-    </button>
-    <span class="brand-name">{{navbarData.brandName}}</span>
-    <button *ngIf="isLoggedIn()" md-mini-fab class="md-accent ml-auto" (click)="onClickSettings()">
-      <md-icon>settings</md-icon>
-    </button>
-    <span *ngIf="isLoggedIn()" class="ml-1">Hello, {{userInfo?.username}}</span>
-    <button *ngIf="!isLoggedIn()" md-raised-button class="md-accent ml-auto" (click)="onClickRegister()">
-      <span mdTooltip="Tooltip!" mdTooltipPosition="below">REGISTER</span>
-    </button>
-    <button *ngIf="!isLoggedIn()" md-mini-fab class="md-accent ml-1" (click)="onClickLogin()" mdTooltip="Tooltip!"
-            mdTooltipPosition="left">
-      <md-icon>cloud_off</md-icon>
-    </button>
-  </md-toolbar>
-  <md-menu #appMenu="mdMenu">
-    <button *ngFor="let menuData of navbarData.menuItems" md-menu-item [disabled]="menuData.disabled"
-            [routerLink]="menuData.routerLink">
-      <md-icon *ngIf="menuData.iconName > ''">{{menuData.iconName}}</md-icon>
-      <span mdTooltip="Tooltip!" mdTooltipPosition="after">{{menuData.displayName}}</span>
-    </button>
-    <button md-menu-item disabled mdTooltip="Tooltip!" mdTooltipPosition="after">
-      <md-icon>settings</md-icon>
-      <span>>Settings</span>
-    </button>
-    <button md-menu-item disabled>
-      <md-icon mdTooltip="Tooltip!" mdTooltipPosition="below">help</md-icon>
-      <span>Help</span>
-    </button>
-  </md-menu>
-  <!--canvas navballs #navballs height="64"></canvas-->
-</div>
+<md-toolbar color="primary" class="toolbar-top">
+  <button md-mini-fab [mdMenuTriggerFor]="appMenu" color="accent" mdTooltip="Tooltip!" mdTooltipPosition="below">
+    <md-icon>menu</md-icon>
+  </button>
+  <button md-mini-fab="true" (click)="openSideNav()" color="accent" mdTooltip="Tooltip!" mdTooltipPosition="below">
+    <md-icon>menu</md-icon>
+  </button>
+  <span class="brand-name">{{navbarData.brandName}}</span>
+  <div flex-spacer></div>
+  <button *ngIf="isLoggedIn()" md-mini-fab="true" (click)="onClickSettings()" color="accent" class="ml-auto"
+          mdTooltip="Settings" mdTooltipPosition="below">
+    <md-icon>settings</md-icon>
+  </button>
+  <!-- TODO: Upgrade to a media-aware ngSwitch here...-->
+  <span *ngIf="isLoggedIn()" class="ml-1">Hello, {{userInfo?.username}}</span>
+  <button *ngIf="!isLoggedIn()" md-raised-button (click)="onClickRegister()" color="accent" class="ml-auto"
+          mdTooltip="Tooltip!" mdTooltipPosition="below">
+    <span>REGISTER</span>
+  </button>
+  <button *ngIf="!isLoggedIn()" md-mini-fab (click)="onClickLogin()" color="accent" class="ml-1"
+          mdTooltip="Tooltip!" mdTooltipPosition="left">
+    <md-icon>cloud_off</md-icon>
+  </button>
+</md-toolbar>
+<md-menu #appMenu="mdMenu">
+  <button *ngFor="let menuData of navbarData.menuItems" [routerLink]="menuData.routerLink" md-menu-item="mdMenu"
+          [disabled]="menuData.disabled ? 'disabled' : ''" mdTooltip="Tooltip!" mdTooltipPosition="after">
+    <md-icon *ngIf="menuData.iconName > ''">{{menuData.iconName}}</md-icon>
+    <span *ngIf="menuData.displayName > ''">{{menuData.displayName}}</span>
+  </button>
+  <button md-menu-item="mdMenu" [disabled]="false" mdTooltip="Tooltip!" mdTooltipPosition="after">
+    <md-icon>settings</md-icon>
+    <span>Settings</span>
+  </button>
+  <button md-menu-item="mdMenu" mdTooltip="Tooltip!" mdTooltipPosition="below">
+    <span><md-icon>help</md-icon>Help1</span>
+  </button>
+</md-menu>
+<!--canvas navballs #navballs height="64"></canvas-->
