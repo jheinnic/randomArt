@@ -10,6 +10,8 @@ exports.config = {
 
   // use `npm run e2e`
   specs: [
+    helpers.root('node_modules/jasmine-expect/dist/jasmine-matches.js'),
+    helpers.root('node_modules/jasmine-promises/dist/jasmine-promises.js'),
     helpers.root('client/**/**.e2e.ts'),
     helpers.root('client/**/*.e2e.ts')
   ],

@@ -32,6 +32,8 @@ require('rxjs/Rx');
 
 var testing = require('@angular/core/testing');
 var browser = require('@angular/platform-browser-dynamic/testing');
+require('jasmine-expect/dist/jasmine-matchers');
+require('jasmine-promises/dist/jasmine-promises');
 
 testing.TestBed.initTestEnvironment(
   browser.BrowserDynamicTestingModule,
