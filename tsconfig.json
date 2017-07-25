@@ -4,6 +4,7 @@
     "outDir": "tscomp",
     "module": "commonjs",
     "moduleResolution": "node",
+    "allowJs": true,
     "sourceMap": true,
     "importHelpers": true,
     "noUnusedLocals": false,
@@ -13,12 +14,13 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "dom", "es5", "scripthost", "es2015.promise", "es2015.core", "es2015.collection" ],
+    "lib": [ "es5", "dom", "scripthost", "es2015.promise", "es2015.iterable", "es2015.core", "es2015.collection" ],
     "rootDirs": [ "client", "common/lib" ],
     "baseUrl": ".",
     "paths": {
       "*": ["*", "common/lib/*", "node_module/*"]
-    },
+    }
+    /*
     "types": [
       "@angular/core",
       "@angular/http",
@@ -30,18 +32,22 @@
       "webrtc",
       "peerjs",
       "webpack",
-      "socket.io-client",
-      "q",
-      "uuid",
-      "chai",
       // "es6-promise",
+      "socket.io-client",
+      "uuid",
       "jasmine",
+      "source-map"
+      // "q",
+      // "jasmine",
       // "hammerjs",
       // "uglify-js",
-      "source-map"
       // "selenium-webdriver"
     ]
+  */
   },
+  "files": [
+    "typings/index.d.ts"
+  ],
   "exclude": [
     "node_modules/**/*",
     "typings/main/**/*",

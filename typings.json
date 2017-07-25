@@ -1,4 +1,8 @@
 {
   "name": "live-random-art",
-  "dependencies": {}
+  "dependencies": {},
+  "globalDependencies": {
+    "custom-typings": "file:./client/custom-typings.d.ts",
+    "peerjs": "file:./common/typings/peerjs/index.d.ts"
+  }
 }

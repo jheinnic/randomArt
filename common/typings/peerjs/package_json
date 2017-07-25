@@ -1,0 +1,18 @@
+{
+    "name": "@types/peerjs",
+    "version": "0.0.28",
+    "description": "TypeScript definitions for PeerJS",
+    "license": "MIT",
+    "author": "Toshiya Nakakura <https://github.com/nakakura>",
+    "main": "",
+    "repository": {
+        "type": "git",
+        "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/webrtc": "*"
+    },
+    "typings": "index.d.ts",
+    "typesPublisherContentHash": "40f27c4785aa71377b667c5d46f955e1fc20966d627d853a3e78b6bea46bc177"
+}

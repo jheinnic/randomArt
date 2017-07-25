@@ -25,8 +25,16 @@ import 'core-js/es6/reflect';
 // This one I'm adding myself...
 // import 'core-js/es6/promise';
 // import 'es6-promise';
-require('es6-promise').polyfill();
+// require('es6-promise').polyfill();
+import {polyfill as assign_polyfill} from 'es6-object-assign';
+import {polyfill as promise_polyfill} from 'es6-promise';
 
+promise_polyfill();
+assign_polyfill();
+
+// require('es6-object-assign').polyfill();
+// import obj_assign = require('es6-object-assign');
+// obj_assign.polyfill();
 
 // These appear to go beyond what Angular requires?
 // import 'core-js/es6/weak-map';
