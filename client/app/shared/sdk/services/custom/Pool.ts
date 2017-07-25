@@ -37,7 +37,7 @@ export class PoolApi extends BaseLoopBackApi {
   /**
    * Fetches belongsTo relation owner.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {boolean} refresh 
    *
@@ -50,7 +50,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public getOwner(id: any, refresh: any = {}): Observable<any> {
+  public getOwner(id: any, refresh: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/owner";
@@ -59,15 +59,15 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (refresh) _urlParams.refresh = refresh;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof refresh !== 'undefined' && refresh !== null) _urlParams.refresh = refresh;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Fetches belongsTo relation imageChain.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {boolean} refresh 
    *
@@ -80,7 +80,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public getImageChain(id: any, refresh: any = {}): Observable<any> {
+  public getImageChain(id: any, refresh: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/imageChain";
@@ -89,15 +89,15 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (refresh) _urlParams.refresh = refresh;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof refresh !== 'undefined' && refresh !== null) _urlParams.refresh = refresh;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Find a related item by id for images.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -110,7 +110,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public findByIdImages(id: any, fk: any): Observable<any> {
+  public findByIdImages(id: any, fk: any, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/:fk";
@@ -120,14 +120,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Delete a related item by id for images.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -137,7 +137,7 @@ export class PoolApi extends BaseLoopBackApi {
    *
    * This method returns no data.
    */
-  public destroyByIdImages(id: any, fk: any): Observable<any> {
+  public destroyByIdImages(id: any, fk: any, customHeaders?: Function): Observable<any> {
     let _method: string = "DELETE";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/:fk";
@@ -147,14 +147,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Update a related item by id for images.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -171,7 +171,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public updateByIdImages(id: any, fk: any, data: any = {}): Observable<any> {
+  public updateByIdImages(id: any, fk: any, data: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "PUT";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/:fk";
@@ -183,14 +183,14 @@ export class PoolApi extends BaseLoopBackApi {
       data: data
     };
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Add a related item by id for images.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -207,7 +207,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public linkImages(id: any, fk: any): Observable<any> {
+  public linkImages(id: any, fk: any, customHeaders?: Function): Observable<any> {
     let _method: string = "PUT";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/rel/:fk";
@@ -217,14 +217,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Remove the images relation to an item by id.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -234,7 +234,7 @@ export class PoolApi extends BaseLoopBackApi {
    *
    * This method returns no data.
    */
-  public unlinkImages(id: any, fk: any): Observable<any> {
+  public unlinkImages(id: any, fk: any, customHeaders?: Function): Observable<any> {
     let _method: string = "DELETE";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/rel/:fk";
@@ -244,14 +244,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Check the existence of images relation to an item by id.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {any} fk Foreign key for images
    *
@@ -264,7 +264,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public existsImages(id: any, fk: any): Observable<any> {
+  public existsImages(id: any, fk: any, customHeaders?: Function): Observable<any> {
     let _method: string = "HEAD";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/rel/:fk";
@@ -274,14 +274,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Queries images of Pool.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {object} filter 
    *
@@ -294,7 +294,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public getImages(id: any, filter: LoopBackFilter = {}): Observable<any> {
+  public getImages(id: any, filter: LoopBackFilter = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images";
@@ -303,15 +303,15 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (filter) _urlParams.filter = filter;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof filter !== 'undefined' && filter !== null) _urlParams.filter = filter;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Creates a new instance in images of this model.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {object} data Request data.
    *
@@ -326,7 +326,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public createImages(id: any, data: any = {}): Observable<any> {
+  public createImages(id: any, data: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "POST";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images";
@@ -337,14 +337,14 @@ export class PoolApi extends BaseLoopBackApi {
       data: data
     };
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Deletes all images of this model.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @returns {object} An empty reference that will be
    *   populated with the actual data once the response is returned
@@ -352,7 +352,7 @@ export class PoolApi extends BaseLoopBackApi {
    *
    * This method returns no data.
    */
-  public deleteImages(id: any): Observable<any> {
+  public deleteImages(id: any, customHeaders?: Function): Observable<any> {
     let _method: string = "DELETE";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images";
@@ -361,14 +361,14 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Counts images of Pool.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {object} where Criteria to match model instances
    *
@@ -380,7 +380,7 @@ export class PoolApi extends BaseLoopBackApi {
    *
    *  - `count` – `{number}` - 
    */
-  public countImages(id: any, where: any = {}): Observable<any> {
+  public countImages(id: any, where: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images/count";
@@ -389,15 +389,15 @@ export class PoolApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (where) _urlParams.where = where;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof where !== 'undefined' && where !== null) _urlParams.where = where;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
   /**
    * Creates a new instance in images of this model.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Pool id
    *
    * @param {object} data Request data.
    *
@@ -412,7 +412,7 @@ export class PoolApi extends BaseLoopBackApi {
    * This usually means the response is a `Pool` object.)
    * </em>
    */
-  public createManyImages(id: any, data: any[] = []): Observable<any> {
+  public createManyImages(id: any, data: any[] = [], customHeaders?: Function): Observable<any> {
     let _method: string = "POST";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Pools/:id/images";
@@ -423,7 +423,7 @@ export class PoolApi extends BaseLoopBackApi {
       data: data
     };
     let _urlParams: any = {};
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 

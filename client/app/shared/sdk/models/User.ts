@@ -2,34 +2,32 @@
 
 declare var Object: any;
 export interface UserInterface {
-  realm?: string;
-  username?: string;
-  password: string;
-  challenges?: any;
-  email: string;
-  emailVerified?: boolean;
-  verificationToken?: string;
-  status?: string;
-  created?: Date;
-  lastUpdated?: Date;
-  id?: any;
+  "realm"?: string;
+  "username"?: string;
+  "challenges"?: any;
+  "email": string;
+  "emailVerified"?: boolean;
+  "status"?: string;
+  "created"?: Date;
+  "lastUpdated"?: Date;
+  "id"?: any;
+  "password"?: string;
   accessTokens?: any[];
   identities?: any[];
   credentials?: any[];
 }
 
 export class User implements UserInterface {
-  realm: string;
-  username: string;
-  password: string;
-  challenges: any;
-  email: string;
-  emailVerified: boolean;
-  verificationToken: string;
-  status: string;
-  created: Date;
-  lastUpdated: Date;
-  id: any;
+  "realm": string;
+  "username": string;
+  "challenges": any;
+  "email": string;
+  "emailVerified": boolean;
+  "status": string;
+  "created": Date;
+  "lastUpdated": Date;
+  "id": any;
+  "password": string;
   accessTokens: any[];
   identities: any[];
   credentials: any[];
@@ -51,7 +49,7 @@ export class User implements UserInterface {
   **/
   public static factory(data: UserInterface): User{
     return new User(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -64,53 +62,49 @@ export class User implements UserInterface {
       name: 'User',
       plural: 'Users',
       properties: {
-        realm: {
+        "realm": {
           name: 'realm',
           type: 'string'
         },
-        username: {
+        "username": {
           name: 'username',
           type: 'string'
         },
-        password: {
-          name: 'password',
-          type: 'string'
-        },
-        credentials: {
+        "credentials": {
           name: 'credentials',
           type: 'any'
         },
-        challenges: {
+        "challenges": {
           name: 'challenges',
           type: 'any'
         },
-        email: {
+        "email": {
           name: 'email',
           type: 'string'
         },
-        emailVerified: {
+        "emailVerified": {
           name: 'emailVerified',
           type: 'boolean'
         },
-        verificationToken: {
-          name: 'verificationToken',
-          type: 'string'
-        },
-        status: {
+        "status": {
           name: 'status',
           type: 'string'
         },
-        created: {
+        "created": {
           name: 'created',
           type: 'Date'
         },
-        lastUpdated: {
+        "lastUpdated": {
           name: 'lastUpdated',
           type: 'Date'
         },
-        id: {
+        "id": {
           name: 'id',
           type: 'any'
+        },
+        "password": {
+          name: 'password',
+          type: 'string'
         },
       },
       relations: {

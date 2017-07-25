@@ -5,30 +5,30 @@ import {
 
 declare var Object: any;
 export interface ArtworkInterface {
-  uuid: string;
-  filename: string;
-  container: string;
-  url: string;
-  type?: string;
-  title?: string;
-  owner?: string;
-  imageChainId?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  "uuid": string;
+  "filename": string;
+  "container": string;
+  "url": string;
+  "type"?: string;
+  "title"?: string;
+  "owner"?: string;
+  "imageChainId"?: string;
+  "createdAt"?: Date;
+  "updatedAt"?: Date;
   imageChain?: ImageChain;
 }
 
 export class Artwork implements ArtworkInterface {
-  uuid: string;
-  filename: string;
-  container: string;
-  url: string;
-  type: string;
-  title: string;
-  owner: string;
-  imageChainId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  "uuid": string;
+  "filename": string;
+  "container": string;
+  "url": string;
+  "type": string;
+  "title": string;
+  "owner": string;
+  "imageChainId": string;
+  "createdAt": Date;
+  "updatedAt": Date;
   imageChain: ImageChain;
   constructor(data?: ArtworkInterface) {
     Object.assign(this, data);
@@ -48,7 +48,7 @@ export class Artwork implements ArtworkInterface {
   **/
   public static factory(data: ArtworkInterface): Artwork{
     return new Artwork(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -61,43 +61,43 @@ export class Artwork implements ArtworkInterface {
       name: 'Artwork',
       plural: 'Artworks',
       properties: {
-        uuid: {
+        "uuid": {
           name: 'uuid',
           type: 'string'
         },
-        filename: {
+        "filename": {
           name: 'filename',
           type: 'string'
         },
-        container: {
+        "container": {
           name: 'container',
           type: 'string'
         },
-        url: {
+        "url": {
           name: 'url',
           type: 'string'
         },
-        type: {
+        "type": {
           name: 'type',
           type: 'string'
         },
-        title: {
+        "title": {
           name: 'title',
           type: 'string'
         },
-        owner: {
+        "owner": {
           name: 'owner',
           type: 'string'
         },
-        imageChainId: {
+        "imageChainId": {
           name: 'imageChainId',
           type: 'string'
         },
-        createdAt: {
+        "createdAt": {
           name: 'createdAt',
           type: 'Date'
         },
-        updatedAt: {
+        "updatedAt": {
           name: 'updatedAt',
           type: 'Date'
         },

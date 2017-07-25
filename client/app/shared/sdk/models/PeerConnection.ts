@@ -5,16 +5,16 @@ import {
 
 declare var Object: any;
 export interface PeerConnectionInterface {
-  peerId?: string;
-  active?: boolean;
-  userId?: any;
+  "peerId"?: string;
+  "active"?: boolean;
+  "userId"?: any;
   user?: User;
 }
 
 export class PeerConnection implements PeerConnectionInterface {
-  peerId: string;
-  active: boolean;
-  userId: any;
+  "peerId": string;
+  "active": boolean;
+  "userId": any;
   user: User;
   constructor(data?: PeerConnectionInterface) {
     Object.assign(this, data);
@@ -34,7 +34,7 @@ export class PeerConnection implements PeerConnectionInterface {
   **/
   public static factory(data: PeerConnectionInterface): PeerConnection{
     return new PeerConnection(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -47,15 +47,15 @@ export class PeerConnection implements PeerConnectionInterface {
       name: 'PeerConnection',
       plural: 'PeerConnections',
       properties: {
-        peerId: {
+        "peerId": {
           name: 'peerId',
           type: 'string'
         },
-        active: {
+        "active": {
           name: 'active',
           type: 'boolean'
         },
-        userId: {
+        "userId": {
           name: 'userId',
           type: 'any'
         },

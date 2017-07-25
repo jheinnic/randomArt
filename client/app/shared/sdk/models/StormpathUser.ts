@@ -2,29 +2,27 @@
 
 declare var Object: any;
 export interface StormpathUserInterface {
-  givenName: string;
-  middleName?: string;
-  surname: string;
-  username?: string;
-  email: string;
-  password: string;
-  status?: string;
-  createdAt?: Date;
-  modifiedAt?: Date;
-  id?: string;
+  "givenName": string;
+  "middleName"?: string;
+  "surname": string;
+  "username"?: string;
+  "email": string;
+  "status"?: string;
+  "createdAt"?: Date;
+  "modifiedAt"?: Date;
+  "id"?: string;
 }
 
 export class StormpathUser implements StormpathUserInterface {
-  givenName: string;
-  middleName: string;
-  surname: string;
-  username: string;
-  email: string;
-  password: string;
-  status: string;
-  createdAt: Date;
-  modifiedAt: Date;
-  id: string;
+  "givenName": string;
+  "middleName": string;
+  "surname": string;
+  "username": string;
+  "email": string;
+  "status": string;
+  "createdAt": Date;
+  "modifiedAt": Date;
+  "id": string;
   constructor(data?: StormpathUserInterface) {
     Object.assign(this, data);
   }
@@ -43,7 +41,7 @@ export class StormpathUser implements StormpathUserInterface {
   **/
   public static factory(data: StormpathUserInterface): StormpathUser{
     return new StormpathUser(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -56,43 +54,39 @@ export class StormpathUser implements StormpathUserInterface {
       name: 'StormpathUser',
       plural: 'StormpathUsers',
       properties: {
-        givenName: {
+        "givenName": {
           name: 'givenName',
           type: 'string'
         },
-        middleName: {
+        "middleName": {
           name: 'middleName',
           type: 'string'
         },
-        surname: {
+        "surname": {
           name: 'surname',
           type: 'string'
         },
-        username: {
+        "username": {
           name: 'username',
           type: 'string'
         },
-        email: {
+        "email": {
           name: 'email',
           type: 'string'
         },
-        password: {
-          name: 'password',
-          type: 'string'
-        },
-        status: {
+        "status": {
           name: 'status',
           type: 'string'
         },
-        createdAt: {
+        "createdAt": {
           name: 'createdAt',
           type: 'Date'
         },
-        modifiedAt: {
+        "modifiedAt": {
           name: 'modifiedAt',
           type: 'Date'
         },
-        id: {
+        "id": {
           name: 'id',
           type: 'string'
         },

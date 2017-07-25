@@ -7,26 +7,26 @@ import {
 
 declare var Object: any;
 export interface PoolInterface {
-  guid?: string;
-  name: string;
-  ownerId?: any;
-  imageChainId?: string;
-  artworkIds?: Array<string>;
-  createdAt?: Date;
-  updatedAt?: Date;
+  "guid"?: string;
+  "name": string;
+  "ownerId"?: any;
+  "imageChainId"?: string;
+  "artworkIds"?: Array<any>;
+  "createdAt"?: Date;
+  "updatedAt"?: Date;
   owner?: User;
   imageChain?: ImageChain;
   images?: Artwork[];
 }
 
 export class Pool implements PoolInterface {
-  guid: string;
-  name: string;
-  ownerId: any;
-  imageChainId: string;
-  artworkIds: Array<string>;
-  createdAt: Date;
-  updatedAt: Date;
+  "guid": string;
+  "name": string;
+  "ownerId": any;
+  "imageChainId": string;
+  "artworkIds": Array<any>;
+  "createdAt": Date;
+  "updatedAt": Date;
   owner: User;
   imageChain: ImageChain;
   images: Artwork[];
@@ -48,7 +48,7 @@ export class Pool implements PoolInterface {
   **/
   public static factory(data: PoolInterface): Pool{
     return new Pool(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -61,32 +61,32 @@ export class Pool implements PoolInterface {
       name: 'Pool',
       plural: 'Pools',
       properties: {
-        guid: {
+        "guid": {
           name: 'guid',
           type: 'string'
         },
-        name: {
+        "name": {
           name: 'name',
           type: 'string'
         },
-        ownerId: {
+        "ownerId": {
           name: 'ownerId',
           type: 'any'
         },
-        imageChainId: {
+        "imageChainId": {
           name: 'imageChainId',
           type: 'string'
         },
-        artworkIds: {
+        "artworkIds": {
           name: 'artworkIds',
-          type: 'Array&lt;string&gt;',
+          type: 'Array&lt;any&gt;',
           default: <any>[]
         },
-        createdAt: {
+        "createdAt": {
           name: 'createdAt',
           type: 'Date'
         },
-        updatedAt: {
+        "updatedAt": {
           name: 'updatedAt',
           type: 'Date'
         },

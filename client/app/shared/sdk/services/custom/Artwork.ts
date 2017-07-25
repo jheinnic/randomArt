@@ -35,7 +35,7 @@ export class ArtworkApi extends BaseLoopBackApi {
   /**
    * Fetches belongsTo relation imageChain.
    *
-   * @param {any} id PersistedModel id
+   * @param {any} id Artwork id
    *
    * @param {boolean} refresh 
    *
@@ -48,7 +48,7 @@ export class ArtworkApi extends BaseLoopBackApi {
    * This usually means the response is a `Artwork` object.)
    * </em>
    */
-  public getImageChain(id: any, refresh: any = {}): Observable<any> {
+  public getImageChain(id: any, refresh: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "GET";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Artworks/:id/imageChain";
@@ -57,8 +57,8 @@ export class ArtworkApi extends BaseLoopBackApi {
     };
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (refresh) _urlParams.refresh = refresh;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof refresh !== 'undefined' && refresh !== null) _urlParams.refresh = refresh;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
@@ -80,7 +80,7 @@ export class ArtworkApi extends BaseLoopBackApi {
    * This usually means the response is a `Artwork` object.)
    * </em>
    */
-  public oldUpload(req: any = {}, data: any = {}): Observable<any> {
+  public oldUpload(req: any = {}, data: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "POST";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Artworks/oldUpload";
@@ -89,8 +89,8 @@ export class ArtworkApi extends BaseLoopBackApi {
       data: data
     };
     let _urlParams: any = {};
-    if (req) _urlParams.req = req;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof req !== 'undefined' && req !== null) _urlParams.req = req;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 
@@ -116,18 +116,18 @@ export class ArtworkApi extends BaseLoopBackApi {
    * This usually means the response is a `Artwork` object.)
    * </em>
    */
-  public upload(req: any = {}, title: any = {}, imageChainId: any = {}, data: any = {}): Observable<any> {
+  public upload(req: any = {}, title: any = {}, imageChainId: any = {}, data: any = {}, customHeaders?: Function): Observable<any> {
     let _method: string = "POST";
     let _url: string = LoopBackConfig.getPath() + "/" + LoopBackConfig.getApiVersion() +
     "/Artworks/upload";
     let _routeParams: any = {};
     let _postBody: any = {};
     let _urlParams: any = {};
-    if (req) _urlParams.req = req;
-    if (title) _urlParams.title = title;
-    if (imageChainId) _urlParams.imageChainId = imageChainId;
-    if (data) _urlParams.data = data;
-    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody);
+    if (typeof req !== 'undefined' && req !== null) _urlParams.req = req;
+    if (typeof title !== 'undefined' && title !== null) _urlParams.title = title;
+    if (typeof imageChainId !== 'undefined' && imageChainId !== null) _urlParams.imageChainId = imageChainId;
+    if (typeof data !== 'undefined' && data !== null) _urlParams.data = data;
+    let result = this.request(_method, _url, _routeParams, _urlParams, _postBody, null, customHeaders);
     return result;
   }
 

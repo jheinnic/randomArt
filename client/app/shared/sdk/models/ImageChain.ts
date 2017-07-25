@@ -2,27 +2,27 @@
 
 declare var Object: any;
 export interface ImageChainInterface {
-  guid?: string;
-  displayName: string;
-  pixelWidth: number;
-  pixelHeight: number;
-  fitOrFill: string;
-  pixelCount?: number;
-  widthPoints?: any;
-  heightPoints?: any;
-  owner?: string;
+  "guid"?: string;
+  "displayName": string;
+  "pixelWidth": number;
+  "pixelHeight": number;
+  "fitOrFill": string;
+  "pixelCount"?: number;
+  "widthPoints"?: any;
+  "heightPoints"?: any;
+  "owner"?: string;
 }
 
 export class ImageChain implements ImageChainInterface {
-  guid: string;
-  displayName: string;
-  pixelWidth: number;
-  pixelHeight: number;
-  fitOrFill: string;
-  pixelCount: number;
-  widthPoints: any;
-  heightPoints: any;
-  owner: string;
+  "guid": string;
+  "displayName": string;
+  "pixelWidth": number;
+  "pixelHeight": number;
+  "fitOrFill": string;
+  "pixelCount": number;
+  "widthPoints": any;
+  "heightPoints": any;
+  "owner": string;
   constructor(data?: ImageChainInterface) {
     Object.assign(this, data);
   }
@@ -41,7 +41,7 @@ export class ImageChain implements ImageChainInterface {
   **/
   public static factory(data: ImageChainInterface): ImageChain{
     return new ImageChain(data);
-  }  
+  }
   /**
   * @method getModelDefinition
   * @author Julien Ledun
@@ -54,39 +54,39 @@ export class ImageChain implements ImageChainInterface {
       name: 'ImageChain',
       plural: 'ImageChains',
       properties: {
-        guid: {
+        "guid": {
           name: 'guid',
           type: 'string'
         },
-        displayName: {
+        "displayName": {
           name: 'displayName',
           type: 'string'
         },
-        pixelWidth: {
+        "pixelWidth": {
           name: 'pixelWidth',
           type: 'number'
         },
-        pixelHeight: {
+        "pixelHeight": {
           name: 'pixelHeight',
           type: 'number'
         },
-        fitOrFill: {
+        "fitOrFill": {
           name: 'fitOrFill',
           type: 'string'
         },
-        pixelCount: {
+        "pixelCount": {
           name: 'pixelCount',
           type: 'number'
         },
-        widthPoints: {
+        "widthPoints": {
           name: 'widthPoints',
           type: 'any'
         },
-        heightPoints: {
+        "heightPoints": {
           name: 'heightPoints',
           type: 'any'
         },
-        owner: {
+        "owner": {
           name: 'owner',
           type: 'string'
         },
