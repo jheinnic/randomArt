@@ -2,7 +2,7 @@ import {
   Component, OnInit, AfterViewInit, QueryList, OnDestroy, ViewChildren, ViewChild
 } from "@angular/core";
 import {NavbarDataService} from "./navbar-data.service";
-import {NavbarDataModelBuilder, NavbarData} from "./navbar-data.datamodel";
+import {INavbarDataModelBuilder, NavbarData} from "./navbar-data.datamodel";
 import {Subscription, Observable} from "rxjs";
 import {LoopBackConfig} from "../shared/sdk/lb.config";
 import {BASE_URL, API_VERSION} from "../shared/base-url.values";
@@ -51,7 +51,7 @@ export class AppRootComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnInit() {
-    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
+    this.navbarDataService.updateNavbar((builder: INavbarDataModelBuilder) => {
       console.log("Creating Image Lab menu item");
       builder.brandName('JCH')
         .addMenuNav('Home', (builder) => {

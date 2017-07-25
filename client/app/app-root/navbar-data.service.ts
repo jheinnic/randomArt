@@ -2,7 +2,7 @@
  * Created by jheinnic on 12/31/16.
  */
 import {Injectable} from "@angular/core";
-import {NavbarData, NavbarDataDirector, NavbarDataModelBuilder} from "./navbar-data.datamodel";
+import {NavbarData, NavbarDataDirector} from "./navbar-data.datamodel";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
 

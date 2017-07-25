@@ -39,6 +39,7 @@ export class PassportComponent implements OnDestroy
         created: issueDate,
         issuedAt: issueDate,
         rememberMe: false,
+        scopes: [],
         ttl: 1209600,
         user: {}
       };

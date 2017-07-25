@@ -5,11 +5,12 @@ import {AbstractTask, TaskEvent} from "../shared/service-util/task-lifecycle.dat
 import {WordPaintInput} from "./word-paint-input.datamodel";
 import {WordPaintProgress} from "./word-paint-progress.datamodel";
 import {WordPaintResult} from "./word-paint-result.datamodel";
-import {ReflectiveFluentBuilder, FluentBuilder} from "../../../common/lib/datamodel-ts";
+import {
+  FluentWrapperBuilder, FluentAdapter, FluentWrapper
+} from "../../../common/lib/datamodel-ts";
 import {Subscription} from "rxjs/Subscription";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import builder = require("fluent-interface-builder");
 import * as randomArtFactory from "./genjs";
 import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
 
@@ -66,7 +67,7 @@ export class WordPaintTask extends AbstractTask<WordPaintInput,WordPaintProgress
     console.log("Pre-ngZone, ", this);
     this.ngZone.run(() => {
       console.log('Back in angular zone');
-      super.report(WordPaintProgress.build((builder: ReflectiveFluentBuilder<WordPaintProgress>) => {
+      super.report(WordPaintProgress.build((builder: FluentAdapter<WordPaintProgress>) => {
         builder.pctDone(pctDone)
           .paintPoints(paintablePoints)
       }));
@@ -75,7 +76,7 @@ export class WordPaintTask extends AbstractTask<WordPaintInput,WordPaintProgress
         let subscription = this.paintableCanvas.blob.subscribe(
           (blob:Blob) => {
             if (! this.isCancelled) {
-              super.finish(WordPaintResult.build((builder: FluentBuilder<WordPaintResult>) => {
+              super.finish(WordPaintResult.build((builder: FluentAdapter<WordPaintResult>) => {
                 builder.imageData(blob)
               }));
             }

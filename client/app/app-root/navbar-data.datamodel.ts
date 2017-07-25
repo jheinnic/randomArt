@@ -1,12 +1,12 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 import builder = require('fluent-interface-builder');
 import {
-  unwrapHelper, buildMethodFactory, copyMethodFactory, FactoryWrapper, Partial, BuildMethod,
-  CopyMethod, copyMethod
+  unwrapHelper, buildMethodFactory, copyMethodFactory, Partial, BuildMethod, CopyMethod,
+  copyMethod, InstanceWrapper
 } from "../../../common/lib/datamodel-ts";
 import Immutable = require('immutable');
 import _ = require('lodash');
-import {Builder} from "fluent-interface-builder";
+import {Builder, Ctor, IBuilder} from "fluent-interface-builder";
 
 //
 // Generic Helper Methods
@@ -17,7 +17,7 @@ import {Builder} from "fluent-interface-builder";
 // Wrapper Implementations
 //
 
-const wrapNavbarData: Builder<NavbarDataWrapper, NavbarData> = builder.build<NavbarDataWrapper,NavbarData>()
+const NavbarDataWrapper: Ctor<NavbarData,INavbarDataWrapper> = new Builder<NavbarData,INavbarDataWrapper>()
   .chain('brandName', (brandName: string) => (context: NavbarData) => {
     return new NavbarData(context, {brandName: brandName});
   })
@@ -58,7 +58,6 @@ const wrapNavbarData: Builder<NavbarDataWrapper, NavbarData> = builder.build<Nav
       }));
     }
 
-
     return new NavbarData(context, {tabs: tabs});
   })
   .chain('resetTabs', () => (context: NavbarData) => {
@@ -67,7 +66,7 @@ const wrapNavbarData: Builder<NavbarDataWrapper, NavbarData> = builder.build<Nav
   .chain('addMenuNav', (
     displayName: string, director: MenuNavDataDirector
   ) => (context: NavbarData) => {
-    var newItem = new MenuNavData(undefined, {displayName: displayName});
+    let newItem = new MenuNavData(undefined, {displayName: displayName});
 
     // TODO: Make sure displayName is unique.
 
@@ -94,24 +93,25 @@ const wrapNavbarData: Builder<NavbarDataWrapper, NavbarData> = builder.build<Nav
     return new NavbarData(context, {
       menuItems: context.menuItems.filter(function (nextItem: MenuNavData) {
         return nextItem.displayName != displayName;
-      })
-        .toList()
+      }).toList()
     });
   })
-  .unwrap('unwrap', unwrapHelper);
+  .unwrap('unwrap', unwrapHelper)
+  .value;
 
 
-const wrapNavbarTabData = builder.build<NavbarTabDataWrapper,NavbarTabData>()
+const NavbarTabDataWrapper = new Builder<NavbarTabData,INavbarTabDataWrapper>()
   .chain('displayName', (displayName: string) => (context: NavbarTabData) => {
     return new NavbarTabData(context, {displayName: displayName});
   })
   .chain('routerLink', (routerLink: string) => (context: NavbarTabData) => {
     return new NavbarTabData(context, {routerLink: routerLink});
   })
-  .unwrap('unwrap', unwrapHelper);
+  .unwrap('unwrap', unwrapHelper)
+  .value;
 
 
-const wrapNavbarDataTwo = builder.build<NavbarDataTwoWrapper,NavbarData>()
+const WrapNavbarDataTwo = new Builder<NavbarData,INavbarDataTwoWrapper>()
   .chain('brandName', (brandName: string) => (context: NavbarData) => {
     return new NavbarData(context, {brandName: brandName}) as NavbarData;
   })
@@ -120,10 +120,11 @@ const wrapNavbarDataTwo = builder.build<NavbarDataTwoWrapper,NavbarData>()
       tabs: context.tabs.push(NavbarTabData.build(director))
     });
   })
-  .unwrap('unwrap', unwrapHelper);
+  .unwrap('unwrap', unwrapHelper)
+  .value;
 
 
-let wrapMenuNavData = builder.build<MenuNavDataWrapper, MenuNavData>()
+let MenuNavDataWrapper = new Builder<MenuNavData, IMenuNavDataWrapper>()
   .chain('routerLink', (routerLink: string) => (context: MenuNavData) => {
     return new MenuNavData(context, {routerLink: routerLink});
   })
@@ -136,7 +137,8 @@ let wrapMenuNavData = builder.build<MenuNavDataWrapper, MenuNavData>()
   .chain('iconName', (iconName: string) => (context: MenuNavData) => {
     return new MenuNavData(context, {iconName: iconName});
   })
-  .unwrap('unwrap', unwrapHelper);
+  .unwrap('unwrap', unwrapHelper)
+  .value;
 
 
 //
@@ -156,7 +158,7 @@ export class NavbarData
     Object.assign(this, predecessor || {}, data || {});
   }
 
-  static build = buildMethodFactory(wrapNavbarData, NavbarData);
+  static build = buildMethodFactory(NavbarDataWrapper, NavbarData);
 
   // static build(director: NavbarDataDirector) {
   //   let wrapper: NavbarDataWrapper = wrapNavbarData.value(new NavbarData());
@@ -164,16 +166,16 @@ export class NavbarData
   //   return wrapper.unwrap();
   // }
 
-  acopy: CopyMethod<NavbarData, NavbarDataModelBuilder> = copyMethodFactory(wrapNavbarData);
+  acopy: CopyMethod<NavbarData, INavbarDataWrapper> = copyMethodFactory(NavbarDataWrapper);
 
   // bcopy(director: NavbarDataDirector): NavbarData {
   //   return copyMethod(this, wrapNavbarData, director);
   // }
 
   copy(director: NavbarDataDirector) {
-    let wrapper: NavbarDataWrapper = wrapNavbarData.value(this);
+    let wrapper: INavbarDataWrapper = new NavbarDataWrapper(this);
     director(wrapper);
-    return wrapper.unwrap();
+    return wrapper.value;
   }
 }
 
@@ -187,12 +189,12 @@ export class NavbarTabData
     Object.assign(this, predecessor || {}, data || {});
   }
 
-  static build = buildMethodFactory(wrapNavbarTabData, NavbarTabData);
+  static build = buildMethodFactory(NavbarTabDataWrapper, NavbarTabData);
 
   copy(director: NavbarTabDataDirector) {
-    let wrapper: NavbarTabDataWrapper = wrapNavbarTabData.value(this);
+    let wrapper: INavbarTabDataWrapper = new NavbarTabDataWrapper(this);
     director(wrapper);
-    return wrapper.unwrap();
+    return wrapper.value;
   }
 }
 
@@ -208,12 +210,12 @@ export class MenuNavData
     Object.assign(this, predecessor || {}, data || {});
   }
 
-  static build = buildMethodFactory(wrapMenuNavData, MenuNavData);
+  static build = buildMethodFactory(MenuNavDataWrapper, MenuNavData);
 
   copy(director: MenuNavDataDirector) {
-    let wrapper: MenuNavDataWrapper = wrapMenuNavData.value(this);
+    let wrapper: IMenuNavDataWrapper = new MenuNavDataWrapper(this);
     director(wrapper);
-    return wrapper.unwrap();
+    return wrapper.value;
   }
 }
 
@@ -221,31 +223,31 @@ export class MenuNavData
 // Director types
 //
 
-export type NavbarDataDirector = (builder: NavbarDataModelBuilder) => void;
+export type NavbarDataDirector = (builder: INavbarDataModelBuilder) => void;
 
-export type MenuNavDataDirector = (builder: MenuNavDataModelBuilder) => void;
+export type MenuNavDataDirector = (builder: IMenuNavDataModelBuilder) => void;
 
-type NavbarTabDataDirector = (builder: NavbarTabDataModelBuilder) => void;
+type NavbarTabDataDirector = (builder: INavbarTabDataModelBuilder) => void;
 
 
 //
 // Wrapper types
 //
 
-type NavbarDataWrapper = FactoryWrapper<NavbarData, NavbarDataModelBuilder>;
+type INavbarDataWrapper = InstanceWrapper<NavbarData, INavbarDataModelBuilder>;
 
-type MenuNavDataWrapper = FactoryWrapper<MenuNavData, MenuNavDataModelBuilder>;
+type IMenuNavDataWrapper = InstanceWrapper<MenuNavData, IMenuNavDataModelBuilder>;
 
-type NavbarTabDataWrapper = FactoryWrapper<NavbarTabData, NavbarTabDataModelBuilder>;
+type INavbarTabDataWrapper = InstanceWrapper<NavbarTabData, INavbarTabDataModelBuilder>;
 
-type NavbarDataTwoWrapper = FactoryWrapper<NavbarData, NavbarDataModelBuilderTwo>;
+type INavbarDataTwoWrapper = InstanceWrapper<NavbarData, INavbarDataModelBuilderTwo>;
 
 
 //
 // Builder Interfaces
 //
 
-export interface NavbarDataModelBuilder
+export interface INavbarDataModelBuilder
 {
   brandName(brandName: string): this;
   openSidenav(): this;
@@ -258,22 +260,22 @@ export interface NavbarDataModelBuilder
   removeMenuNav(displayName: string): this;
 }
 
-export interface MenuNavDataModelBuilder
+export interface IMenuNavDataModelBuilder
 {
   routerLink(routerLink: string): this;
   disabled(disabled: boolean): this;
   orderRank(orderRank: number): this;
   iconName(iconName: string): this;
 }
-;
 
-interface NavbarTabDataModelBuilder
+
+interface INavbarTabDataModelBuilder
 {
   displayName(displayName: string): this;
   outerLink(routerLink: string): this;
 }
 
-interface NavbarDataModelBuilderTwo
+interface INavbarDataModelBuilderTwo
 {
   brandName(brandName: string): this;
   addTab(director: NavbarTabDataDirector): this;

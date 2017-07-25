@@ -57,8 +57,8 @@ export class PoolStoreService
     return !! this.poolRef;
   }
 
-  public subscribeWithFilter(filter: LoopBackFilter): Observable<Pool[]> {
-    let retVal: Observable<Pool[]>;
+  public subscribeWithFilter(filter: LoopBackFilter): Observable<Pool|Pool[]> {
+    let retVal: Observable<Pool|Pool[]>;
 
     if (!! this.poolRef) {
       retVal = this.poolRef.on('change', filter);

@@ -5,8 +5,8 @@ import {
   Component, ViewChild, AfterViewInit, OnInit, OnDestroy, ElementRef, ViewChildren
 } from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
-import {NavbarDataService, NavbarDataModelBuilder, MenuNavDataModelBuilder } from "../app-root";
-import {ReflectiveFluentBuilder} from "../../../common/lib/datamodel-ts/index";
+import {NavbarDataService, INavbarDataModelBuilder, IMenuNavDataModelBuilder } from "../app-root";
+import {FluentAdapter} from "../../../common/lib/datamodel-ts/index";
 import {PhraseGeneratorService} from "../shared/phrase-generator/phrase-generator.service";
 import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
 import {ArtworkApi} from "../shared/sdk/services/custom/Artwork";
@@ -124,9 +124,9 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
     //   );
 
     console.log("Editting Image Lab menu item");
-    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
+    this.navbarDataService.updateNavbar((builder: INavbarDataModelBuilder) => {
       builder.resetTabs()
-        .editMenuNav('Image Pools', (builder: MenuNavDataModelBuilder) => {
+        .editMenuNav('Image Pools', (builder: IMenuNavDataModelBuilder) => {
           builder.disabled(true)
         });
     });
@@ -207,8 +207,8 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
       this.fireLoopRef.dispose();
     }
 
-    this.navbarDataService.updateNavbar((builder: NavbarDataModelBuilder) => {
-      builder.editMenuNav('Image Pools', (builder: MenuNavDataModelBuilder) => {
+    this.navbarDataService.updateNavbar((builder: INavbarDataModelBuilder) => {
+      builder.editMenuNav('Image Pools', (builder: IMenuNavDataModelBuilder) => {
         builder.disabled(false)
       });
     });
@@ -241,7 +241,7 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
       let rawTask: WordPaintInput = this.paintQueue.peek();
 
       let newTask: WordPaintInput = rawTask.copy(
-        (builder: ReflectiveFluentBuilder<WordPaintInput>) => {
+        (builder: FluentAdapter<WordPaintInput>) => {
           builder.phrase(
             this.phraseGenerator.createNextPhrase()
           ).chain(this.selectedImageChain)
@@ -257,7 +257,7 @@ export class ImageLobbyComponent implements OnInit, AfterViewInit, OnDestroy
   public scheduleNext() {
     this.paintQueue.offer(
     WordPaintInput.build(
-      (builder: ReflectiveFluentBuilder<WordPaintInput>) => {
+      (builder: FluentAdapter<WordPaintInput>) => {
         builder.phrase(
           this.phraseGenerator.createNextPhrase()
         ).chain(this.selectedImageChain)

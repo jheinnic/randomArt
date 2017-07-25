@@ -5,6 +5,7 @@ import {MockBackend} from "@angular/http/testing";
 import {HomeMainComponent} from "./home-main.component";
 import {Title} from "./title";
 
+
 describe('Home', () => {
   // provide our implementations or mocks to the dependency injector
   beforeEach(() => TestBed.configureTestingModule({
@@ -20,8 +21,7 @@ describe('Home', () => {
   }));
 
   it('should have default data', inject([HomeMainComponent], (home: HomeMainComponent) => {
-    expect(home.localState)
-      .toEqual({value: ''});
+    return expect(home.localState).toEqual({value: ''}); //.eventually.to.equal({value: ''});
   }));
 
   it('should have a title', inject([HomeMainComponent], (home: HomeMainComponent) => {

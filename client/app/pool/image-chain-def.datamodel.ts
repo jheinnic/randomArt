@@ -3,11 +3,9 @@
  */
 
 import {PointMap, Point} from "../shared/canvas-util/point.datamodel";
-import {Partial, FactoryWrapper, Pick, Director} from "../../../common/lib/datamodel-ts";
+import {Partial, Pick, Director} from "../../../common/lib/datamodel-ts";
 import {Observable} from "rxjs/Observable";
-import Immutable = require("immutable");
-import builder = require("fluent-interface-builder");
-import {Builder} from "fluent-interface-builder";
+import {Builder, Instance} from "fluent-interface-builder";
 
 export type FitOrFillType = 'fit' | 'fill' | 'square';
 
@@ -54,10 +52,11 @@ function derivePointMaps(widthPoints: number[], heightPoints: number[]): Observa
     });
 }
 
-type ImageChainDefWrapper = FactoryWrapper<ImageChainDef,ImageChainDefBuilder>;
-
-const wrapImageChainDef: Builder<ImageChainDefWrapper,Partial<ImageChainDef>> =
-  builder.build<ImageChainDefWrapper,Partial<ImageChainDef>>()
+// type ImageChainDefWrapper = BuildFromPartial<ImageChainDef,ImageChainDefBuilder>;
+//
+// const wrapImageChainDef: ImageChainDefWrapper =
+const ImageChainDefWrapper =
+  new Builder<Partial<ImageChainDef>,ImageChainDefBuilder>()
     .cascade(
       'dimensions',
       (pixelWidth: number, pixelHeight: number, fitOrFill: FitOrFillType) =>
@@ -77,15 +76,18 @@ const wrapImageChainDef: Builder<ImageChainDefWrapper,Partial<ImageChainDef>> =
     .cascade('uuid', (uuid:string) => (context: Partial<ImageChainDef>) =>
       Object.assign(context, {uuid: uuid})
     )
-    .unwrap('unwrap', () => (context:Partial<ImageChainDef>) =>
-      new ImageChainDef(context as Pick<ImageChainDef,Required>));
+    .unwrap<ImageChainDef>('unwrap', () => (context:Partial<ImageChainDef>) =>
+      new ImageChainDef(context as Pick<ImageChainDef,Required>)).value;
+
+// const WrapImageChainDef = wrapImageChainDef.value;
 
 
-export interface ImageChainDefBuilder {
+export interface ImageChainDefBuilder extends Instance<ImageChainDef> {
   dimensions(pixelWidth: number, pixelHeight: number, fitOrFill: FitOrFillType): this;
   displayName(displayName: string): this;
   localId(localId: number): this;
   uuid(uuid: string): this;
+  value: ImageChainDef;
 }
 
 type Required = 'localId' | 'uuid' | 'displayName' | 'pixelWidth' | 'pixelHeight' | 'pixelCount' | 'fitOrFill';
@@ -129,8 +131,8 @@ export class ImageChainDef {
       xScale = this.pixelWidth / this.pixelHeight;
     }
 
-    this.widthPoints = computeAffinePixelPoints(this.pixelWidth, -1 * xScale, xScale);
-    this.heightPoints = computeAffinePixelPoints(this.pixelHeight, -1 * yScale, yScale);
+    this.widthPoints = computeAffinePixelPoints(this.pixelWidth,-1 * xScale, xScale);
+    this.heightPoints = computeAffinePixelPoints(this.pixelHeight,-1 * yScale, yScale);
     this.pointMaps = derivePointMaps(this.widthPoints, this.heightPoints)
     this.pixelCount = this.pixelWidth * this.pixelHeight;
     this.createdAt = now;
@@ -138,8 +140,8 @@ export class ImageChainDef {
   }
 
   static build(director: Director<ImageChainDefBuilder>): ImageChainDef {
-    let wrapper = wrapImageChainDef.value({});
+    let wrapper = new ImageChainDefWrapper({});
     director(wrapper);
-    return wrapper.unwrap();
+    return wrapper.value;
   }
 }

@@ -4,6 +4,10 @@
 
 export class DynamicCanvasRenderingContext2D implements CanvasRenderingContext2D
 {
+  imageSmoothingEnabled: boolean;
+
+  public drawFocusIfNeeded(element: Element): void {
+  }
   public ctx: CanvasRenderingContext2D = null;
 
   constructor(initialCtx?: CanvasRenderingContext2D) {
@@ -50,13 +54,9 @@ export class DynamicCanvasRenderingContext2D implements CanvasRenderingContext2D
 
   set miterLimit(value: number) { this.ctx.miterLimit = value; }
 
-  get msFillRule(): string { return this.ctx.msFillRule; }
+  get msFillRule(): CanvasFillRule { return this.ctx.msFillRule; }
 
-  set msFillRule(value: string) { this.ctx.msFillRule = value; }
-
-  get msImageSmoothingEnabled(): boolean { return this.ctx.msImageSmoothingEnabled; }
-
-  set msImageSmoothingEnabled(value: boolean) { this.ctx.msImageSmoothingEnabled = value; }
+  set msFillRule(value: CanvasFillRule) { this.ctx.msFillRule = value; }
 
   get shadowBlur(): number { return this.ctx.shadowBlur; }
 
@@ -106,7 +106,7 @@ export class DynamicCanvasRenderingContext2D implements CanvasRenderingContext2D
     this.ctx.clearRect(x, y, w, h);
   }
 
-  public clip(fillRule?: string): void {
+  public clip(fillRule?: CanvasFillRule): void {
     this.ctx.clip(fillRule);
   }
 
@@ -138,7 +138,7 @@ export class DynamicCanvasRenderingContext2D implements CanvasRenderingContext2D
     this.ctx.drawImage(image, offsetX, offsetY, width, height, canvasOffsetX, canvasOffsetY, canvasImageWidth, canvasImageHeight);
   }
 
-  public fill(fillRule?: string): void {
+  public fill(fillRule?: CanvasFillRule): void {
     this.ctx.fill(fillRule);
   }
 
@@ -160,7 +160,7 @@ export class DynamicCanvasRenderingContext2D implements CanvasRenderingContext2D
     return undefined;
   }
 
-  public isPointInPath(x: number, y: number, fillRule?: string): boolean {
+  public isPointInPath(x: number, y: number, fillRule?: CanvasFillRule): boolean {
     this.ctx.isPointInPath(x, y, fillRule);
     return undefined;
   }

@@ -3,7 +3,8 @@
  */
 import {PaintablePoint} from "../shared/canvas-util/point.datamodel";
 import {
-  deriveFactoryWrapper, copyMethodFactory, buildMethodFactory, ReflectiveBuilder
+  deriveFactoryWrapper, copyMethodFactory, buildMethodFactory, FluentWrapperBuilder,
+  reflectiveBuildMethodFactory, reflectiveCopyMethodFactory
 } from "../../../common/lib/datamodel-ts/index";
 
 // const initialPaintProgressWrapper =
@@ -26,7 +27,7 @@ import {
 /**
  * Encapsulation for a partial set of paintable pixels, giving
  */
-const wordPaintProgressWrapper: ReflectiveBuilder<WordPaintProgress> =
+const WordPaintProgressWrapper =
   deriveFactoryWrapper<WordPaintProgress>(['paintPoints', 'pctDone']);
 
 export class WordPaintProgress
@@ -35,11 +36,11 @@ export class WordPaintProgress
   public readonly paintPoints: PaintablePoint[];
   public readonly pctDone: number;
 
-  copy = copyMethodFactory(wordPaintProgressWrapper);
+  copy = reflectiveCopyMethodFactory(WordPaintProgressWrapper);
 
   static build =
-    buildMethodFactory(wordPaintProgressWrapper, WordPaintProgress);
+    reflectiveBuildMethodFactory(WordPaintProgressWrapper, WordPaintProgress);
 
-  constructor() { }
+  constructor(source: Partial<WordPaintProgress>) { Object.assign(self, source); }
 }
 

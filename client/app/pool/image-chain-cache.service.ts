@@ -19,7 +19,7 @@ export class ImageChainCacheService
     LoopBackConfig.setBaseURL(BASE_URL);
     LoopBackConfig.setApiVersion(API_VERSION);
 
-    this.imageChainSource = this.imageChainApi.find({
+    this.imageChainSource = this.imageChainApi.find<ImageChain>({
       offset: 0,
       order: "pixelCount ASC, pixelHeight ASC, pixelWidth ASC"
     }).share(); // publishReplay();

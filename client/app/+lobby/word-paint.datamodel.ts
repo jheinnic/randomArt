@@ -1,84 +1,79 @@
 /**
  * Created by jheinnic on 12/31/16.
  */
-import builder = require('fluent-interface-builder');
 import {
-  unwrapHelper, copyMethodFactory, BuildMethod, FactoryWrapper, CopyMethod
+  CopyMethod, copyMethodFactory, InstanceWrapper, unwrapHelper
 } from "../../../common/lib/datamodel-ts";
-//import * as builder from "fluent-interface-builder";
+import {Builder, IBuilder} from "fluent-interface-builder";
 
-const wrapWordPaintDataModel = builder.build<WordPaintDataModelWrapper,WordPaintDataModel>()
-  .chain(
-    'visitReady', (event: CanvasReadyEvent) => (context: WordPaintDataModel) => {
+const wrapWordPaintDataModel = new Builder<WordPaintDataModel, InstanceWrapper<WordPaintDataModel, WordPaintDataModelBuilder>>()
+  .chain('visitReady',
+    (event: CanvasReadyEvent) => (context: WordPaintDataModel) => {
       return new WordPaintDataModel({
         sequenceId: event.sequenceId,
         currentWord: null,
         status: WordPaintStatus.readyForWord,
         pctDone: -1
       });
-    }
-  )
-  .chain(
-    'visitUpdate', (event: ProgressUpdateEvent) => (context: WordPaintDataModel) => {
+    })
+  .chain('visitUpdate',
+    (event: ProgressUpdateEvent) => (context: WordPaintDataModel) => {
       return new WordPaintDataModel({
         sequenceId: event.sequenceId,
         status: WordPaintStatus.busyPainting,
         currentWord: event.taskWord,
         pctDone: event.pctDone
       });
-    }
-  )
-  .chain(
-    'visitCancelled', (event: TaskCancelledEvent) => (context: WordPaintDataModel) => {
+    })
+  .chain('visitCancelled',
+    (event: TaskCancelledEvent) => (context: WordPaintDataModel) => {
       return new WordPaintDataModel({
         sequenceId: event.sequenceId,
         currentWord: null,
         status: WordPaintStatus.readyForWord,
         pctDone: -1,
       });
-    }
-  )
-  .chain(
-    'visitCompleted', (event: TaskCompletedEvent) => (context: WordPaintDataModel) => {
-      var retVal = new WordPaintDataModel(
-        Object.assign({}, context, {
+    })
+  .chain('visitCompleted',
+    (event: TaskCompletedEvent) => (context: WordPaintDataModel) => {
+      let retVal = new WordPaintDataModel(Object.assign({},
+        context,
+        {
           sequenceId: event.sequenceId,
           status: WordPaintStatus.cleaningUp,
           pctDone: 100.0
-        })
-      );
+        }));
       console.log('About to update post-completion state to ' + JSON.stringify(retVal));
       return retVal;
-    }
-  )
+    })
   .unwrap('unwrap', unwrapHelper);
 
 
-export interface WordPaintDataModelBuilder extends WordPaintEventVisitor
+export interface WordPaintDataModelBuilder
+  extends WordPaintEventVisitor
 {
-  visitReady(event: CanvasReadyEvent) : this;
+  visitReady(event: CanvasReadyEvent): this;
+
   visitUpdate(event: ProgressUpdateEvent): this;
+
   visitCancelled(event: TaskCancelledEvent): this;
+
   visitCompleted(event: TaskCompletedEvent): this;
 }
 
-type WordPaintDataModelWrapper = FactoryWrapper<WordPaintDataModel, WordPaintDataModelBuilder>;
+export const WordPaintDataModelWrapper = wrapWordPaintDataModel.value;
 
 export interface WordPaintEventVisitor
 {
   visitReady(event: CanvasReadyEvent);
+
   visitUpdate(event: ProgressUpdateEvent);
+
   visitCancelled(event: TaskCancelledEvent);
+
   visitCompleted(event: TaskCompletedEvent);
 }
 
-export abstract class AbstractWordPaintEventVisitor implements WordPaintEventVisitor
-{
-  visitReady(event: CanvasReadyEvent) { }
-  visitUpdate(event: ProgressUpdateEvent) { }
-  visitCancelled(event: TaskCancelledEvent) { }
-  visitCompleted(event: TaskCompletedEvent) { }
-}
 
 export abstract class WordPaintEvent
 {
@@ -87,7 +82,8 @@ export abstract class WordPaintEvent
   abstract accept(visitor: WordPaintEventVisitor): void;
 }
 
-export class CanvasReadyEvent extends WordPaintEvent
+export class CanvasReadyEvent
+  extends WordPaintEvent
 {
   constructor(sequenceId: number) {
     super(sequenceId);
@@ -98,7 +94,8 @@ export class CanvasReadyEvent extends WordPaintEvent
   }
 }
 
-export class ProgressUpdateEvent extends WordPaintEvent
+export class ProgressUpdateEvent
+  extends WordPaintEvent
 {
   constructor(sequenceId: number, readonly taskWord: string, readonly pctDone: number) {
     super(sequenceId);
@@ -109,7 +106,8 @@ export class ProgressUpdateEvent extends WordPaintEvent
   }
 }
 
-export class TaskCancelledEvent extends WordPaintEvent
+export class TaskCancelledEvent
+  extends WordPaintEvent
 {
   constructor(sequenceId: number, readonly taskWord: string) {
     super(sequenceId);
@@ -120,7 +118,8 @@ export class TaskCancelledEvent extends WordPaintEvent
   }
 }
 
-export class TaskCompletedEvent extends WordPaintEvent
+export class TaskCompletedEvent
+  extends WordPaintEvent
 {
   constructor(sequenceId: number, readonly taskWord: string) {
     super(sequenceId);
@@ -131,17 +130,16 @@ export class TaskCompletedEvent extends WordPaintEvent
   }
 }
 
-export enum WordPaintStatus {
-  notInitialized,
-  readyForWord,
-  busyPainting,
-  cleaningUp
+export enum WordPaintStatus
+{
+  notInitialized, readyForWord, busyPainting, cleaningUp
 }
 
-interface WordPaintDataInterface {
+interface WordPaintDataInterface
+{
   sequenceId: number;
   status?: WordPaintStatus;
-  currentWord?: string|null;
+  currentWord?: string | null;
   pctDone?: number;
 };
 
@@ -149,14 +147,15 @@ export class WordPaintDataModel
 {
   readonly sequenceId: number;
   readonly status: WordPaintStatus;
-  readonly currentWord: string|null;
+  readonly currentWord: string | null;
   readonly pctDone: number;
 
   readonly copy: CopyMethod<WordPaintDataModel, WordPaintDataModelBuilder>;
 
   constructor(content?: WordPaintDataInterface) {
-    console.log( 'This: ', JSON.stringify(this), ' & that: ' + JSON.stringify(content));
+    console.log('This: ',
+      JSON.stringify(this), ' & that: ' + JSON.stringify(content));
     Object.assign(this, content);
-    this.copy = copyMethodFactory(wrapWordPaintDataModel);
+    this.copy = copyMethodFactory(WordPaintDataModelWrapper);
   }
 }

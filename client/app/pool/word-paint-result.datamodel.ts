@@ -2,24 +2,23 @@
  * Created by jheinnic on 2/12/17.
  */
 import {
-  deriveFactoryWrapper, copyMethodFactory, buildMethodFactory, Partial, FactoryWrapper,
-  ReflectiveFluentBuilder
+  deriveFactoryWrapper, reflectiveCopyMethodFactory, reflectiveBuildMethodFactory
 } from "../../../common/lib/datamodel-ts/index";
-import {Builder} from "fluent-interface-builder";
 
 
 /**
  * Encapsulation for a partial set of paintable pixels, giving
  */
-const wordPaintResultWrapper: Builder<FactoryWrapper<WordPaintResult, ReflectiveFluentBuilder<WordPaintResult>>, WordPaintResult> =
-deriveFactoryWrapper<WordPaintResult>(['imageData']);
+const WordPaintResultWrapper = deriveFactoryWrapper<WordPaintResult>(['imageData']);
 
 export class WordPaintResult
 {
   public readonly imageData: Blob;
 
   static build =
-    buildMethodFactory(wordPaintResultWrapper, WordPaintResult);
+    reflectiveBuildMethodFactory(WordPaintResultWrapper, WordPaintResult);
 
-  constructor() { }
+  copy = reflectiveCopyMethodFactory(WordPaintResultWrapper);
+
+  constructor(src: Partial<WordPaintResult>) { Object.assign(self, src)}
 }

@@ -2,10 +2,10 @@
  * Created by jheinnic on 2/5/17.
  */
 import {
-  buildMethodFactory, deriveFactoryWrapper, ReflectiveBuilder
+  buildMethodFactory, deriveFactoryWrapper, FluentWrapperBuilder
 } from "../../../common/lib/datamodel-ts/index";
 
-const poolListSettingsWrapper: ReflectiveBuilder<PoolListUserSettings> = deriveFactoryWrapper<PoolListUserSettings>(['newPoolDefaultChain']);
+const PoolListSettingsWrapper = deriveFactoryWrapper<PoolListUserSettings>(['newPoolDefaultChain']);
 
 export type OrderCriteria = 'name' | 'created' | 'modified' | 'size'
 export type OrderDirection = 'ascending' | 'descending';
@@ -24,7 +24,7 @@ export class PoolListUserSettings
   orderBy: Immutable.List<OrderCriteria>;
 
 
-  static build = buildMethodFactory(poolListSettingsWrapper, PoolListUserSettings);
+  static build = buildMethodFactory(PoolListSettingsWrapper, PoolListUserSettings);
 
   constructor() { }
 

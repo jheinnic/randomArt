@@ -8,6 +8,7 @@ import {BASE_URL, API_VERSION} from "../shared/base-url.values";
 import {LoopBackConfig} from "../shared/sdk/lb.config";
 import {Observable} from "rxjs/Observable";
 import {Pool} from "../shared/sdk/models/Pool";
+import {isArray} from "rxjs/util/isArray";
 
 @Injectable()
 export class ResourcePathPoolResolver implements Resolve<Observable<Pool>>
@@ -19,11 +20,18 @@ export class ResourcePathPoolResolver implements Resolve<Observable<Pool>>
 
   resolve(
     route: ActivatedRouteSnapshot, state: RouterStateSnapshot
-  ): Observable<Pool> {
+  ): Observable<Observable<Pool>> {
     const poolId = route.data['poolId'];
 
     return this.rt.FireLoop
       .ref<Pool>(Pool)
-      .on("changes", {where: {id: poolId}});
+      .on("changes", {where: {id: poolId}})
+      .map( (pools) => {
+        if (isArray(pools)) {
+          return Observable.from(pools);
+        } else {
+          return Observable.of(pools);
+        }
+      });
   }
 }

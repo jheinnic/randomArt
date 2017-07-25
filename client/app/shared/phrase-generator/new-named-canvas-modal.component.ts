@@ -5,7 +5,7 @@ import {Component} from "@angular/core"
 import {MdDialogRef} from "@angular/material";
 import {PhraseGeneratorService} from "./phrase-generator.service";
 import {WordPaintInput} from "../../pool/word-paint-input.datamodel";
-import {ReflectiveFluentBuilder} from "../../../../common/lib/datamodel-ts/index";
+import {FluentAdapter} from "../../../../common/lib/datamodel-ts/index";
 import path = require('path');
 
 @Component({
@@ -21,7 +21,7 @@ export class NewNamedCanvasModalComponent {
     private readonly phraseGenerator: PhraseGeneratorService
   ) {
     this.wordPaintInput = WordPaintInput.build(
-      (builder:ReflectiveFluentBuilder<WordPaintInput>) => {
+      (builder:FluentAdapter<WordPaintInput>) => {
         builder.phrase(
           this.phraseGenerator.createNextPhrase()
         )
