@@ -1,5 +1,4 @@
-@import '~@angular/material/core/theming/palette';
-@import '~@angular/material/core/theming/theming';
+@import '~@angular/material/theming';
 
 $warn:          mat-palette($mat-red);
 
@@ -15,3 +14,35 @@ $light-primary: mat-palette($mat-cyan, A700, 400, 800);
 $light-accent:  mat-palette($mat-pink, 400, 300, 600);
 $light-warn:    $warn;
 
+
+// Create a theme.
+@mixin jchptf-material-theme($themeOne, $themeTwo) {
+  @include mat-core-theme($themeOne);
+  @include mat-autocomplete-theme($themeOne);
+  @include mat-button-theme($themeOne);
+  @include mat-button-toggle-theme($themeOne);
+  @include mat-card-theme($themeOne);
+  @include mat-checkbox-theme($themeOne);
+  @include mat-chips-theme($themeOne);
+  @include mat-table-theme($themeTwo);
+  @include mat-datepicker-theme($themeOne);
+  @include mat-dialog-theme($themeOne);
+  @include mat-expansion-panel-theme($themeOne);
+  @include mat-grid-list-theme($themeOne);
+  @include mat-icon-theme($themeOne);
+  @include mat-input-theme($themeOne);
+  @include mat-list-theme($themeOne);
+  @include mat-menu-theme($themeOne);
+  @include mat-paginator-theme($themeTwo);
+  @include mat-progress-bar-theme($themeOne);
+  @include mat-progress-spinner-theme($themeOne);
+  @include mat-radio-theme($themeOne);
+  @include mat-select-theme($themeOne);
+  @include mat-sidenav-theme($themeTwo);
+  @include mat-slide-toggle-theme($themeOne);
+  @include mat-slider-theme($themeOne);
+  @include mat-tabs-theme($themeTwo);
+  @include mat-toolbar-theme($themeTwo);
+  @include mat-tooltip-theme($themeOne);
+  @include mat-simple-snack-bar-theme($themeOne);
+}

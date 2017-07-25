@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-@import '~@angular/material/core/theming/all-theme';
+//@import '~@angular/material/core/theming/all-theme';
 @import 'app.palette';
 
 @include mat-core();
@@ -9,7 +9,7 @@ $light-theme: mat-light-theme($light-primary, $light-accent, $warn);
 $control-theme: mat-dark-theme($control-primary, $control-accent, $warn);
 $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $warn);
 
-@include angular-material-theme($light-theme);
+@include jchptf-material-theme($light-theme, $control-theme);
 
 .portfolio-dark {
   @include angular-material-theme($dark-theme);
