@@ -14,7 +14,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "es5", "dom", "scripthost", "es2015.promise", "es2015.iterable", "es2015.core", "es2015.collection" ],
+    "lib": [ "es6", "dom", "scripthost", "es2015.promise", "es2015.iterable", "es2015.core", "es2015.collection" ],
     "rootDirs": [ "client", "common/lib" ],
     "baseUrl": ".",
     "paths": {

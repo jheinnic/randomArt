@@ -3,6 +3,252 @@
 // Definitions by: Toshiya Nakakura <https://github.com/nakakura>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+type EventHandler = (event: Event) => void;
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcofferansweroptions
+interface RTCOfferAnswerOptions {
+  voiceActivityDetection?: boolean; // default = true
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcofferoptions
+interface RTCOfferOptions extends RTCOfferAnswerOptions {
+  iceRestart?: boolean; // default = false
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcansweroptions
+interface RTCAnswerOptions extends RTCOfferAnswerOptions {
+}
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpparameters
+interface RTCRtpParameters {
+  transactionId: string;
+  //encodings: RTCRtpEncodingParameters[];
+  //headerExtensions: RTCRtpHeaderExtensionParameters[];
+  //rtcp: RTCRtcpParameters;
+  //codecs: RTCRtpCodecParameters[];
+  degradationPreference?: RTCDegradationPreference; // default = 'balanced'
+}
+
+// https://www.w3.org/TR/webrtc/#dom-rtcrtpcontributingsource
+interface RTCRtpContributingSource {
+  //readonly timestamp: number;
+  readonly source: number;
+  //readonly audioLevel: number | null;
+  readonly voiceActivityFlag: boolean | null;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdtlstransport
+interface RTCDtlsTransport {
+  readonly transport: RTCIceTransport;
+  //readonly state: RTCDtlsTransportState;
+  getRemoteCertificates(): ArrayBuffer[];
+  onstatechange: EventHandler;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpcodeccapability
+interface RTCRtpCodecCapability {
+  mimeType: string;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpheaderextensioncapability
+interface RTCRtpHeaderExtensionCapability {
+  uri: string;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpcapabilities
+interface RTCRtpCapabilities {
+  //codecs: RTCRtpCodecCapability[];
+  //headerExtensions: RTCRtpHeaderExtensionCapability[];
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtprtxparameters
+interface RTCRtpRtxParameters {
+  //ssrc: number;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpfecparameters
+interface RTCRtpFecParameters {
+  //ssrc: number;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdtxstatus
+type RTCDtxStatus = 'disabled' | 'enabled';
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcprioritytype
+type RTCPriorityType = 'very-low' | 'low' | 'medium' | 'high';
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpcapabilities
+interface RTCRtcCapabilities {
+  codecs: RTCRtpCodecCapability[];
+  headerExtensions: RTCRtpHeaderExtensionCapability[];
+}
+
+// https://www.w3.org/TR/webrtc/#dom-rtcrtpsender
+interface RTCRtpSender {
+  //readonly track?: MediaStreamTrack;
+  //readonly transport?: RTCDtlsTransport;
+  //readonly rtcpTransport?: RTCDtlsTransport;
+  setParameters(parameters?: RTCRtpParameters): Promise<void>;
+  getParameters(): RTCRtpParameters;
+  replaceTrack(withTrack: MediaStreamTrack): Promise<void>;
+}
+interface RTCRtpSenderStatic {
+  new(): RTCRtpSender;
+  getCapabilities(kind: string): RTCRtpCapabilities;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtpreceiver
+interface RTCRtpReceiver {
+  //readonly track?: MediaStreamTrack;
+  //readonly transport?: RTCDtlsTransport;
+  //readonly rtcpTransport?: RTCDtlsTransport;
+  getParameters(): RTCRtpParameters;
+  getContributingSources(): RTCRtpContributingSource[];
+}
+interface RTCRtpReceiverStatic {
+  new(): RTCRtpReceiver;
+  getCapabilities(kind: string): RTCRtcCapabilities;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtptransceiverdirection
+type RTCRtpTransceiverDirection = 'sendrecv' | 'sendonly' | 'recvonly' | 'inactive';
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtptransceiver
+interface RTCRtpTransceiver {
+  readonly mid: string | null;
+  readonly sender: RTCRtpSender;
+  readonly receiver: RTCRtpReceiver;
+  readonly stopped: boolean;
+  readonly direction: RTCRtpTransceiverDirection;
+  setDirection(direction: RTCRtpTransceiverDirection): void;
+  stop(): void;
+  setCodecPreferences(codecs: RTCRtpCodecCapability[]): void;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtptransceiverinit
+interface RTCRtpTransceiverInit {
+  direction?: RTCRtpTransceiverDirection; // default = 'sendrecv'
+  streams: MediaStream[];
+  sendEncodings: RTCRtpEncodingParameters[];
+}
+
+// https://www.w3.org/TR/webrtc/#dom-rtccertificate
+interface RTCCertificate {
+  readonly expires: number;
+  getAlgorithm(): string;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcconfiguration
+interface RTCConfiguration {
+  iceServers?: RTCIceServer[];
+  iceTransportPolicy?: RTCIceTransportPolicy; // default = 'all'
+  bundlePolicy?: RTCBundlePolicy; // default = 'balanced'
+  rtcpMuxPolicy?: RTCRtcpMuxPolicy; // default = 'require'
+  peerIdentity?: string; // default = null
+  certificates?: RTCCertificate[];
+  iceCandidatePoolSize?: number; // default = 0
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcrtcpmuxpolicy
+type RTCRtcpMuxPolicy = 'negotiate' | 'require';
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcsctptransport
+interface RTCSctpTransport {
+  readonly transport: RTCDtlsTransport;
+  readonly maxMessageSize: number;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdatachannelinit
+interface RTCDataChannelInit {
+  ordered?: boolean; // default = true
+  maxPacketLifeTime?: number;
+  maxRetransmits?: number;
+  protocol?: string; // default = ''
+  negotiated?: boolean; // default = false
+  id?: number;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdatachannelstate
+type RTCDataChannelState = 'connecting' | 'open' | 'closing' | 'closed';
+
+// https://www.w3.org/TR/websockets/#dom-websocket-binarytype
+type RTCBinaryType = 'blob' | 'arraybuffer';
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdatachannel
+interface RTCDataChannel extends EventTarget {
+  readonly label: string;
+  readonly ordered: boolean;
+  readonly maxPacketLifeTime: number | null;
+  readonly maxRetransmits: number | null;
+  readonly protocol: string;
+  readonly negotiated: boolean;
+  readonly id: number;
+  readonly readyState: RTCDataChannelState;
+  readonly bufferedAmount: number;
+  bufferedAmountLowThreshold: number;
+  binaryType: RTCBinaryType;
+
+  close(): void;
+  send(data: string | Blob | ArrayBuffer | ArrayBufferView): void;
+
+  onopen: EventHandler;
+  onmessage: (event: MessageEvent) => void;
+  onbufferedamountlow: EventHandler;
+  onerror: (event: ErrorEvent) => void;
+  onclose: EventHandler;
+}
+
+// https://www.w3.org/TR/webrtc/#h-rtctrackevent
+interface RTCTrackEvent extends Event {
+  readonly receiver: RTCRtpReceiver;
+  readonly track: MediaStreamTrack;
+  readonly streams: MediaStream[];
+  readonly transceiver: RTCRtpTransceiver;
+}
+
+// https://www.w3.org/TR/webrtc/#h-rtcpeerconnectioniceevent
+interface RTCPeerConnectionIceEvent extends Event {
+  readonly candidate: RTCIceCandidate | null;
+  readonly url: string;
+}
+
+// https://www.w3.org/TR/webrtc/#h-rtcpeerconnectioniceerrorevent
+interface RTCPeerConnectionIceErrorEvent extends Event {
+  readonly hostCandidate: string;
+  readonly url: string;
+  readonly errorCode: number;
+  readonly errorText: string;
+}
+
+// https://www.w3.org/TR/webrtc/#h-rtcdatachannelevent
+interface RTCDataChannelEvent {
+  readonly channel: RTCDataChannel;
+}
+
+// https://www.w3.org/TR/webrtc/#idl-def-rtcdatachannel
+interface RTCDataChannel extends EventTarget {
+  readonly label: string;
+  readonly ordered: boolean;
+  readonly maxPacketLifeTime: number | null;
+  readonly maxRetransmits: number | null;
+  readonly protocol: string;
+  readonly negotiated: boolean;
+  readonly id: number;
+  readonly readyState: RTCDataChannelState;
+  readonly bufferedAmount: number;
+  bufferedAmountLowThreshold: number;
+  binaryType: RTCBinaryType;
+
+  close(): void;
+  send(data: string | Blob | ArrayBuffer | ArrayBufferView): void;
+
+  onopen: EventHandler;
+  onmessage: (event: MessageEvent) => void;
+  onbufferedamountlow: EventHandler;
+  onerror: (event: ErrorEvent) => void;
+  onclose: EventHandler;
+}
+
+// Compatibility for older definitions on DefinitelyTyped.
+type RTCPeerConnectionConfig = RTCConfiguration;
 
 
 declare namespace PeerJs{
