@@ -1,0 +1,209 @@
+body {
+  font-family: monospace;
+  font-size: 12pt;
+  color: #000000;
+  margin: 0px;
+  height: 100%;
+  background: #ffffff;
+  text-align: center;
+}
+
+a:link {  
+  color: #0000d0;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:hover, a:visited:hover {  
+  color: #0000ff;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+a:visited { 
+  color: #0000d0;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+b { 
+  font-weight: bold;
+}
+
+p.navigation {
+    text-align: center;
+}
+
+span.inactive {
+    color: #e0e0e0;
+}
+
+div#flattr {
+  text-align: right;
+}
+
+div#content { 
+  text-align: left;
+  margin: 3em;
+  letter-spacing: 0.5px; 
+}
+
+h1 {
+  background: #0000d0;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-transform: lowercase;
+  font-size: 300%;
+  font-family: monospace;
+  font-weight: bold;
+  padding: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+div#menu {
+  margin-top: 0px;
+  font-size: 200%;
+  text-align: center;
+}
+
+div#menu a {
+  margin-left: 1em;
+  margin-right: 1em;
+  padding: 10px;
+  text-decoration: none;
+}
+
+div#menu a:hover {
+  color: #ffffff;
+  background-color: #0000d0;
+}
+
+div#menu a.active-menu {
+  color: #ffffff;
+  background-color: #0000d0;
+}
+
+h1 a:link { text-decoration: none; color: #ffffff; }
+h1 a:hover {  text-decoration: none; color: #ffffff;  }
+h1 a:visited { text-decoration: none; color: #ffffff;  }
+h1 a:visited:hover { text-decoration: none; color: #ffffff;  }
+
+h2 {
+  font-size: 200%;
+  font-family: monospace;
+  font-weight: bold;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+h3 {
+  font-size: 170%;
+  font-family: monospace;
+  text-transform: lowercase;
+  text-align: center;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+div.formula { 
+  font-size: 75%;
+  margin-left: 4em;
+  margin-right: 4em;
+}
+
+div.gallery {
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
+}
+
+div#image-exists {
+  text-align: center;
+  padding: 1.5em;
+  font-family: monospace;
+  font-weight: bold;  
+}
+
+div#image-exists img { 
+  border-color: #000000;
+  border: solid 1px;
+}
+
+div.image {
+  float: left;
+  text-align: center;
+  padding: 1.5em;
+  font-family: monospace;
+  font-weight: bold;
+  height: 300px;
+}
+
+div.image img { 
+  border-color: #000000;
+  border: solid 1px;
+}
+
+div.image a {
+  color: #000000;
+}
+
+span.star {
+  font-family: "Zapf Dingbats", serif;
+  cursor: pointer;
+  font-size: 200%;
+  color: #909090;
+}
+
+span.star-liked {
+  cursor: pointer;
+  font-size: 200%;
+  color: #20d000;
+}
+
+
+div.caption {
+  width: 256px;
+  max-width: 256px;
+  overflow: hidden;
+}
+
+div.image a.vote { 
+  font-weight: normal;
+}
+
+div.image a.vote:hover {
+  text-decoration: none;
+}
+
+table.figure {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table.figure td { 
+  padding-bottom: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: center;
+  font-family: monospace;
+}
+
+table.figure img { 
+  border-color: #000000;
+  border: solid 1px;
+}
+
+form#online, div#submit {
+  text-align: center;
+}
+
+canvas#picture {
+  border: solid 1px;
+}
+
+input {
+  font-family: monospace;
+  font-size: 12pt;
+}
