@@ -25,7 +25,7 @@ const NO_USER_INFO: UserInterface = {
 export class TopToolbarComponent implements OnDestroy
 {
   private userInfo: UserInterface;
-  private loginModalRef: MdDialogRef<LoginModalComponent>;
+  private loginModalRef?: MdDialogRef<LoginModalComponent>;
   // private loginResultSubscription: Subscription;
 
   private navbarData: NavbarData = new NavbarData();

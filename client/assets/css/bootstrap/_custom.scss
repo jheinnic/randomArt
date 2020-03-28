@@ -203,20 +203,22 @@ $inverse-color: map_get($mat-light-theme-foreground, 'disabled-button');
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
 
-// $grid-breakpoints: (
-//   xs: 0,
-//   sm: 576px,
-//   md: 768px,
-//   lg: 992px,
-//   xl: 1200px
-// ) !default;
-$grid-breakpoints: (
-  xs: 0,
-  sm: 600px,
-  md: 768px,
-  lg: 960px,
-  xl: 1200px
-) !default;
+ $grid-breakpoints: (
+   xs: 0,
+   sm: 576px,
+   md: 768px,
+   lg: 992px,
+   xl: 1200px
+ ) !default;
+// These were set in an attempt to align with the breakpoints used by @angular/material, but on second thought, we
+// use _app.media.scss to override @angular/material so it matches Bootstrap's boundaries instead.
+//$grid-breakpoints: (
+//  xs: 0,
+//  sm: 600px,
+//  md: 768px,
+//  lg: 960px,
+//  xl: 1200px
+//) !default;
 // @include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
 // @include _assert-starts-at-zero($grid-breakpoints);
 

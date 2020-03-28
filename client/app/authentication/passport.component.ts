@@ -22,8 +22,8 @@ interface TokenKeys
 })
 export class PassportComponent implements OnDestroy
 {
-  private lookupSubscription: Subscription;
-  private routeSubscription: Subscription;
+  private lookupSubscription?: Subscription;
+  private routeSubscription?: Subscription;
 
   constructor(
     private auth: LoopBackAuth, private userApi: UserApi, private route: ActivatedRoute,
@@ -60,18 +60,20 @@ export class PassportComponent implements OnDestroy
           }
         },
           (err: any) => { console.error(err); },
-          () => { this.lookupSubscription = null; });
+          () => { this.lookupSubscription = undefined; });
     },
       (err: any) => { console.error(err); },
-      () => { this.routeSubscription = null; });
+      () => { this.routeSubscription = undefined; });
   }
 
   public ngOnDestroy(): void {
     if (this.lookupSubscription) {
       this.lookupSubscription.unsubscribe();
+      this.lookupSubscription = undefined;
     }
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
+      this.routeSubscription = undefined;
     }
   }
 }

@@ -10,7 +10,7 @@ import {MdSidenav} from "@angular/material";
 import {GlobalSelection} from "../shared/component-util/global-selection.service";
 
 @Component({
-  moduleId: "client/app/app-root/app-root.component",
+  moduleId: "app/app-root/app-root.component",
   selector: "app-root",
   template: require("./_app-root.view.html"),
   providers: [GlobalSelection]

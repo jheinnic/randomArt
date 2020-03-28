@@ -23,14 +23,12 @@ import 'core-js/es6/set';
 import 'core-js/es6/reflect';
 
 // This one I'm adding myself...
-// import 'core-js/es6/promise';
 // import 'es6-promise';
-// require('es6-promise').polyfill();
-import {polyfill as assign_polyfill} from 'es6-object-assign';
-import {polyfill as promise_polyfill} from 'es6-promise';
+// import {polyfill as assign_polyfill} from 'es6-object-assign';
+// import {polyfill as promise_polyfill} from 'es6-promise';
 
-promise_polyfill();
-assign_polyfill();
+// promise_polyfill();
+// assign_polyfill();
 
 // require('es6-object-assign').polyfill();
 // import obj_assign = require('es6-object-assign');
@@ -42,7 +40,7 @@ assign_polyfill();
 // import 'core-js/es6/typed';
 
 // see issue https://github.com/AngularClass/angular2-webpack-starter/issues/709
-// import 'core-js/es6/promise';
+import 'core-js/es6/promise';
 
 import 'core-js/es7/reflect';
 import 'zone.js/dist/zone';

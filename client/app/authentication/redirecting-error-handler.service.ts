@@ -10,8 +10,8 @@ import { Observable } from 'rxjs/Observable';
  */
 @Injectable()
 export class RedirectingErrorHandler {
-  private dialogService:MdDialog;
-  private loginModalRef:MdDialogRef<LoginModalComponent>;
+  private readonly dialogService:MdDialog;
+  private loginModalRef?:MdDialogRef<LoginModalComponent>;
 
   constructor( @Inject(MdDialog) dialogService: MdDialog ) {
     this.dialogService = dialogService;

@@ -38,6 +38,8 @@ import {PaintableDirective} from "./shared/canvas-util/paintable.directive";
 import {FlexSpacerDirective} from "./shared/blank-area/flex-spacer.directive";
 import {RealTimeManagerService} from "./shared/service-util/real-time-manager.service";
 import {MatchMediaService} from "./shared/service-util/match-media.service";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import "hammerjs"
 
 function configureXSRFStrategy() {
   return new CookieXSRFStrategy('XSRF', 'X-XSRF-Token');
@@ -54,6 +56,7 @@ function configureXSRFStrategy() {
     CommonModule,
     FormsModule,
     HttpModule,
+    BrowserAnimationsModule,
     AsyncLocalStorageModule,
     PoolModule,
     ScrollModule,

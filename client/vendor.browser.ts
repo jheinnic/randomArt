@@ -21,6 +21,12 @@ import '@angularclass/hmr';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 
+// NG-Bootstrap
+import '@ng-bootstrap/ng-bootstrap';
+import 'angular-async-local-storage';
+
+import 'immutable';
+
 if ('production' === ENV) {
   // Production
 

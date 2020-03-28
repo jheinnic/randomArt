@@ -20,7 +20,7 @@ import {ImageLobbyComponent} from "./image-lobby.component";
 import {ImageLobbySideComponent} from "./image-lobby-side.component";
 import {ImageLobbyActionComponent} from "./image-lobby-action.component";
 import {PoolListComponent} from "./pool-list.component";
-import {ImageChainDefResolver} from "./image-chain-def.resolver";
+// import {ImageChainDefResolver} from "./image-chain-def.resolver";
 import {NewPoolModalComponent} from "./new-pool-modal.component";
 import {PaintableDirective} from "../shared/canvas-util/paintable.directive";
 import {ImageChainCacheService} from "./image-chain-cache.service";

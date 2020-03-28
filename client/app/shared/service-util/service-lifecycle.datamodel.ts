@@ -49,6 +49,7 @@ export interface ShutDownServiceEvent
 export interface CrashedServiceEvent
 {
   kind: ServiceEventKind & 'crashed';
+  error: any;
 }
 
 export interface ResetServiceEvent
@@ -93,7 +94,7 @@ export class AbstractService
       throw new Error(`Cannot transition from ${from} while current state is ${this.svcStage}`);
     }
 
-    let nextEvent;
+    let nextEvent: ServiceEventType;
     switch(`${from}->${to}`) {
       case 'offline->available':
         nextEvent = { kind: 'launched' };

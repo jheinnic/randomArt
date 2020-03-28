@@ -20,6 +20,7 @@ import * as _ from "lodash";
 import {AppModule} from "./app";
 import {NgModuleRef} from "@angular/core";
 import {DurableCanvasService} from "./app/shared/canvas-cache/durable-canvas.service";
+import "angular-async-local-storage";
 
 // import "@angular/material/core/theming/prebuilt/purple-green";
 require("./assets/css/app.scss");

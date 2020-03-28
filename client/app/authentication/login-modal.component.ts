@@ -14,10 +14,10 @@ interface Credentials
 }
 
 @Component({
-  moduleId: 'client/app/authentication/login-modal.component',
-  selector: 'login-modal',
-  template: require('./_login-modal.view.html'),
-  styles: [require('./_social.scss')]
+  moduleId: "app/authentication/login-modal.component",
+  selector: "login-modal",
+  template: require("./_login-modal.view.html"),
+  styleUrls: ["./_social.scss"]
 })
 export class LoginModalComponent
 {
@@ -41,7 +41,7 @@ export class LoginModalComponent
     return this.userApi.login(this.cred, undefined, true)
       .subscribe(
         (userData) => {
-          let userInfo = this.extractProfile(userData);
+          let userInfo = LoginModalComponent.extractProfile(userData);
           console.log("Logged in as ", userInfo);
 
           this.modalRef.close(userInfo);
@@ -56,7 +56,7 @@ export class LoginModalComponent
       );
   }
 
-  private extractProfile(userData: User) {
+  private static extractProfile(userData: User) {
     let firstName = '';
     let lastName = '';
     let photo = '';
@@ -84,7 +84,7 @@ export class LoginModalComponent
     };
   }
 
-  private showError(error) {
+  private showError(error: any) {
     this.error = error;
   }
 

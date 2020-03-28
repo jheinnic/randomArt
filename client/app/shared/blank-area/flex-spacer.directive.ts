@@ -1,7 +1,7 @@
 import {Directive} from "@angular/core";
 
 @Directive({
-  // moduleId: "client/app/shared/blank-area/flex-spacer.directive",
+  // moduleId: "app/shared/blank-area/flex-spacer.directive",
   selector: "[flex-spacer]",
   host:{
     "[class.flex-spacer]": "true"

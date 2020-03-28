@@ -4,7 +4,7 @@ import * as path from 'path';
 @Component({
   moduleId: './app/+home/home-sidenav.component',
   selector: 'home',  // <home></home>
-  // styleUrls: [ './_home.component.scss' ],
+  styleUrls: [ './_home.component.scss' ],
   templateUrl: './_home-sidenav.component.html'
 })
 export class HomeSidenavComponent {

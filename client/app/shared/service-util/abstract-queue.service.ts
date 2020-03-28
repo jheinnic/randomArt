@@ -3,6 +3,7 @@
  */
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import Immutable = require('immutable');
+import {Optional} from "@angular/core";
 
 
 export class AbstractQueueService<T>
@@ -30,8 +31,8 @@ export class AbstractQueueService<T>
     });
   }
 
-  take(): T {
-    let retVal: T = undefined;
+  take(): Optional<T> {
+    let retVal: T;
     if (!this.content.isEmpty()) {
       retVal = this.content.first();
       this.content = this.content.unshift();

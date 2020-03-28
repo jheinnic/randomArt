@@ -1,23 +1,27 @@
 /**
  * Created by jheinnic on 1/14/17.
  */
-import { Injectable } from '@angular/core';
-import { Router, CanActivate } from '@angular/router';
+import {Injectable} from '@angular/core';
+import {CanActivate, Router} from '@angular/router';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate
+{
+  private readonly _router: Router;
 
-  constructor(private router: Router) { }
+  constructor(router: Router) {
+    this._router = router;
+  }
 
-  canActivate() {
-    console.log('Checking can activate!');
-    if (localStorage.getItem('currentUser')) {
-      // logged in so return true
-      return true;
+  canActivate(): boolean {
+    console.log('Checking whether may or may not activate!');
+    let retval = true;
+    if (!localStorage.getItem('currentUser')) {
+      // not logged in, so redirect to login page and return false.
+      this._router.navigate(['/login']);
+      retval = false;
     }
 
-    // not logged in so redirect to login page
-    this.router.navigate(['/login']);
-    return false;
+    return retval;
   }
 }

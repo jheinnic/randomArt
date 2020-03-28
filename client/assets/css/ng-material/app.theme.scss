@@ -9,7 +9,7 @@ $light-theme: mat-light-theme($light-primary, $light-accent, $warn);
 $control-theme: mat-dark-theme($control-primary, $control-accent, $warn);
 $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $warn);
 
-@include jchptf-material-theme($light-theme, $control-theme);
+@include jchptf-material-theme($light-theme, $dark-theme);
 
 .portfolio-dark {
   @include angular-material-theme($dark-theme);

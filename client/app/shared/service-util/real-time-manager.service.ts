@@ -13,11 +13,9 @@ import {FireLoop} from "../sdk/models/FireLoop";
 @Injectable()
 export class RealTimeManagerService
 {
-  private readonly returnSubject = new AsyncSubject<FireLoop>();
-
-  private rtSubscription: Subscription;
-  private selfSubscription: Subscription;
-  private disconnectSubscription: Subscription;
+  private readonly returnSubject: AsyncSubject<FireLoop> = new AsyncSubject<FireLoop>();
+  private rtSubscription?: Subscription;
+  private disconnectSubscription?: Subscription;
   private disposed: boolean = false;
 
 
@@ -31,17 +29,20 @@ export class RealTimeManagerService
   private openSocket() {
     this.rtSubscription = this.realTime.onReady()
       .subscribe(
-        () => {
-          this.monitorSocket()
-        },
+        this.monitorSocket,
         (err: any) => {
           console.error('Halting on fatal error: ', err);
 
-          if (this.disconnectSubscription) {
+          if (!! this.disconnectSubscription) {
             this.disconnectSubscription.unsubscribe();
+            this.disconnectSubscription = undefined;
           }
 
-          this.rtSubscription.unsubscribe();
+          if (!! this.rtSubscription) {
+            this.rtSubscription.unsubscribe();
+            this.rtSubscription = undefined;
+          }
+
           this.returnSubject.complete();
         },
         () => {
@@ -53,15 +54,18 @@ export class RealTimeManagerService
       );
   }
 
-  private monitorSocket() {
+  private monitorSocket(event: any) {
     this.disconnectSubscription = this.realTime.onDisconnect()
       .subscribe(() => {
-        this.disconnectSubscription.unsubscribe();
-        if (this.rtSubscription) {
+        if (!! this.disconnectSubscription) {
+          this.disconnectSubscription.unsubscribe();
+        }
+
+        if (!! this.rtSubscription) {
           this.rtSubscription.unsubscribe();
         }
 
-        if (!this.disposed) {
+        if (! this.disposed) {
           console.log("Retrying on premature disconnect");
           this.openSocket();
         } else {
@@ -69,12 +73,14 @@ export class RealTimeManagerService
         }
       }, (err: any) => {
         console.error("Disconnection monitoring error", err);
-        this.disconnectSubscription.unsubscribe();
-        if (this.rtSubscription) {
+        if (!! this.disconnectSubscription) {
+          this.disconnectSubscription.unsubscribe();
+        }
+        if (!! this.rtSubscription) {
           this.rtSubscription.unsubscribe();
         }
 
-        if (!this.disposed) {
+        if (! this.disposed) {
           console.log("Retrying on premature disconnect");
           this.openSocket();
         } else {
@@ -100,5 +106,8 @@ export class RealTimeManagerService
     if (this.rtSubscription) {
       this.rtSubscription.unsubscribe();
     }
+
+    // TODO: Verify if onComplete above is called after dispose() and complete returnSubjevt
+    //       here as well if necessary!
   }
 }

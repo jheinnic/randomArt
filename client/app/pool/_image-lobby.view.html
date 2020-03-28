@@ -12,9 +12,9 @@
           <md-card-content>
             <section>
               <md-chip-list>
-                <template ngFor let-queueItem [ngForOf]="queueContent">
+                <ng-template ngFor let-queueItem [ngForOf]="queueContent | async">
                   <md-chip selectable="false">{{queueItem.phrase}}</md-chip>
-                </template>
+                </ng-template>
               </md-chip-list>
             </section>
             <section>
@@ -28,7 +28,7 @@
           <md-card-title class="md-accent">Recently Painted</md-card-title>
           <md-card-content>
             <md-chip-list>
-              <!--<template ngFor let-recentItem [ngForOf]="paintJobsDone">-->
+              <!--<ng-template ngFor let-recentItem [ngForOf]="paintJobsDone">-->
                 <!--<md-chip selectable="true" color="primary" (select)="recentItem.showCard=true"-->
                          <!--(deselect)="recentItem.showCard=false" [ngClass]="{hidden: selected}">-->
                   <!--{{recentItem.phrasePainted}}-->
@@ -57,7 +57,7 @@
                     <!--</button>-->
                   <!--</md-card-actions>-->
                 <!--</md-card>-->
-              <!--</template>-->
+              <!--</ng-template>-->
             </md-chip-list>
           </md-card-content>
         </md-card>

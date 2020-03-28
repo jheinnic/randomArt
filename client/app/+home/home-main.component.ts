@@ -6,7 +6,7 @@ import * as path from 'path';
 @Component({
   moduleId: './app/+home/home-main.compoment',
   selector: 'home',  // <home></home>
-  // styleUrls: [ './_home.component.scss' ],
+  styleUrls: [ './_home.component.scss' ],
   templateUrl: './_home-main.component.html'
 })
 export class HomeMainComponent implements OnInit

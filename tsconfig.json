@@ -3,6 +3,8 @@
     "target": "es5",
     "outDir": "tscomp",
     "module": "commonjs",
+    "rootDirs": [ "client/app", "common/lib" ],
+    "baseUrl": "node_modules",
     "moduleResolution": "node",
     "allowJs": true,
     "sourceMap": true,
@@ -10,48 +12,23 @@
     "noUnusedLocals": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
+    "alwaysStrict": true,
     "noUnusedParameters": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "es6", "dom", "scripthost", "es2015.promise", "es2015.iterable", "es2015.core", "es2015.collection" ],
-    "rootDirs": [ "client", "common/lib" ],
-    "baseUrl": ".",
-    "paths": {
-      "*": ["*", "common/lib/*", "node_module/*"]
-    }
-    /*
-    "types": [
-      "@angular/core",
-      "@angular/http",
-      "@angular/material",
-      "@angular/router",
-      "node",
-      "chance",
-      "lodash",
-      "webrtc",
-      "peerjs",
-      "webpack",
-      // "es6-promise",
-      "socket.io-client",
-      "uuid",
-      "jasmine",
-      "source-map"
-      // "q",
-      // "jasmine",
-      // "hammerjs",
-      // "uglify-js",
-      // "selenium-webdriver"
-    ]
-  */
+    "lib": ["es2016", "dom"]
   },
   "files": [
     "typings/index.d.ts"
   ],
+  "paths": {
+    "angular-async-local-storage": ["node_modules/angular-async-local-storage/src"]
+  },
   "exclude": [
     "node_modules/**/*",
-    "typings/main/**/*",
     "attic/*",
+    "tscomp/**/*",
     "server/**/*",
     "build/**/*",
     "dist/**/*"

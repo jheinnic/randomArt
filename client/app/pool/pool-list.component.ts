@@ -13,10 +13,8 @@ import {ImageChainCacheService} from "./image-chain-cache.service";
 import {UserApi} from "../shared/sdk/services/custom/User";
 import {Observable} from "rxjs";
 import {NewPoolModalComponent} from "./new-pool-modal.component";
+import {MdDialog, MdDialogRef} from "@angular/material";
 import Immutable = require('immutable');
-import uuid = require('uuid');
-import _ = require('lodash');
-import {MdDialogRef, MdDialog} from "@angular/material";
 
 
 const MIN_QUEUE_SIZE: number = 8;
@@ -25,29 +23,32 @@ const LIVE_LATENCY: number = 600;
 
 
 @Component({
-  moduleId: "client/app/pool/pool-list.component'",
+  moduleId: "app/pool/pool-list.component'",
   selector: "pool-list",
   inputs: [],
   template: require("./_pool-list.view.html"),
   styleUrls: ["./_image-lobby.scss"]
 })
-export class PoolListComponent implements OnDestroy
+export class PoolListComponent
+  implements OnDestroy
 {
   // private routeSnapshot: ActivatedRouteSnapshot;
 
-  private imageChainSubsn: Subscription;
+  private imageChainSubsn?: Subscription;
   private allImageChains: Immutable.List<ImageChain>;
 
-  private poolSub: Subscription;
-  private poolRef: FireLoopRef<Pool>;
+  private poolRefSub?: Subscription;
+
+  private poolSub?: Subscription;
+  private poolFireLoopRef?: FireLoopRef<Pool>;
   private poolList: Immutable.List<Pool>;
 
   private newPoolDialogRef: MdDialogRef<NewPoolModalComponent>;
 
-  constructor(
-    private readonly route: ActivatedRoute, private readonly userApi: UserApi,
+  constructor(private readonly route: ActivatedRoute, private readonly userApi: UserApi,
     private readonly phraseGen: PhraseGeneratorService, private readonly realTime: RealTime,
-    private readonly imageChainCache: ImageChainCacheService, private readonly dialogSvc: MdDialog
+    private readonly imageChainCache: ImageChainCacheService,
+    private readonly dialogSvc: MdDialog
   ) {
 
     // this.rtSubscription = this.realTime.onReady()
@@ -75,116 +76,144 @@ export class PoolListComponent implements OnDestroy
 
     let imageChains = this.imageChainCache.getImageChainCache();
     if (imageChains instanceof Observable) {
-      this.imageChainSubsn = imageChains.subscribe(
-        (chains: ImageChain[]) => {
-          this.allImageChains = Immutable.List<ImageChain>(chains);
+      this.imageChainSubsn = imageChains.subscribe((chains: Immutable.List<ImageChain>) => {
+          this.allImageChains = chains;
         },
         (err: any) => {
           console.error(err);
-          this.imageChainSubsn.unsubscribe();
+          if (!!this.imageChainSubsn) {
+            this.imageChainSubsn.unsubscribe();
+            this.imageChainSubsn = undefined;
+          }
         },
-        () => { this.imageChainSubsn = undefined; }
-      );
+        () => { this.imageChainSubsn = undefined; });
     } else {
       this.allImageChains = imageChains;
     }
 
     this.poolList = Immutable.List<Pool>([]);
-    this.poolSub =
-      this.realTime.onReady().subscribe(
-        (ready: string) => {
-          this.poolSub.unsubscribe();
+    this.poolRefSub = this.realTime.onReady()
+      .subscribe((ready: string) => {
+          console.log(ready);
+          if (!!this.poolRefSub) {
+            this.poolFireLoopRef = this.realTime.FireLoop.ref<Pool>(Pool);
+            ;
 
-          let fireLoop = this.realTime.FireLoop;
-          this.poolRef = fireLoop.ref<Pool>(Pool);
-          this.poolSub =
-            this.poolRef.on('change', {
-              offset: 0,
-              where: {
-                ownerId: this.userApi.getCurrentId()
-              },
-              order: "imageChainId ASC, name ASC"
-            }).subscribe(
-              (pools: Pool[]) => {
-                this.poolList = Immutable.List<Pool>(pools);
-              },
-              (err: any) => {
-                console.error(err);
-                this.poolSub.unsubscribe();
-              },
-              () => {this.poolSub = undefined; }
-            );
+            this.poolRefSub.unsubscribe();
+            this.poolRefSub = undefined;
+          }
         },
         (err: any) => {
           console.error(err);
-          this.poolSub.unsubscribe();
+          if (!!this.poolRefSub) {
+            this.poolRefSub.unsubscribe();
+            this.poolRefSub = undefined;
+          }
         },
-        () => { this.poolSub = undefined; }
-      );
+        () => {
+          if (!!this.poolFireLoopRef) {
+            this.poolSub = this.poolFireLoopRef.on("change",
+              {
+                offset: 0,
+                where: {
+                  ownerId: this.userApi.getCurrentId()
+                },
+                order: "imageChainId ASC, name ASC"
+              })
+              .map((feedback: Pool | Pool[] | { error: any }) => {
+                let retval: Immutable.List<Pool>;
+                if (feedback instanceof Pool) {
+                  retval = Immutable.List<Pool>([feedback]);
+                } else if (feedback instanceof Array) {
+                  retval = Immutable.List(feedback);
+                } else {
+                  throw feedback.error;
+                }
+
+                return retval;
+              })
+              .subscribe((poolList: Immutable.List<Pool>) => {
+                  this.poolList = poolList
+                },
+                (err: any) => {
+                  console.error(err);
+                  if (!!this.poolSub) {
+                    this.poolSub.unsubscribe();
+                    this.poolSub = undefined;
+                  }
+                },
+                () => { this.poolSub = undefined; });
+          }
+        });
   }
 
   ngOnDestroy() {
+    if (this.poolRefSub) {
+      this.poolRefSub.unsubscribe();
+      this.poolRefSub = undefined;
+    }
     if (this.poolSub) {
       this.poolSub.unsubscribe();
+      this.poolSub = undefined;
     }
-    if (this.poolRef) {
-      this.poolRef.dispose();
+    if (this.poolFireLoopRef) {
+      this.poolFireLoopRef.dispose();
+      this.poolFireLoopRef = undefined;
     }
     if (this.imageChainSubsn) {
       this.imageChainSubsn.unsubscribe();
+      this.imageChainSubsn = undefined;
     }
   }
 
-  toggleChainFilter($event) {
+
+  toggleChainFilter($event: any) {
     console.log($event);
   }
 
-  add($event) {
-    console.log($event);
 
+  add($event: any) {
+    if (!this.poolFireLoopRef) {
+      throw new Error("Not initialized!");
+    }
+
+    this._do_add(this.phraseGen.createNextPhrase());
+  }
+
+  add2() {
+    this.newPoolDialogRef = this.dialogSvc.open(NewPoolModalComponent,
+      {});
+    this.newPoolDialogRef.afterClosed()
+      .subscribe((data: string) => { this._do_add(data); });
+  }
+
+
+  private _do_add(next_name: string ) {
+    if (! this.poolFireLoopRef) {
+      throw Error("No FireLoopRef for Pool");
+    }
     let newPool: Pool = Pool.factory({
-      name: this.phraseGen.createNextPhrase(),
+      name: next_name,
       createdAt: new Date(),
       updatedAt: new Date()
     });
-    this.poolRef.create(newPool).subscribe(
-      (result:Pool) => {
-        console.log('Success');
-      },
-      (err:any) => {
-        console.error('Failed: ', err);
-      }
-    );
+    // No need to dispose of subscrption here?
+    this.poolFireLoopRef.create(newPool)
+      .subscribe(
+        (result: Pool) => { console.log('Success'); },
+        (err: any) => { console.error('Failed: ', err);
+        });
 
     console.log(newPool);
-
-    this.newPoolDialogRef = this.dialogSvc.open(NewPoolModalComponent, {});
-    this.newPoolDialogRef.afterClosed().subscribe(
-      (data: string) => {
-        let newPool: Pool = Pool.factory({
-          name: data,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-        this.poolRef.create(newPool).subscribe(
-          (result:Pool) => {
-            console.log('Success: ', data);
-          },
-          (err:any) => {
-            console.error('Failed: ', data, err);
-          }
-        );
-      }
-    );
-
-    return newPool;
   }
 
-  filter($event) {
+
+  filter($event : any) {
     console.log($event);
   }
 
-  sort($event) {
+
+  sort($event : any ) {
     console.log($event);
   }
 }

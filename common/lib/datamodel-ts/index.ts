@@ -6,7 +6,9 @@ import {makeDecorator} from "@angular/core/src/util/decorators";
 // From the standard library....
 export type Partial<T> = { [P in keyof T]?: T[P]; }
 export type Readonly<T> = { readonly [P in keyof T]: T[P]; }
-export type Nullable<T> = { [P in keyof T]: T[P] | null; }
+
+export type Nullable<T> = T | null; // { [P in keyof T]: T[P] | null; }
+export type Possible<T> = T | undefined;
 
 export type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
 export type PartialPick<T, K extends keyof T> = Pick<T, K> & Partial<T>

@@ -5,7 +5,7 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
-import {MdCardModule, MdInputModule, MdButtonModule} from "@angular/material";
+import {MdButtonModule, MdCardModule, MdInputModule} from "@angular/material";
 import {HomeMainComponent} from "./home-main.component";
 import {HomeSidenavComponent} from "./home-sidenav.component";
 import {NgZoneDemoComponent} from "./ng-zone-demo/ng-zone-demo.component";
@@ -16,7 +16,12 @@ import {routes} from "./home.routes";
 @NgModule({
   declarations: [HomeMainComponent, HomeSidenavComponent, NgZoneDemoComponent, XLarge],
   imports: [
-    CommonModule, FormsModule, RouterModule.forChild(routes), MdButtonModule, MdCardModule, MdInputModule
+    CommonModule,
+    FormsModule,
+    RouterModule.forChild(routes),
+    MdButtonModule,
+    MdCardModule,
+    MdInputModule
   ],
   providers: [Title],
   exports: [RouterModule, XLarge, NgZoneDemoComponent]
