@@ -127,7 +127,7 @@
     "kmeans-js": "^0.1.2",
     "localforage": "^1.5.0",
     "lodash": "^4.17.19",
-    "loopback": "2.38.3",
+    "loopback": "3.25.1",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.4.0",
     "loopback-component-passport": "~2.1.0",
