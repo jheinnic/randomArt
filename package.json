@@ -126,7 +126,7 @@
     "jscache": "^0.5.4",
     "kmeans-js": "^0.1.2",
     "localforage": "^1.5.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "loopback": "2.38.3",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.4.0",
